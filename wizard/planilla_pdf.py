@@ -18,7 +18,9 @@ class report_planilla_pdf(models.AbstractModel):
         reporte['cuentas_analiticas'] = []
         reporte['puestos'] = {}
         reporte['lineas'] = []
-
+        reporte['suma'] = {}
+        reporte['total'] = 0
+        
         columnas = []
         for columna in planilla.columna_id:
             columnas.append(columna.name)
@@ -49,6 +51,7 @@ class report_planilla_pdf(models.AbstractModel):
 
             if llave not in reporte['cuentas_analiticas']:
                 reporte['cuentas_analiticas'].append(llave)
+                reporte['suma'][llave] = 0
 
             if llave not in reporte['puestos']:
                 reporte['puestos'][llave] = []
@@ -96,14 +99,19 @@ class report_planilla_pdf(models.AbstractModel):
                         total_columna += r.amount
                 if c.sumar:
                     total_salario += total_columna
+                    
+                    
 
                 linea['dinamico'].append(total_columna)
                 lineas[llave][slip.employee_id.job_id.name]['totales'][x] += total_columna
 #                totales[x] += total_columna
                 x += 1
-
+            
             linea['dinamico'].append(total_salario)
             lineas[llave][slip.employee_id.job_id.name]['totales'][len(totales) - 1] += total_salario
+            reporte['suma'][llave] += total_salario
+            reporte['total'] += total_salario
+            
 #            totales[len(totales) - 1] += total_salario
             linea['estatico']['banco_depositar'] = slip.employee_id.bank_account_id.bank_id.name
             linea['estatico']['cuenta_depositar'] = slip.employee_id.bank_account_id.acc_number
@@ -113,9 +121,11 @@ class report_planilla_pdf(models.AbstractModel):
             else:
                 linea['estatico']['cuenta_analitica'] = llave
             lineas[llave][slip.employee_id.job_id.name]['datos'].append(linea)
+            
 
 #            lineas[llave]['totales'] = []
 #            lineas[llave]['totales'].append(totales)
+        
         reporte['columnas'] = columnas
         reporte['lineas'] = lineas
 
