@@ -92,8 +92,18 @@
                         <br> </br>
                         <table style="margin:0px auto 0px auto;width:22cm">
                             <tr>
-                                <th>TOTAL DE LA CUENTA</th>
-                                <td><span t-esc="reporte['suma'][cuenta]" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/></td>
+                                <th></th>
+                                <t t-foreach="reporte['columnas']" t-as="columna">
+                                    <th><span t-esc="columna"/></th>
+                                </t>
+                            </tr>
+                            <tr>
+                                <th>TOTALES</th>
+                                <t t-foreach="reporte['suma'][cuenta]" t-as="t">
+                                    <td>
+                                        <span t-esc="t" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                    </td>
+                                </t>
                             </tr>
                         </table>
                     </div>
@@ -106,17 +116,27 @@
                     <table style="margin:0px auto 0px auto;width:22cm">
                         <tr>
                             <th>Cuenta</th>
-                            <th>Total</th>
+                            <t t-foreach="reporte['columnas']" t-as="columna">
+                                <th><span t-esc="columna"/></th>
+                            </t>
                         </tr>
                         <t t-foreach="reporte['cuentas_analiticas']" t-as="cuenta"> 
                             <tr>
                                 <td><span t-esc="cuenta"/></td>
-                                <td><span t-esc="reporte['suma'][cuenta]" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/></td>
+                                <t t-foreach="reporte['suma'][cuenta]" t-as="t">
+                                    <td>
+                                        <span t-esc="t" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                    </td>
+                                </t>
                             </tr> 
                         </t>
                         <tr>
                             <th>GRAN TOTAL</th>
-                            <td><span t-esc="reporte['total']" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/></td>
+                            <t t-foreach="reporte['total']" t-as="t">
+                                <td>
+                                    <span t-esc="t" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                </td>
+                            </t>
                         </tr>
                     </table>
                 </div>
