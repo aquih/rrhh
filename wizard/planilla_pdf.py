@@ -72,8 +72,7 @@ class report_planilla_pdf(models.AbstractModel):
             linea['estatico']['numero'] = numero
             linea['estatico']['codigo_empleado'] = slip.employee_id.codigo_empleado
             linea['estatico']['nombre_empleado'] = slip.employee_id.name
-            linea['estatico']['fecha_ingreso'] = datetime.datetime.strptime(str(slip.contract_id.date_start), "%Y-%m-%d").strftime('%d/%m/%Y')
-#            linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
+            linea['estatico']['fecha_ingreso'] = datetime.datetime.strptime(str(slip.contract_id.date_start), "%Y-%m-%d").strftime('%d/%m/%Y') if slip.contract_id.date_start else ""
             linea['estatico']['puesto'] = slip.employee_id.job_id.name
 
             dias = 0
@@ -132,7 +131,11 @@ class report_planilla_pdf(models.AbstractModel):
 
         logging.getLogger('reporte').warn(reporte)
         return reporte
-
+    
+    @api.model
+    def _get_report_values(self, docids, data=None):
+        return self.get_report_values(docids, data)
+    
     @api.model
     def get_report_values(self, docids, data=None):
         model = self.env.context.get('active_model')
