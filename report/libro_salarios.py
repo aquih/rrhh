@@ -19,7 +19,7 @@ class ReportLibroSalarios(models.AbstractModel):
                 if contrato.state == 'open':
                     contract = contrato
         else:
-            contract = contrato_id            
+            contract = contrato_id
         return {'fecha_ingreso':contract.date_start,'fecha_finalizacion': contract.date_end}
 
     def _get_empleado(self,id):
