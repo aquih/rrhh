@@ -19,6 +19,7 @@
     'data': [
         'data/rrhh_data.xml',
         'data/paperformat_libro_salarios.xml',
+        'data/paperformat_planilla.xml',
         'views/hr_views.xml',
         'views/hr_contract_views.xml',
         'views/hr_payroll_views.xml',
@@ -26,6 +27,7 @@
         'views/res_company_views.xml',
         'views/report.xml',
         'views/recibo.xml',
+        'wizard/planilla_pdf.xml',
         'wizard/planilla.xml',
         'wizard/vacaciones.xml',
         'views/libro_salarios.xml',

@@ -17,6 +17,22 @@ class rrhh_planilla_wizard(models.TransientModel):
     name =  fields.Char('File Name', size=32)
     agrupado  = fields.Boolean('Agrupado por cuenta analítica')
 
+    def generar_pdf(self):
+        datas = {'ids': self.env.context.get('active_ids', [])}
+        res = self.read([])
+        res = res and res[0] or {}
+        datas['form'] = res
+        return self.env.ref('rrhh.action_planilla_pdf').report_action([], data=datas)
+
+    @api.multi
+    def print_report(self):
+        data = {
+             'ids': [],
+             'model': 'rrhh.planilla.wizard',
+             'form': self.read()[0]
+        }
+        return self.env.ref('rrhh.action_planilla_pdf').report_action(self, data=data)
+
     def generar(self):
         for w in self:
             f = io.BytesIO()
