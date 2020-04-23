@@ -175,8 +175,8 @@ class ReportLibroSalarios(models.AbstractModel):
                     'fecha_fin': nomina.date_to,
                     'moneda_id': nomina.company_id.currency_id,
                     'salario': salario,
-                    'dias_trabajados': dias_laborados_netos if dias_laborados_netos > 0 else dias_trabajados,
-                    'dias_calculados': dias_calculados,
+                    'dias_trabajados': int(dias_laborados_netos) if dias_laborados_netos > 0 else int(dias_trabajados),
+                    'dias_calculados': int(dias_calculados),
                     'ordinarias': ordinarias,
                     'extra_ordinarias': extra_ordinarias,
                     'ordinario': ordinario,
@@ -194,7 +194,7 @@ class ReportLibroSalarios(models.AbstractModel):
                     'fija': fija,
                     'variable': variable,
                     'bono_agui_indem': bono_agui_indem,
-                    'liquido_recibir': total_salario_devengado + total_deducciones + bonificacion + bono_agui_indem + decreto + fija + variable
+                    'liquido_recibir': total_salario_devengado + total_deducciones + bono_agui_indem + decreto + fija + variable
                 })
         return nominas_lista
 
