@@ -145,7 +145,6 @@ class ReportLibroSalarios(models.AbstractModel):
                         # otras_deducciones += isr
                     if linea.salary_rule_id.id in nomina.company_id.anticipos_ids.ids:
                         anticipos += linea.total
-                        otras_deducciones += anticipos
                     if linea.salary_rule_id.id in nomina.company_id.bonificacion_ids.ids:
                         bonificacion += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.bono_ids.ids and contiene_bono:
@@ -166,6 +165,7 @@ class ReportLibroSalarios(models.AbstractModel):
                         variable += linea.total
                 total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones
                 # total_descuentos = igss + isr + anticipos
+                otras_deducciones = anticipos
                 total_deducciones = igss + otras_deducciones + isr
                 bono_agui_indem = bono + aguinaldo + indemnizacion
                 numero_orden += 1
