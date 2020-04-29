@@ -165,9 +165,9 @@ class ReportLibroSalarios(models.AbstractModel):
                         variable += linea.total
                 total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones
                 # total_descuentos = igss + isr + anticipos
+                otras_deducciones = anticipos
                 total_deducciones = igss + otras_deducciones + isr
                 bono_agui_indem = bono + aguinaldo + indemnizacion
-                otras_deducciones = anticipos
                 numero_orden += 1
                 nominas_lista.append({
                     'orden': numero_orden,
