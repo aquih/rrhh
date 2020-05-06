@@ -55,7 +55,6 @@ class rrhh_planilla_wizard(models.TransientModel):
                 for i in cuentas_analiticas:
                     hoja = libro.add_worksheet(i)
 
-                    xlwt.add_palette_colour("custom_colour", 0x21)
                     hoja.write(0, 0, 'Planilla')
                     hoja.write(0, 1, w.nomina_id.name)
                     hoja.write(0, 2, 'Periodo')
