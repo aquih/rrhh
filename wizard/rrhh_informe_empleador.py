@@ -29,9 +29,9 @@ class rrhh_informe_empleador(models.TransientModel):
                 for contrato in empleado.contract_ids:
                     if contrato.state == 'open':
                         anio_fin_contrato = 0
-                        anio_inicio_contrato = datetime.strptime(contrato.date_start, "%Y-%m-%d").year
+                        anio_inicio_contrato = datetime.strptime(str(contrato.date_start), "%Y-%m-%d").year
                         if contrato.date_end:
-                            anio_fin_contrato = datetime.strptime(contrato.date_end, "%Y-%m-%d").year
+                            anio_fin_contrato = datetime.strptime(str(contrato.date_end), "%Y-%m-%d").year
                         if anio_inicio_contrato < anio and (contrato.date_end == False or anio_fin_contrato < anio) :
                             empleados += 1
         return empleados
@@ -44,14 +44,13 @@ class rrhh_informe_empleador(models.TransientModel):
                 for contrato in empleado.contract_ids:
                     if contrato.state == 'open':
                         anio_fin_contrato = 0
-                        anio_inicio_contrato = datetime.strptime(contrato.date_start, "%Y-%m-%d").year
+                        anio_inicio_contrato = datetime.strptime(str(contrato.date_start), "%Y-%m-%d").year
                         if contrato.date_end:
-                            anio_fin_contrato = datetime.strptime(contrato.date_end, "%Y-%m-%d").year
+                            anio_fin_contrato = datetime.strptime(str(contrato.date_end), "%Y-%m-%d").year
                         if anio_inicio_contrato <= anio and (contrato.date_end == False or anio_fin_contrato <= anio) :
                             empleados += 1
         return empleados
 
-    @api.multi
     def print_report(self):
         datas = {'ids': self.env.context.get('active_ids', [])}
         res = self.read(['anio'])
@@ -65,20 +64,21 @@ class rrhh_informe_empleador(models.TransientModel):
         anio_inicio = datetime.strptime(str(anio)+'-01'+'-01', '%Y-%m-%d').date().strftime('%Y-%m-%d')
         anio_fin = datetime.strptime(str(anio)+'-12'+'-31', '%Y-%m-%d').date().strftime('%Y-%m-%d')
         dias_laborados = 0
+        empleado = self.env['hr.employee'].browse(empleado_id.id)
         if empleado_id.contract_id.date_start and empleado_id.contract_id.date_end:
             anio_fin_contrato = int(datetime.strptime(str(empleado_id.contract_id.date_end), '%Y-%m-%d').date().strftime('%Y'))
             if anio_inicio_contrato == anio and anio_fin_contrato == anio:
-                dias = empleado_id.get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado._get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
             if anio_inicio_contrato != anio and anio_fin_contrato == anio:
-                dias = empleado_id.get_work_days_data(Datetime.from_string(anio_inicio), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado._get_work_days_data(Datetime.from_string(anio_inicio), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
         if empleado_id.contract_id.date_start and empleado_id.contract_id.date_end == False:
             if anio_inicio_contrato == anio:
-                dias = empleado_id.get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado._get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
             else:
-                dias = empleado_id.get_work_days_data(Datetime.from_string(anio_inicio), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado.get_work_days_data(Datetime.from_string(anio_inicio), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
         return dias_laborados
 
@@ -292,6 +292,7 @@ class rrhh_informe_empleador(models.TransientModel):
             empleado_numero = 1
             numero = 1
             for empleado in empleados:
+                logging.warn(empleado)
                 nombre_empleado = empleado.name.split( )
                 if len(nombre_empleado) >=4:
                     nominas_lista = []
@@ -312,7 +313,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     bonificacion_decreto = 0
                     indemnizacion = 0
                     for nomina in nomina_id:
-                        nomina_anio = datetime.strptime(nomina.date_from, "%Y-%m-%d").year
+                        nomina_anio = datetime.strptime(str(nomina.date_from), "%Y-%m-%d").year
                         if w['anio'] == nomina_anio:
                             if nomina.input_line_ids:
                                 for entrada in nomina.input_line_ids:
@@ -386,7 +387,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     hoja_empleado.write(fila, 22, empleado.pueblo_pertenencia,estilo_borde)
                     hoja_empleado.write(fila, 23, empleado.idioma,estilo_borde)
                     hoja_empleado.write(fila, 24, contrato.temporalidad_contrato,estilo_borde)
-                    hoja_empleado.write(fila, 25, contrato.type_id.name,estilo_borde)
+                    hoja_empleado.write(fila, 25, contrato.structure_type_id.default_struct_id.name,estilo_borde)
                     hoja_empleado.write(fila, 26, contrato.date_start,estilo_borde)
                     hoja_empleado.write(fila, 27, contrato.fecha_reinicio_labores,estilo_borde)
                     hoja_empleado.write(fila, 28, contrato.date_end,estilo_borde)

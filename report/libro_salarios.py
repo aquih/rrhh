@@ -19,7 +19,7 @@ class ReportLibroSalarios(models.AbstractModel):
                 if contrato.state == 'open':
                     contract = contrato
         else:
-            contract = contrato_id            
+            contract = contrato_id
         return {'fecha_ingreso':contract.date_start,'fecha_finalizacion': contract.date_end}
 
     def _get_empleado(self,id):
@@ -199,7 +199,7 @@ class ReportLibroSalarios(models.AbstractModel):
         return nominas_lista
 
     @api.model
-    def get_report_values(self, docids, data=None):
+    def _get_report_values(self, docids, data=None):
         data = data if data is not None else {}
         self.model = 'hr.employee'
         docs = data.get('ids', data.get('active_ids'))

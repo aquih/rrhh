@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-from openerp import models, fields, api, _
-from openerp.exceptions import UserError, ValidationError
+from odoo import models, fields, api, _
 import time
 import base64
 import xlwt
@@ -40,7 +39,7 @@ class rrhh_igss_wizard(models.TransientModel):
     def generar(self):
         datos = ''
         for w in self:
-            datos += str(w.payslip_run_id.slip_ids[0].company_id.version_mensaje) + '|' + str(datetime.today().strftime('%d/%m/%Y')) + '|' + str(w.payslip_run_id.slip_ids[0].company_id.numero_patronal) + '|'+ str(datetime.strptime(w.payslip_run_id.date_start,'%Y-%m-%d').date().strftime('%m')).lstrip('0')+ '|' + str(datetime.strptime(w.payslip_run_id.date_start,'%Y-%m-%d').date().strftime('%Y')).lstrip('0') + '|' + str(w.payslip_run_id.slip_ids[0].company_id.name) + '|' +str(w.payslip_run_id.slip_ids[0].company_id.vat) + '|'+ str(w.payslip_run_id.slip_ids[0].company_id.email) + '|' + str(w.payslip_run_id.slip_ids[0].company_id.tipo_planilla) + '\r\n'
+            datos += str(w.payslip_run_id.slip_ids[0].company_id.version_mensaje) + '|' + str(datetime.today().strftime('%d/%m/%Y')) + '|' + str(w.payslip_run_id.slip_ids[0].company_id.numero_patronal) + '|'+ str(datetime.strptime(str(w.payslip_run_id.date_start),'%Y-%m-%d').date().strftime('%m')).lstrip('0')+ '|' + str(datetime.strptime(str(w.payslip_run_id.date_start),'%Y-%m-%d').date().strftime('%Y')).lstrip('0') + '|' + str(w.payslip_run_id.slip_ids[0].company_id.name) + '|' +str(w.payslip_run_id.slip_ids[0].company_id.vat) + '|'+ str(w.payslip_run_id.slip_ids[0].company_id.email) + '|' + str(w.payslip_run_id.slip_ids[0].company_id.tipo_planilla) + '\r\n'
             datos += '[centros]' + '\r\n'
             for centro in w.payslip_run_id.slip_ids[0].company_id.centro_trabajo_ids:
                 datos += str(centro.codigo) + '|' + str(centro.nombre) + '|' + str(centro.direccion) + '|' + str(centro.zona) + '|' + str(centro.telefono) + '|' + str(centro.fax) + '|' + str(centro.nombre_contacto) + '|' + str(centro.correo_electronico) + '|' + str(centro.codigo_departamento) + '|' + str(centro.codigo_municipio) + '|' + str(centro.codigo_actividad_economica) + '\r\n'
@@ -51,26 +50,26 @@ class rrhh_igss_wizard(models.TransientModel):
             datos += self.numero_liquidacion + '|' + self.tipo_planilla_liquidacion + '|' + self.fecha_inicial + '|' + self.fecha_final + '|' + self.tipo_liquidacion + '|' + (self.numero_nota_cargo if self.numero_nota_cargo else '') + '|' +'\r\n'
             datos += '[empleados]' + '\r\n'
             for slip in w.payslip_run_id.slip_ids:
-                fecha_planilla = datetime.strptime(w.payslip_run_id.date_start, '%Y-%m-%d')
+                fecha_planilla = datetime.strptime(str(w.payslip_run_id.date_start), '%Y-%m-%d')
                 mes_planilla = fecha_planilla.month
                 anio_planilla = fecha_planilla.year
                 contrato_ids = self.env['hr.contract'].search( [['employee_id', '=', slip.employee_id.id]],offset=0,limit=1,order='date_start desc')
                 logging.warn(contrato_ids)
-                datos += '1' + '|' + str(slip.employee_id.igss) + '|' + slip.employee_id.primer_nombre + '|'+(slip.employee_id.segundo_nombre if slip.employee_id.segundo_nombre else '' ) + '|' + (slip.employee_id.primer_apellido if slip.employee_id.primer_apellido else '' )+ '|' + (slip.employee_id.segundo_apellido if slip.employee_id.segundo_apellido else '') + '|'+ (slip.employee_id.apellido_casada if slip.employee_id.apellido_casada else '') + '|'
+                datos += '1' + '|' + str(slip.employee_id.igss if slip.employee_id.igss else '' ) + '|' + slip.employee_id.primer_nombre if slip.employee_id.primer_nombre else '' + '|'+(slip.employee_id.segundo_nombre if slip.employee_id.segundo_nombre else '' ) + '|' + (slip.employee_id.primer_apellido if slip.employee_id.primer_apellido else '' )+ '|' + (slip.employee_id.segundo_apellido if slip.employee_id.segundo_apellido else '') + '|'+ (slip.employee_id.apellido_casada if slip.employee_id.apellido_casada else '') + '|'
                 if contrato_ids:
                     contrato = self.env['hr.contract'].browse([contrato_ids.id])
                     if contrato.date_end:
-                        mes_contrato= datetime.strptime(contrato.date_end, '%Y-%m-%d')
+                        mes_contrato= datetime.strptime(str(contrato.date_end), '%Y-%m-%d')
                         mes_final_contrato = mes_contrato.month
                         anio_final_contrato = mes_contrato.year
                         if mes_planilla == mes_final_contrato and anio_final_contrato == anio_planilla:
-                            datos += str(contrato.wage) + '|' + str(datetime.strptime(contrato.date_start,'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + str(datetime.strptime(contrato.date_end,'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|'
+                            datos += str(contrato.wage) + '|' + str(datetime.strptime(str(contrato.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + str(datetime.strptime(str(contrato.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|'
                     else:
-                        mes_contrato = datetime.strptime(contrato.date_start, '%Y-%m-%d')
+                        mes_contrato = datetime.strptime(str(contrato.date_start), '%Y-%m-%d')
                         mes_final_contrato = mes_contrato.month
                         anio_final_contrato = mes_contrato.year
                         if mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla:
-                            datos += str(contrato.wage) + '|' + str(datetime.strptime(contrato.date_start,'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + '|'
+                            datos += str(contrato.wage) + '|' + str(datetime.strptime(str(contrato.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + '|'
                         else:
                             datos += str(contrato.wage) + '|' + '|' + '' + '|'
                 else:

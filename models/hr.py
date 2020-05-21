@@ -13,7 +13,7 @@ class hr_employee(models.Model):
     codigo_ocupacion = fields.Char('Codigo ocupacion')
     condicion_laboral = fields.Selection([('P', 'Permanente'), ('T', 'Temporal')], 'Condicion laboral')
 
-    job_id = fields.Many2one('hr.job', 'Job Title', track_visibility='onchange')
+    job_id = fields.Many2one(track_visibility='onchange')
     department_id = fields.Many2one('hr.department', 'Department', track_visibility='onchange')
     diario_pago_id = fields.Many2one('account.journal', 'Diario de Pago')
     igss = fields.Char('IGSS')
@@ -30,15 +30,9 @@ class hr_employee(models.Model):
     jornada_trabajo = fields.Char('Jornada de Trabajo')
     permiso_trabajo = fields.Char('Permiso de Trabajo')
     contacto_emergencia = fields.Many2one('res.partner','Contacto de Emergencia')
-    marital = fields.Selection([
-        ('single', 'Single'),
-        ('married', 'Married'),
-        ('widower', 'Widower'),
-        ('divorced', 'Divorced'),
-        ('separado', 'Separado(a)'),
-        ('unido', 'Unido(a)')
-    ], string='Marital Status', groups='hr.group_hr_user')
-    edad = fields.Integer(compute='_get_edad',string='Edad')
+    marital = fields.Selection(selection_add=[('separado', 'Separado(a)'),('unido', 'Unido(a)')])
+    # edad = fields.Integer(compute='_get_edad',string='Edad')
+    edad = fields.Integer(string='Edad')
     vecindad_dpi = fields.Char('Vecindad DPI')
     tarjeta_salud = fields.Boolean('Tarjeta de salud')
     tarjeta_manipulacion = fields.Boolean('Tarjeta de manipulación')
@@ -59,7 +53,7 @@ class hr_employee(models.Model):
     primer_apellido = fields.Char('Primer apellido')
     segundo_apellido = fields.Char('Segundo apellido')
     apellido_casada = fields.Char('Apellido casada')
-    centro_trabajo_id = fields.Many2one('res.company.centro_trabajo','Centro de trabajo')
+    centro_trabajo_id = fields.Many2one('res.company.centro_trabajo',strin='Centro de trabajo')
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):

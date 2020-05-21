@@ -5,6 +5,7 @@ import logging
 
 class ReportRecibo(models.AbstractModel):
     _name = 'report.rrhh.recibo'
+    _description = 'Repote recibo'
 
     def horas_extras(self,o):
         horas_extras = 0

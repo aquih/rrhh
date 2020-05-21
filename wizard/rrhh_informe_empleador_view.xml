@@ -22,9 +22,8 @@
         </record>
 
         <act_window id="action_rrhh_informe_empleador"
-            key2="client_print_multi"
             name="Informe del empleador"
             res_model="rrhh.informe_empleador"
-            src_model="hr.employee"
-            view_mode="form" target="new" view_type="form" />
+            binding_model="hr.employee"
+            view_mode="form" target="new"/>
 </odoo>

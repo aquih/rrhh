@@ -6,35 +6,12 @@
 	        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
 	        <field name="arch" type="xml">
                 <data>
-                    <field name="type_id" position="after">
-                        <field name="motivo_terminacion"/>
-                        <field name="temporalidad_contrato"/>
-                    </field>
                     <field name="date_start" position="after">
                         <field name="fecha_reinicio_labores"/>
+                        <field name="motivo_terminacion"/>
+                        <field name="temporalidad_contrato"/>
+                        <field name="calcula_indemnizacion"/>
                     </field>
-                    <!-- <notebook position="inside">
-                        <page string="Planilla">
-                            <group string="Reglas salariales del empleado">
-                                <group>
-                                    <field name="salario_extra_ordinario_id" widget="many2many_tags"/>
-                                    <field name="igss_id" widget="many2many_tags"/>
-                                    <field name="otras_deducciones_legales_id" widget="many2many_tags"/>
-                                    <field name="total_deducciones_id" widget="many2many_tags"/>
-                                    <field name="decreto_42_92_id" widget="many2many_tags"/>
-                                    <field name="ubicacion"/>
-
-                                </group>
-                                <group>
-                                    <field name="bonificacion_incentivo_id" widget="many2many_tags"/>
-                                    <field name="comisiones_id" widget="many2many_tags"/>
-                                    <field name="septimos_asuetos_id" widget="many2many_tags"/>
-                                    <field name="vacaciones_id" widget="many2many_tags"/>
-                                    <field name="liquido_recibir_id" widget="many2many_tags"/>
-                                </group>
-                            </group>
-                        </page>
-                    </notebook> -->
                     <group name="salary_and_advantages" position="inside">
                         <label for="base_extra"/>
                         <div class="o_row" name="base_extra">
