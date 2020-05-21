@@ -17,9 +17,10 @@
 
         <act_window id="action_cerrar_nominas_wizard"
             name="Cerrar nominas"
-            src_model="hr.payslip"
+            target="new"
+            binding_model="hr.payslip"
             res_model="rrhh.cerrar_nominas.wizard"
-            view_type="form" view_mode="form" key2="client_action_multi" target="new"
+            view_mode="form"
             />
 
 </odoo>

@@ -10,7 +10,6 @@ class rrhh_libro_salarios(models.TransientModel):
 
     anio = fields.Integer('Año', required=True)
 
-    @api.multi
     def print_report(self):
         datas = {'ids': self.env.context.get('active_ids', [])}
         res = self.read(['anio'])

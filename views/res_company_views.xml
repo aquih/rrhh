@@ -74,7 +74,7 @@
                                     <field name="extras_ids" widget="many2many_tags"/>
                                     <field name="descuentos_ids" widget="many2many_tags"/>
                                     <field name="septimos_asuetos_ids" widget="many2many_tags"/>
-                                    <field name="numero_horas_extras_ids" widget="many2many_tags"/>
+                                    <!-- <field name="numero_horas_extras_ids" widget="many2many_tags"/> -->
                                 </group>
                                 <group>
                                     <field name="igss_ids" widget="many2many_tags"/>
@@ -91,7 +91,7 @@
                                     <field name="variable_ids" widget="many2many_tags"/>
                                 </group>
                             </group>
-                            <label for="centro" string="Centros de trabajo"/>
+                            <!-- <label for="centro" string="Centros de trabajo"/>
                             <field name="centro_trabajo_ids">
                                 <tree string="Centros" editable="bottom">
                                     <field name="codigo"/>
@@ -106,7 +106,7 @@
                                     <field name="codigo_municipio"/>
                                     <field name="codigo_actividad_economica"/>
                                 </tree>
-                            </field>
+                            </field> -->
                         </page>
                     </notebook>
                 </data>

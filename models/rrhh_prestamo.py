@@ -10,6 +10,7 @@ import calendar
 
 class rrhh_prestamo(models.Model):
     _name = 'rrhh.prestamo'
+    _description = 'Prestamo'
     _rec_name = 'descripcion'
 
     employee_id = fields.Many2one('hr.employee','Empleado')
@@ -31,14 +32,16 @@ class rrhh_prestamo(models.Model):
         for prestamo in self:
             total_prestamo = 0
             total_prestamo_pagado = 0
+            nominas = 0
             for linea in prestamo.prestamo_ids:
                 for nomina in linea.nomina_id:
+                    nominas += 1
                     for nomina_entrada in nomina.input_line_ids:
                         if prestamo.codigo == nomina_entrada.code:
                             total_prestamo_pagado += nomina_entrada.amount
                 total_prestamo += linea.monto
             prestamo.pendiente_pagar_prestamo = total_prestamo - total_prestamo_pagado
-            if prestamo.pendiente_pagar_prestamo == 0:
+            if prestamo.pendiente_pagar_prestamo == 0 and nominas > 0:
                 prestamo.estado = 'pagado'
             return True
 
@@ -62,11 +65,11 @@ class rrhh_prestamo(models.Model):
                         mes = int(mes.strftime('%m'))
                         if contador < (self.numero_descuentos -1):
                             total_sumado += self.mensualidad
-                            self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': mes,'anio': anio,'monto': self.mensualidad})
+                            self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': str(mes),'anio': anio,'monto': self.mensualidad})
                         else:
                             pago_restante = self.total - total_sumado
                             ultimos_pagos_mensuales = pago_restante / diferencias_meses
-                            self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': mes,'anio': anio,'monto': pago_restante})
+                            self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': str(mes),'anio': anio,'monto': pago_restante})
                         contador += 1
                 else:
                     while contador < (self.numero_descuentos):
@@ -74,12 +77,11 @@ class rrhh_prestamo(models.Model):
                         anio = mes.strftime('%Y')
                         mes = int(mes.strftime('%m'))
                         if contador <= (int(numero_pagos_mensualidad) -1 ):
-                            self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': mes,'anio': anio,'monto': self.mensualidad})
+                            self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': str(mes),'anio': anio,'monto': self.mensualidad})
                         else:
                             pago_restante = self.total%self.mensualidad
                             ultimos_pagos_mensuales = pago_restante / diferencias_meses
-                            logging.warn(ultimos_pagos_mensuales)
-                            self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': mes,'anio': anio,'monto': ultimos_pagos_mensuales})
+                            self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': str(mes),'anio': anio,'monto': ultimos_pagos_mensuales})
                         contador += 1
         return True
 
@@ -98,7 +100,6 @@ class rrhh_prestamo(models.Model):
             self.generar_mensualidades()
         return True
 
-    @api.multi
     def unlink(self):
         for prestamo in self:
             if not prestamo.estado == 'nuevo':
@@ -107,20 +108,21 @@ class rrhh_prestamo(models.Model):
 
 class rrhh_prestamo_linea(models.Model):
     _name = 'rrhh.prestamo.linea'
+    _description = 'Prestamo linea'
 
     mes = fields.Selection([
-        (1, 'Enero'),
-        (2, 'Febrero'),
-        (3, 'Marzo'),
-        (4, 'Abril'),
-        (5, 'Mayo'),
-        (6, 'Junio'),
-        (7, 'Julio'),
-        (8, 'Agosto'),
-        (9, 'Septiembre'),
-        (10, 'Octubre'),
-        (11, 'Noviembre'),
-        (12, 'Diciembre'),
+        ('1', 'Enero'),
+        ('2', 'Febrero'),
+        ('3', 'Marzo'),
+        ('4', 'Abril'),
+        ('5', 'Mayo'),
+        ('6', 'Junio'),
+        ('7', 'Julio'),
+        ('8', 'Agosto'),
+        ('9', 'Septiembre'),
+        ('10', 'Octubre'),
+        ('11', 'Noviembre'),
+        ('12', 'Diciembre'),
         ], string='Mes')
     monto = fields.Float('Monto')
     anio = fields.Integer('Año')

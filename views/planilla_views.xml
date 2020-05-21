@@ -64,7 +64,6 @@
             <field name="name">Planilla</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">rrhh.planilla</field>
-            <field name="view_type">form</field>
             <field name="help">Configuración de planillas para generar reportes en Excel</field>
         </record>
 
@@ -147,11 +146,10 @@
             <field name="name">Recibo</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">rrhh.recibo</field>
-            <field name="view_type">form</field>
             <field name="help">Configuración de recibos para generar formatos</field>
         </record>
 
-        <menuitem action="action_recibo" id="menu_recibo" parent="hr_payroll.menu_hr_payroll_configuration" sequence="3"/>
+        <menuitem action="action_recibo" id="menu_recibo" name="Recibo" parent="hr_payroll.menu_hr_salary_configuration" groups="hr.group_hr_manager" sequence="100"/>
 
 
   </data>

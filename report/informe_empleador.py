@@ -10,9 +10,8 @@ import logging
 class ReportInformeEmpleador(models.AbstractModel):
     _name = 'report.rrhh.informe_empleador'
 
-
     @api.model
-    def get_report_values(self, docids, data=None):
+    def _get_report_values(self, docids, data=None):
         data = data if data is not None else {}
         self.model = 'hr.employee'
         docs = data.get('ids', data.get('active_ids'))

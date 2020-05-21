@@ -49,9 +49,8 @@
 
         <act_window id="action_igss_wizard"
             name="Igss"
-            src_model="hr.payslip.run"
+            target="new"
+            binding_model="hr.payslip.run"
             res_model="rrhh.igss.wizard"
-            view_type="form" view_mode="form"
-            key2="client_action_multi" target="new"/>
-
+            view_mode="form"/>
 </odoo>

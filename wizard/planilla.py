@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-from openerp import models, fields, api, _
-from openerp.exceptions import UserError, ValidationError
+from odoo import models, fields, api, _
 import time
 import base64
 import xlsxwriter
@@ -10,6 +9,7 @@ import logging
 
 class rrhh_planilla_wizard(models.TransientModel):
     _name = 'rrhh.planilla.wizard'
+    _description = 'Wizard de planilla'
 
     nomina_id = fields.Many2one('hr.payslip.run', 'Nomina', default=lambda self: self.env['hr.payslip.run'].browse(self._context.get('active_id')), required=True)
     planilla_id = fields.Many2one('rrhh.planilla', 'Planilla', required=True)

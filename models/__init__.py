@@ -1,3 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from . import hr, hr_contract, hr_payroll, planilla, res_company, rrhh_prestamo, res_country, account_payment, hr_holidays
+from . import hr
+from . import hr_contract
+from . import rrhh_prestamo
+from . import hr_payroll
+from . import planilla
+from . import res_company
+from . import res_country
+from . import account_payment
+from . import hr_work_entry
