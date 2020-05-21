@@ -145,7 +145,6 @@ class ReportLibroSalarios(models.AbstractModel):
                         # otras_deducciones += isr
                     if linea.salary_rule_id.id in nomina.company_id.anticipos_ids.ids:
                         anticipos += linea.total
-                        otras_deducciones += anticipos
                     if linea.salary_rule_id.id in nomina.company_id.bonificacion_ids.ids:
                         bonificacion += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.bono_ids.ids and contiene_bono:
@@ -166,6 +165,7 @@ class ReportLibroSalarios(models.AbstractModel):
                         variable += linea.total
                 total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones
                 # total_descuentos = igss + isr + anticipos
+                otras_deducciones = anticipos
                 total_deducciones = igss + otras_deducciones + isr
                 bono_agui_indem = bono + aguinaldo + indemnizacion
                 numero_orden += 1
@@ -175,8 +175,8 @@ class ReportLibroSalarios(models.AbstractModel):
                     'fecha_fin': nomina.date_to,
                     'moneda_id': nomina.company_id.currency_id,
                     'salario': salario,
-                    'dias_trabajados': dias_laborados_netos if dias_laborados_netos > 0 else dias_trabajados,
-                    'dias_calculados': dias_calculados,
+                    'dias_trabajados': int(dias_laborados_netos) if dias_laborados_netos > 0 else int(dias_trabajados),
+                    'dias_calculados': int(dias_calculados),
                     'ordinarias': ordinarias,
                     'extra_ordinarias': extra_ordinarias,
                     'ordinario': ordinario,
@@ -194,7 +194,7 @@ class ReportLibroSalarios(models.AbstractModel):
                     'fija': fija,
                     'variable': variable,
                     'bono_agui_indem': bono_agui_indem,
-                    'liquido_recibir': total_salario_devengado + total_deducciones + bonificacion + bono_agui_indem + decreto + fija + variable
+                    'liquido_recibir': total_salario_devengado + total_deducciones + bono_agui_indem + decreto + fija + variable
                 })
         return nominas_lista
 
