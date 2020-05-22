@@ -19,6 +19,8 @@
                     <footer>
                         <button name="generar" string="Generar" type="object" class="oe_highlight"/>
                         or
+                        <button name="generar_pdf" string="Generar PDF" type="object" class="oe_highlight"/>
+                        or
                         <button string="Cancel" class="oe_link" special="cancel"/>
                     </footer>
                 </form>
@@ -32,6 +34,7 @@
             binding_model="hr.payslip.run"
             res_model="rrhh.planilla.wizard"
             view_mode="form"/>
+        />
 
         <report
             id="action_planilla_pdf"

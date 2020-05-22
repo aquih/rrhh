@@ -163,7 +163,6 @@ class HrPayslip(models.Model):
                             entrada.amount = lineas.monto*(self.porcentaje_prestamo/100)
         return res
 
-
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 

@@ -17,6 +17,22 @@ class rrhh_planilla_wizard(models.TransientModel):
     name =  fields.Char('File Name', size=32)
     agrupado  = fields.Boolean('Agrupado por cuenta analítica')
 
+    def generar_pdf(self):
+        datas = {'ids': self.env.context.get('active_ids', [])}
+        res = self.read([])
+        res = res and res[0] or {}
+        datas['form'] = res
+        return self.env.ref('rrhh.action_planilla_pdf').report_action([], data=datas)
+
+    @api.multi
+    def print_report(self):
+        data = {
+             'ids': [],
+             'model': 'rrhh.planilla.wizard',
+             'form': self.read()[0]
+        }
+        return self.env.ref('rrhh.action_planilla_pdf').report_action(self, data=data)
+
     def generar(self):
         for w in self:
             f = io.BytesIO()
@@ -42,8 +58,8 @@ class rrhh_planilla_wizard(models.TransientModel):
                     hoja.write(0, 0, 'Planilla')
                     hoja.write(0, 1, w.nomina_id.name)
                     hoja.write(0, 2, 'Periodo')
-                    hoja.write(0, 3, w.nomina_id.date_start,formato_fecha)
-                    hoja.write(0, 4, w.nomina_id.date_end,formato_fecha)
+                    hoja.write(0, 3, w.nomina_id.date_start, formato_fecha)
+                    hoja.write(0, 4, w.nomina_id.date_end, formato_fecha)
 
                     linea = 2
                     num = 1
@@ -78,7 +94,7 @@ class rrhh_planilla_wizard(models.TransientModel):
                                 hoja.write(linea, 0, num)
                                 hoja.write(linea, 1, l.employee_id.codigo_empleado)
                                 hoja.write(linea, 2, l.employee_id.name)
-                                hoja.write(linea, 3, str(l.contract_id.date_start))
+                                hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
                                 hoja.write(linea, 4, l.employee_id.job_id.name)
                                 work = -1
                                 trabajo = -1
@@ -229,7 +245,7 @@ class rrhh_planilla_wizard(models.TransientModel):
                 hoja.write(0, 1, w.nomina_id.name)
                 hoja.write(0, 2, 'Periodo')
                 logging.warn(w.nomina_id.date_start)
-                hoja.write(0, 3, w.nomina_id.date_start,formato_fecha)
+                hoja.write(0, 3, w.nomina_id.date_start, formato_fecha)
                 hoja.write(0, 4, w.nomina_id.date_end, formato_fecha)
 
                 linea = 2
