@@ -19,7 +19,6 @@
     'data': [
         'data/rrhh_data.xml',
         'data/paperformat_libro_salarios.xml',
-        'data/paperformat_planilla.xml',
         'data/hr_payroll_expense_data.xml',
         'views/hr_views.xml',
         'views/hr_contract_views.xml',
@@ -31,7 +30,6 @@
         'wizard/planilla_pdf.xml',
         'wizard/planilla.xml',
         'views/libro_salarios.xml',
-        'views/res_country_view.xml',
         'views/hr_work_entry_views.xml',
         'wizard/rrhh_libro_salarios_view.xml',
         'wizard/rrhh_informe_empleador_view.xml',

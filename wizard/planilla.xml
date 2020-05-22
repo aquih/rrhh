@@ -43,8 +43,8 @@
             report_type="qweb-pdf"
             file="rrhh.planilla_pdf"
             name="rrhh.planilla_pdf"
-            paperformat ="paperformat_ticket_oficio_horizontal"
+            paperformat ="paperformat_libro_salarios"
             menu="False"
         />
-        
+
 </odoo>

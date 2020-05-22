@@ -5,8 +5,8 @@
             <t t-foreach="docs" t-as="o">
                 <t t-set="reporte" t-value="reporte(data)"/>
                 <t t-foreach="reporte['cuentas_analiticas']" t-as="cuenta">
-                    <div class="page"  style="page-break-after:always;">
-                        <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/>FITNESS ONE</center></h2>
+                    <div class="page">
+                        <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="user.company_id.name"/></center></h2>
                         <h3><center><span t-esc="cuenta"/></center></h3><br/>
                         <t t-foreach="reporte['puestos'][cuenta]" t-as="puesto">
                             <center><span t-esc="puesto"/></center><br/>
@@ -79,7 +79,7 @@
                                         </td>
                                         <td>
                                         </td>
-                                        <td>  
+                                        <td>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -120,7 +120,7 @@
                                 <th><span t-esc="columna"/></th>
                             </t>
                         </tr>
-                        <t t-foreach="reporte['cuentas_analiticas']" t-as="cuenta"> 
+                        <t t-foreach="reporte['cuentas_analiticas']" t-as="cuenta">
                             <tr>
                                 <td><span t-esc="cuenta"/></td>
                                 <t t-foreach="reporte['suma'][cuenta]" t-as="t">
@@ -128,7 +128,7 @@
                                         <span t-esc="t" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
                                     </td>
                                 </t>
-                            </tr> 
+                            </tr>
                         </t>
                         <tr>
                             <th>GRAN TOTAL</th>

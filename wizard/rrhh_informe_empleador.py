@@ -3,7 +3,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-import xlwt
+import xlsxwriter
 import base64
 import io
 import logging
@@ -29,9 +29,9 @@ class rrhh_informe_empleador(models.TransientModel):
                 for contrato in empleado.contract_ids:
                     if contrato.state == 'open':
                         anio_fin_contrato = 0
-                        anio_inicio_contrato = datetime.strptime(str(contrato.date_start), "%Y-%m-%d").year
+                        anio_inicio_contrato = contrato.date_start.year
                         if contrato.date_end:
-                            anio_fin_contrato = datetime.strptime(str(contrato.date_end), "%Y-%m-%d").year
+                            anio_fin_contrato = contrato.date_end.year
                         if anio_inicio_contrato < anio and (contrato.date_end == False or anio_fin_contrato < anio) :
                             empleados += 1
         return empleados
@@ -44,9 +44,9 @@ class rrhh_informe_empleador(models.TransientModel):
                 for contrato in empleado.contract_ids:
                     if contrato.state == 'open':
                         anio_fin_contrato = 0
-                        anio_inicio_contrato = datetime.strptime(str(contrato.date_start), "%Y-%m-%d").year
+                        anio_inicio_contrato = contrato.date_start.year
                         if contrato.date_end:
-                            anio_fin_contrato = datetime.strptime(str(contrato.date_end), "%Y-%m-%d").year
+                            anio_fin_contrato = contrato.date_end.year
                         if anio_inicio_contrato <= anio and (contrato.date_end == False or anio_fin_contrato <= anio) :
                             empleados += 1
         return empleados
@@ -60,13 +60,13 @@ class rrhh_informe_empleador(models.TransientModel):
         return self.env.ref('rrhh.action_informe_empleador').report_action([], data=datas)
 
     def dias_trabajados_anual(self,empleado_id,anio):
-        anio_inicio_contrato = int(datetime.strptime(str(empleado_id.contract_id.date_start), '%Y-%m-%d').date().strftime('%Y'))
+        anio_inicio_contrato = int(empleado_id.contract_id.date_start.strftime('%Y'))
         anio_inicio = datetime.strptime(str(anio)+'-01'+'-01', '%Y-%m-%d').date().strftime('%Y-%m-%d')
         anio_fin = datetime.strptime(str(anio)+'-12'+'-31', '%Y-%m-%d').date().strftime('%Y-%m-%d')
         dias_laborados = 0
         empleado = self.env['hr.employee'].browse(empleado_id.id)
         if empleado_id.contract_id.date_start and empleado_id.contract_id.date_end:
-            anio_fin_contrato = int(datetime.strptime(str(empleado_id.contract_id.date_end), '%Y-%m-%d').date().strftime('%Y'))
+            anio_fin_contrato = int(empleado_id.contract_id.date_end.strftime('%Y'))
             if anio_inicio_contrato == anio and anio_fin_contrato == anio:
                 dias = empleado._get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
@@ -86,7 +86,8 @@ class rrhh_informe_empleador(models.TransientModel):
         for w in self:
             dict = {}
             empleados_id = self.env.context.get('active_ids', [])
-            libro = xlwt.Workbook()
+            f = io.BytesIO()
+            libro = xlsxwriter.Workbook(f)
             dict['anio'] = w['anio']
             empleados_archivados = self.env['hr.employee'].sudo().search([('active','=',False),('id', 'in', empleados_id)])
             empleados_activos = self.env['hr.employee'].sudo().search([('active','=',True),('id', 'in', empleados_id)])
@@ -94,142 +95,114 @@ class rrhh_informe_empleador(models.TransientModel):
             responsable_id = self.env['hr.employee'].sudo().search([['id', '=', self.env.user.id]])
             datos_compania = empleados[0].company_id
 
-            # ESTILOS
-            estilo_borde = xlwt.easyxf('border: bottom thin, left thin,right thin, top thin')
-            xlwt.add_palette_colour("custom_colour", 0x21)
-            libro.set_colour_RGB(0x21, 58, 137, 255)
-            estilo = xlwt.easyxf('pattern: pattern solid, fore_colour custom_colour;border: bottom thin, left thin,right thin, top thin;align: wrap on, vert centre, horiz center')
 
-            hoja_patrono = libro.add_sheet('Patrono')
+            hoja_patrono = libro.add_worksheet('Patrono')
             empleados_inicio_anio = self.empleados_inicio_anio(datos_compania.id,w['anio'])
             empleados_fin_anio = self.empleados_fin_anio(datos_compania.id,w['anio'])
             col_width = 100 * 75
             row_height = 35 * 30
 
-            lista = [0]
-            try:
-                for i in lista:
-                    hoja_patrono.col(i).width = col_width
-                    hoja_patrono.row(i).height = row_height
-            except ValueError:
-                pass
+            hoja_patrono.write(6,0,'Datos De Identificación')
+            hoja_patrono.write(7,0,'NIT')
+            hoja_patrono.write(7,1,datos_compania.vat)
+            hoja_patrono.write(8,0,'NOMBRE DE LA EMPRESA')
+            hoja_patrono.write(8,1,datos_compania.name)
+            hoja_patrono.write(9,0,'NACIONALIDAD DEL EMPLEADOR')
+            hoja_patrono.write(9,1,datos_compania.country_id.name)
+            hoja_patrono.write(10,0,'DENOMINACION O RAZON SOCIAL DEL PATRONO')
+            hoja_patrono.write(10,1,datos_compania.company_registry)
+            hoja_patrono.write(11,0,'NUMERO PATRONAL IGSS')
+            hoja_patrono.write(11,1,datos_compania.numero_patronal)
 
-            default_book_style = libro.default_style
-            default_book_style.font.height = 20 * 36    # 36pt
+            hoja_patrono.write(12,0,'Datos General')
+            hoja_patrono.write(13,0,'Barrio O Colonia')
+            hoja_patrono.write(13,1,datos_compania.barrio_colonia)
+            hoja_patrono.write(13,2,'Zona')
+            hoja_patrono.write(13,3,datos_compania.zona_centro_trabajo)
+            hoja_patrono.write(14,0,'Calle')
+            hoja_patrono.write(14,1,datos_compania.street2)
+            hoja_patrono.write(14,2,'Avenida')
+            hoja_patrono.write(14,3,datos_compania.street)
+            hoja_patrono.write(15,0,'Teléfono')
+            hoja_patrono.write(15,1,datos_compania.phone)
+            hoja_patrono.write(15,2,'Nomenclatura')
+            hoja_patrono.write(15,3,datos_compania.nomenclatura)
+            hoja_patrono.write(16,0,'Sitio Web')
+            hoja_patrono.write(16,1,datos_compania.website)
+            hoja_patrono.write(16,2,'E-Mail')
+            hoja_patrono.write(16,3,datos_compania.email)
+            hoja_patrono.write(17,0,'Existe Sindicato (SI) O (NO)')
+            hoja_patrono.write(17,1,datos_compania.sindicato)
 
+            hoja_patrono.write(19,0,'Ubicación Geográfica')
+            hoja_patrono.write(20,0,'País')
+            hoja_patrono.write(20,1,datos_compania.country_id.name)
+            hoja_patrono.write(20,2,'Región')
+            hoja_patrono.write(20,3,datos_compania.state_id.name)
+            hoja_patrono.write(21,0,'Departamento')
+            hoja_patrono.write(21,1,datos_compania.state_id.name)
+            hoja_patrono.write(21,2,'Municipio')
+            hoja_patrono.write(21,3,datos_compania.city)
+            hoja_patrono.write(22,0,'Datos Económicos')
+            hoja_patrono.write(23,0,'Año de Inicio de Operaciones')
+            hoja_patrono.write(23,1,datos_compania.anio_inicio_operaciones)
+            hoja_patrono.write(24,0,'Cantidad Total de Empleados Inicio de Año ')
+            hoja_patrono.write(24,1, empleados_inicio_anio)
+            hoja_patrono.write(25,0,'Cantidad Total de Empleados fin de Año')
+            hoja_patrono.write(25,1, empleados_fin_anio)
+            hoja_patrono.write(26,0,'Tamaño de la empresa por ventas anuales en salarios minimos')
+            hoja_patrono.write(26,1, datos_compania.tamanio_empresa_ventas)
+            hoja_patrono.write(27,0,'Tamaño de empresa según cantidad de Trabajadores')
+            hoja_patrono.write(27,1,datos_compania.tamanio_empresa_trabajadores)
+            hoja_patrono.write(28,0,'Tiene planificado contratar nuevo personal (SI) (NO)')
+            hoja_patrono.write(28,1,datos_compania.contratar_personal)
+            hoja_patrono.write(29,0,'Contabilidad Completa')
+            hoja_patrono.write(29,1,datos_compania.contabilidad_completa)
 
-            hoja_patrono.write(6,0,'Datos De Identificación',estilo_borde)
-            hoja_patrono.write(7,0,'NIT',estilo_borde)
-            hoja_patrono.write(7,1,datos_compania.vat,estilo_borde)
-            hoja_patrono.write(8,0,'NOMBRE DE LA EMPRESA',estilo_borde)
-            hoja_patrono.write(8,1,datos_compania.name,estilo_borde)
-            hoja_patrono.write(9,0,'NACIONALIDAD DEL EMPLEADOR',estilo_borde)
-            hoja_patrono.write(9,1,datos_compania.country_id.name,estilo_borde)
-            hoja_patrono.write(10,0,'DENOMINACION O RAZON SOCIAL DEL PATRONO',estilo_borde)
-            hoja_patrono.write(10,1,datos_compania.company_registry,estilo_borde)
-            hoja_patrono.write(11,0,'NUMERO PATRONAL IGSS',estilo_borde)
-            hoja_patrono.write(11,1,datos_compania.numero_patronal,estilo_borde)
+            hoja_patrono.write(31,0,'Actividad Económica Principal')
+            hoja_patrono.write(32,0,'Actividad Gran Grupo')
+            hoja_patrono.write(32,1,datos_compania.actividad_gran_grupo)
+            hoja_patrono.write(33,0,'Actividad Económica')
+            hoja_patrono.write(33,1,datos_compania.actividad_economica)
+            hoja_patrono.write(34,0,'Sub Actividad Económica')
+            hoja_patrono.write(34,1,datos_compania.sub_actividad_economica)
+            hoja_patrono.write(35,0,'Ocupación Grupo')
+            hoja_patrono.write(35,1,datos_compania.ocupacion_grupo)
 
-            hoja_patrono.write(12,0,'Datos General',estilo_borde)
-            hoja_patrono.write(13,0,'Barrio O Colonia',estilo_borde)
-            hoja_patrono.write(13,1,datos_compania.barrio_colonia,estilo_borde)
-            hoja_patrono.write(13,2,'Zona',estilo_borde)
-            hoja_patrono.write(13,3,datos_compania.zona_centro_trabajo,estilo_borde)
-            hoja_patrono.write(14,0,'Calle',estilo_borde)
-            hoja_patrono.write(14,1,datos_compania.street2,estilo_borde)
-            hoja_patrono.write(14,2,'Avenida',estilo_borde)
-            hoja_patrono.write(14,3,datos_compania.street,estilo_borde)
-            hoja_patrono.write(15,0,'Teléfono',estilo_borde)
-            hoja_patrono.write(15,1,datos_compania.phone,estilo_borde)
-            hoja_patrono.write(15,2,'Nomenclatura',estilo_borde)
-            hoja_patrono.write(15,3,datos_compania.nomenclatura,estilo_borde)
-            hoja_patrono.write(16,0,'Sitio Web',estilo_borde)
-            hoja_patrono.write(16,1,datos_compania.website,estilo_borde)
-            hoja_patrono.write(16,2,'E-Mail',estilo_borde)
-            hoja_patrono.write(16,3,datos_compania.email,estilo_borde)
-            hoja_patrono.write(17,0,'Existe Sindicato (SI) O (NO)',estilo_borde)
-            hoja_patrono.write(17,1,datos_compania.sindicato,estilo_borde)
+            hoja_patrono.write(37,0,'Datos Del Contacto')
+            hoja_patrono.write(38,0,'Nombre Del Represéntate. Legal')
+            hoja_patrono.write(38,1,datos_compania.representante_legal_id.name)
+            hoja_patrono.write(39,0,'Tipo De Documento Del Represéntate. Legal ')
+            hoja_patrono.write(39,1,'DPI')
+            hoja_patrono.write(40,0,'Nombre Jefe De Recursos Humanos')
+            hoja_patrono.write(40,1,datos_compania.jefe_recursos_humanos_id.name)
+            hoja_patrono.write(41,0,'No. De Identificación De  Jefe De RR.HH.')
+            hoja_patrono.write(41,1,datos_compania.jefe_recursos_humanos_id.identification_id)
+            hoja_patrono.write(42,0,'E-Mail Del Jefe RR.HH.')
+            hoja_patrono.write(42,1,datos_compania.jefe_recursos_humanos_id.work_email)
+            hoja_patrono.write(43,0,'E-Mail Del Responsable Del Informe ')
+            hoja_patrono.write(43,1,responsable_id.work_email)
+            hoja_patrono.write(44,0,'Teléfono Del Represéntate Del Informe')
+            hoja_patrono.write(44,1,responsable_id.work_phone)
+            hoja_patrono.write(45,0,'Nacionalidad Del Representante Legal')
+            hoja_patrono.write(45,1, datos_compania.representante_legal_id.country_id.name)
+            hoja_patrono.write(46,0,'No. De Identificación Del Represéntate Legal')
+            hoja_patrono.write(46,1, datos_compania.representante_legal_id.identification_id)
+            hoja_patrono.write(47,0,'Tipo De Documentación Del Jefe De RR.HH.')
+            hoja_patrono.write(47,1, 'DPI')
+            hoja_patrono.write(48,0,'Teléfono Jefe RR.HH.')
+            hoja_patrono.write(48,1, datos_compania.jefe_recursos_humanos_id.work_phone)
+            hoja_patrono.write(49,0,'Nombre Del Represéntate de Elaborar el Informe Del Empleador')
+            hoja_patrono.write(49,1, responsable_id.name)
+            hoja_patrono.write(50,0,'Documento Identificación Responsable')
+            hoja_patrono.write(50,1, responsable_id.identification_id)
+            hoja_patrono.write(51,0,'Nacionalidad Del Responsable')
+            hoja_patrono.write(51,1, responsable_id.country_id.name)
+            hoja_patrono.write(52,0,'Año Del Informe ')
+            hoja_patrono.write(52,1,dict['anio'])
 
-            hoja_patrono.write(19,0,'Ubicación Geográfica',estilo_borde)
-            hoja_patrono.write(20,0,'País',estilo_borde)
-            hoja_patrono.write(20,1,datos_compania.country_id.name,estilo_borde)
-            hoja_patrono.write(20,2,'Región',estilo_borde)
-            hoja_patrono.write(20,3,)
-            hoja_patrono.write(21,0,'Departamento',estilo_borde)
-            hoja_patrono.write(21,1,datos_compania.state_id.name,estilo_borde)
-            hoja_patrono.write(21,2,'Municipio',estilo_borde)
-            hoja_patrono.write(21,3,datos_compania.city,estilo_borde)
-            hoja_patrono.write(22,0,'Datos Económicos',estilo_borde)
-            hoja_patrono.write(23,0,'Año de Inicio de Operaciones',estilo_borde)
-            hoja_patrono.write(23,1,datos_compania.anio_inicio_operaciones,estilo_borde)
-            hoja_patrono.write(24,0,'Cantidad Total de Empleados Inicio de Año ',estilo_borde)
-            hoja_patrono.write(24,1, empleados_inicio_anio,estilo_borde)
-            hoja_patrono.write(25,0,'Cantidad Total de Empleados fin de Año',estilo_borde)
-            hoja_patrono.write(25,1, empleados_fin_anio,estilo_borde)
-            hoja_patrono.write(26,0,'Tamaño de la empresa por ventas anuales en salarios minimos',estilo_borde)
-            hoja_patrono.write(26,1, datos_compania.tamanio_empresa_ventas,estilo_borde)
-            hoja_patrono.write(27,0,'Tamaño de empresa según cantidad de Trabajadores',estilo_borde)
-            hoja_patrono.write(27,1,datos_compania.tamanio_empresa_trabajadores,estilo_borde)
-            hoja_patrono.write(28,0,'Tiene planificado contratar nuevo personal (SI) (NO)',estilo_borde)
-            hoja_patrono.write(28,1,datos_compania.contratar_personal,estilo_borde)
-            hoja_patrono.write(29,0,'Contabilidad Completa',estilo_borde)
-            hoja_patrono.write(29,1,datos_compania.contabilidad_completa,estilo_borde)
-
-            hoja_patrono.write(31,0,'Actividad Económica Principal',estilo_borde)
-            hoja_patrono.write(32,0,'Actividad Gran Grupo',estilo_borde)
-            hoja_patrono.write(32,1,datos_compania.actividad_gran_grupo,estilo_borde)
-            hoja_patrono.write(33,0,'Actividad Económica',estilo_borde)
-            hoja_patrono.write(33,1,datos_compania.actividad_economica,estilo_borde)
-            hoja_patrono.write(34,0,'Sub Actividad Económica',estilo_borde)
-            hoja_patrono.write(34,1,datos_compania.sub_actividad_economica,estilo_borde)
-            hoja_patrono.write(35,0,'Ocupación Grupo',estilo_borde)
-            hoja_patrono.write(35,1,datos_compania.ocupacion_grupo,estilo_borde)
-
-            hoja_patrono.write(37,0,'Datos Del Contacto',estilo_borde)
-            hoja_patrono.write(38,0,'Nombre Del Represéntate. Legal',estilo_borde)
-            hoja_patrono.write(38,1,datos_compania.representante_legal_id.name,estilo_borde)
-            hoja_patrono.write(39,0,'Tipo De Documento Del Represéntate. Legal ',estilo_borde)
-            hoja_patrono.write(39,1,'DPI',estilo_borde)
-            hoja_patrono.write(40,0,'Nombre Jefe De Recursos Humanos',estilo_borde)
-            hoja_patrono.write(40,1,datos_compania.jefe_recursos_humanos_id.name,estilo_borde)
-            hoja_patrono.write(41,0,'No. De Identificación De  Jefe De RR.HH.',estilo_borde)
-            hoja_patrono.write(41,1,datos_compania.jefe_recursos_humanos_id.identification_id,estilo_borde)
-            hoja_patrono.write(42,0,'E-Mail Del Jefe RR.HH.',estilo_borde)
-            hoja_patrono.write(42,1,datos_compania.jefe_recursos_humanos_id.work_email,estilo_borde)
-            hoja_patrono.write(43,0,'E-Mail Del Responsable Del Informe ',estilo_borde)
-            hoja_patrono.write(43,1,responsable_id.work_email,estilo_borde)
-            hoja_patrono.write(44,0,'Teléfono Del Represéntate Del Informe',estilo_borde)
-            hoja_patrono.write(44,1,responsable_id.work_phone,estilo_borde)
-            hoja_patrono.write(45,0,'Nacionalidad Del Representante Legal',estilo_borde)
-            hoja_patrono.write(45,1, datos_compania.representante_legal_id.country_id.name,estilo_borde)
-            hoja_patrono.write(46,0,'No. De Identificación Del Represéntate Legal',estilo_borde)
-            hoja_patrono.write(46,1, datos_compania.representante_legal_id.identification_id,estilo_borde)
-            hoja_patrono.write(47,0,'Tipo De Documentación Del Jefe De RR.HH.',estilo_borde)
-            hoja_patrono.write(47,1, 'DPI',estilo_borde)
-            hoja_patrono.write(48,0,'Teléfono Jefe RR.HH.',estilo_borde)
-            hoja_patrono.write(48,1, datos_compania.jefe_recursos_humanos_id.work_phone,estilo_borde)
-            hoja_patrono.write(49,0,'Nombre Del Represéntate de Elaborar el Informe Del Empleador',estilo_borde)
-            hoja_patrono.write(49,1, responsable_id.name,estilo_borde)
-            hoja_patrono.write(50,0,'Documento Identificación Responsable',estilo_borde)
-            hoja_patrono.write(50,1, responsable_id.identification_id,estilo_borde)
-            hoja_patrono.write(51,0,'Nacionalidad Del Responsable',estilo_borde)
-            hoja_patrono.write(51,1, responsable_id.country_id.name,estilo_borde)
-            hoja_patrono.write(52,0,'Año Del Informe ',estilo_borde)
-            hoja_patrono.write(52,1,dict['anio'],estilo_borde)
-
-            hoja_empleado = libro.add_sheet('Empleado')
-            datos = libro.add_sheet('Hoja2')
-            xlwt.add_palette_colour("custom_colour_pink", 0x24)
-            libro.set_colour_RGB(0x24, 228, 55, 247)
-            # estilo_rosado = xlwt.easyxf('pattern: pattern solid, fore_colour custom_colour_purp;border: bottom thin, left thin,right thin, top thin;align: wrap on, vert centre, horiz center')
-
-            lista = [0]
-            try:
-                for i in lista:
-                    hoja_empleado.col(i).width = col_width
-                    hoja_empleado.row(i).height = row_height
-            except ValueError:
-                pass
+            hoja_empleado = libro.add_worksheet('Empleado')
+            datos = libro.add_worksheet('Hoja2')
 
             hoja_empleado.write(0, 0, 'Numero de trabajadores')
             hoja_empleado.write(0, 1, 'Primer Nombre')
@@ -256,9 +229,6 @@ class rrhh_informe_empleador(models.TransientModel):
             hoja_empleado.write(0, 22, 'Pueblo de pertenencia')
             hoja_empleado.write(0, 23, 'Idiomas que dominca')
 
-            xlwt.add_palette_colour("custom_colour_azul", 0x25)
-            libro.set_colour_RGB(0x25, 55, 81, 247)
-            estilo_azul = xlwt.easyxf('pattern: pattern solid, fore_colour custom_colour_azul;border: bottom thin, left thin,right thin, top thin')
             hoja_empleado.write(0, 24, 'Temporalidad del contrato')
             hoja_empleado.write(0, 25, 'Tipo Contrato')
             hoja_empleado.write(0, 26, 'Fecha Inicio Labores')
@@ -268,11 +238,6 @@ class rrhh_informe_empleador(models.TransientModel):
             hoja_empleado.write(0, 30, 'Jornada de Trabajo')
             hoja_empleado.write(0, 31, 'Dias Laborados en el Año')
 
-
-
-            xlwt.add_palette_colour("custom_colour_amarillo", 0x26)
-            libro.set_colour_RGB(0x26, 239, 255, 0)
-            estilo_amarillo = xlwt.easyxf('pattern: pattern solid, fore_colour custom_colour_amarillo;border: bottom thin, left thin,right thin, top thin;align: wrap on, vert centre, horiz center')
             hoja_empleado.write(0, 32, 'Número de expediente del permiso de extranjero')
             hoja_empleado.write(0, 33, 'Salario Mensual Nominal')
             hoja_empleado.write(0, 34, 'Salario Anual Nominal')
@@ -313,7 +278,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     bonificacion_decreto = 0
                     indemnizacion = 0
                     for nomina in nomina_id:
-                        nomina_anio = datetime.strptime(str(nomina.date_from), "%Y-%m-%d").year
+                        nomina_anio = nomina.date_from.year
                         if w['anio'] == nomina_anio:
                             if nomina.input_line_ids:
                                 for entrada in nomina.input_line_ids:
@@ -362,60 +327,59 @@ class rrhh_informe_empleador(models.TransientModel):
                     if empleado.marital == 'unido':
                         estado_civil = 6
                     dias_trabajados_anual = self.dias_trabajados_anual(empleado,w['anio'])
-                    hoja_empleado.write(fila, 0, empleado_numero,estilo_borde)
-                    hoja_empleado.write(fila, 1, nombre_empleado[0],estilo_borde)
-                    hoja_empleado.write(fila, 2, nombre_empleado[1],estilo_borde)
-                    hoja_empleado.write(fila, 3, nombre_empleado[2],estilo_borde)
-                    hoja_empleado.write(fila, 4, nombre_empleado[3],estilo_borde)
-                    hoja_empleado.write(fila, 5, empleado.country_id.name,estilo_borde)
-                    hoja_empleado.write(fila, 6, estado_civil,estilo_borde)
-                    hoja_empleado.write(fila, 7, empleado.documento_identificacion,estilo_borde)
-                    hoja_empleado.write(fila, 8, empleado.identification_id,estilo_borde)
-                    hoja_empleado.write(fila, 9, empleado.pais_origen.name,estilo_borde)
-                    hoja_empleado.write(fila, 10, empleado.place_of_birth,estilo_borde)
-                    hoja_empleado.write(fila, 11, empleado.nit,estilo_borde)
-                    hoja_empleado.write(fila, 12, empleado.igss,estilo_borde)
-                    hoja_empleado.write(fila, 13, genero,estilo_borde)
-                    hoja_empleado.write(fila, 14, empleado.birthday,estilo_borde)
-                    hoja_empleado.write(fila, 15, empleado.children,estilo_borde)
-                    hoja_empleado.write(fila, 16, empleado.trabajado_extranjero,estilo_borde)
-                    hoja_empleado.write(fila, 17, empleado.forma_trabajo_extranjero,estilo_borde)
-                    hoja_empleado.write(fila, 18, empleado.pais_trabajo_extranjero_id.name,estilo_borde)
-                    hoja_empleado.write(fila, 19, empleado.finalizacion_laboral_extranjero,estilo_borde)
-                    hoja_empleado.write(fila, 20, empleado.nivel_academico,estilo_borde)
-                    hoja_empleado.write(fila, 21, empleado.profesion,estilo_borde)
-                    hoja_empleado.write(fila, 22, empleado.pueblo_pertenencia,estilo_borde)
-                    hoja_empleado.write(fila, 23, empleado.idioma,estilo_borde)
-                    hoja_empleado.write(fila, 24, contrato.temporalidad_contrato,estilo_borde)
-                    hoja_empleado.write(fila, 25, contrato.structure_type_id.default_struct_id.name,estilo_borde)
-                    hoja_empleado.write(fila, 26, contrato.date_start,estilo_borde)
-                    hoja_empleado.write(fila, 27, contrato.fecha_reinicio_labores,estilo_borde)
-                    hoja_empleado.write(fila, 28, contrato.date_end,estilo_borde)
-                    hoja_empleado.write(fila, 29, contrato.job_id.name,estilo_borde)
-                    hoja_empleado.write(fila, 30, empleado.jornada_trabajo,estilo_borde)
-                    hoja_empleado.write(fila, 31, dias_trabajados_anual,estilo_borde)
-                    hoja_empleado.write(fila, 32, empleado.permiso_trabajo,estilo_borde)
-                    hoja_empleado.write(fila, 33, contrato.wage,estilo_borde)
-                    # hoja_empleado.write(fila, 34, salario_anual_nominal,estilo_borde)
-                    hoja_empleado.write(fila, 34, (contrato.wage + contrato.base_extra) * 12,estilo_borde)
-                    hoja_empleado.write(fila, 35, bonificacion_decreto,estilo_borde)
-                    hoja_empleado.write(fila, 36, horas_extras,estilo_borde)
-                    hoja_empleado.write(fila, 37, ((horas_extras / valor_horas_extras) if valor_horas_extras > 0 else horas_extras),estilo_borde)
-                    hoja_empleado.write(fila, 38, aguinaldo,estilo_borde)
-                    hoja_empleado.write(fila, 39, bono,estilo_borde)
-                    hoja_empleado.write(fila, 40, retribucion_comisiones,estilo_borde)
-                    hoja_empleado.write(fila, 41, viaticos,estilo_borde)
-                    hoja_empleado.write(fila, 42, bonificaciones_adicionales,estilo_borde)
-                    hoja_empleado.write(fila, 43, retribucion_vacaciones,estilo_borde)
-                    hoja_empleado.write(fila, 44, indemnizacion,estilo_borde)
-                    # hoja_empleado.write(fila, 45, datos_compania.company_registry,estilo_borde)
+                    hoja_empleado.write(fila, 0, empleado_numero)
+                    hoja_empleado.write(fila, 1, nombre_empleado[0])
+                    hoja_empleado.write(fila, 2, nombre_empleado[1])
+                    hoja_empleado.write(fila, 3, nombre_empleado[2])
+                    hoja_empleado.write(fila, 4, nombre_empleado[3])
+                    hoja_empleado.write(fila, 5, empleado.country_id.name)
+                    hoja_empleado.write(fila, 6, estado_civil)
+                    hoja_empleado.write(fila, 7, empleado.documento_identificacion)
+                    hoja_empleado.write(fila, 8, empleado.identification_id)
+                    hoja_empleado.write(fila, 9, empleado.pais_origen.name)
+                    hoja_empleado.write(fila, 10, empleado.place_of_birth)
+                    hoja_empleado.write(fila, 11, empleado.nit)
+                    hoja_empleado.write(fila, 12, empleado.igss)
+                    hoja_empleado.write(fila, 13, genero)
+                    hoja_empleado.write(fila, 14, empleado.birthday)
+                    hoja_empleado.write(fila, 15, empleado.children)
+                    hoja_empleado.write(fila, 16, empleado.trabajado_extranjero)
+                    hoja_empleado.write(fila, 17, empleado.forma_trabajo_extranjero)
+                    hoja_empleado.write(fila, 18, empleado.pais_trabajo_extranjero_id.name)
+                    hoja_empleado.write(fila, 19, empleado.finalizacion_laboral_extranjero)
+                    hoja_empleado.write(fila, 20, empleado.nivel_academico)
+                    hoja_empleado.write(fila, 21, empleado.profesion)
+                    hoja_empleado.write(fila, 22, empleado.pueblo_pertenencia)
+                    hoja_empleado.write(fila, 23, empleado.idioma)
+                    hoja_empleado.write(fila, 24, contrato.temporalidad_contrato)
+                    hoja_empleado.write(fila, 25, contrato.structure_type_id.default_struct_id.name)
+                    hoja_empleado.write(fila, 26, contrato.date_start)
+                    hoja_empleado.write(fila, 27, contrato.fecha_reinicio_labores)
+                    hoja_empleado.write(fila, 28, contrato.date_end)
+                    hoja_empleado.write(fila, 29, contrato.job_id.name)
+                    hoja_empleado.write(fila, 30, empleado.jornada_trabajo)
+                    hoja_empleado.write(fila, 31, dias_trabajados_anual)
+                    hoja_empleado.write(fila, 32, empleado.permiso_trabajo)
+                    hoja_empleado.write(fila, 33, contrato.wage)
+                    # hoja_empleado.write(fila, 34, salario_anual_nominal)
+                    hoja_empleado.write(fila, 34, (contrato.wage + contrato.base_extra) * 12)
+                    hoja_empleado.write(fila, 35, bonificacion_decreto)
+                    hoja_empleado.write(fila, 36, horas_extras)
+                    hoja_empleado.write(fila, 37, ((horas_extras / valor_horas_extras) if valor_horas_extras > 0 else horas_extras))
+                    hoja_empleado.write(fila, 38, aguinaldo)
+                    hoja_empleado.write(fila, 39, bono)
+                    hoja_empleado.write(fila, 40, retribucion_comisiones)
+                    hoja_empleado.write(fila, 41, viaticos)
+                    hoja_empleado.write(fila, 42, bonificaciones_adicionales)
+                    hoja_empleado.write(fila, 43, retribucion_vacaciones)
+                    hoja_empleado.write(fila, 44, indemnizacion)
+                    # hoja_empleado.write(fila, 45, datos_compania.company_registry)
                     empleado_numero +=1
 
                     fila += 1
                     numero += 1
 
-            f = io.BytesIO()
-            libro.save(f)
+            libro.close()
             datos = base64.b64encode(f.getvalue())
             self.write({'archivo':datos, 'name':'informe_del_empleador.xls'})
 
