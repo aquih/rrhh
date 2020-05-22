@@ -13,7 +13,7 @@ class report_planilla_pdf(models.AbstractModel):
         nomina = self.env['hr.payslip.run'].browse(datos['nomina_id'][0])
         logging.getLogger('nomina.name').warn(nomina.name)
         reporte = {}
-        reporte['encabezado'] = {} 
+        reporte['encabezado'] = {}
         reporte['encabezado']['nomina'] = nomina.name
         reporte['cuentas_analiticas'] = []
         reporte['puestos'] = {}
@@ -32,10 +32,10 @@ class report_planilla_pdf(models.AbstractModel):
                 llave = slip.contract_id.analytic_account_id.name
             else:
                 llave = 'Indefinido'
-            
+
             if llave not in lineas:
                 lineas[llave] = {}
-                
+
             if slip.employee_id.job_id.name not in lineas[llave]:
                 lineas[llave][slip.employee_id.job_id.name] = {}
                 lineas[llave][slip.employee_id.job_id.name]['datos'] = []
@@ -52,7 +52,7 @@ class report_planilla_pdf(models.AbstractModel):
 
             if llave not in reporte['puestos']:
                 reporte['puestos'][llave] = []
-            
+
             if slip.employee_id.job_id.name not in reporte['puestos'][llave]:
                 reporte['puestos'][llave].append(slip.employee_id.job_id.name)
 
@@ -61,7 +61,7 @@ class report_planilla_pdf(models.AbstractModel):
             linea['estatico']['numero'] = numero
             linea['estatico']['codigo_empleado'] = slip.employee_id.codigo_empleado
             linea['estatico']['nombre_empleado'] = slip.employee_id.name
-            linea['estatico']['fecha_ingreso'] = datetime.datetime.strptime(str(slip.contract_id.date_start), "%Y-%m-%d").strftime('%d/%m/%Y')
+            linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
 #            linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
             linea['estatico']['puesto'] = slip.employee_id.job_id.name
 

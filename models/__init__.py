@@ -6,6 +6,5 @@ from . import rrhh_prestamo
 from . import hr_payroll
 from . import planilla
 from . import res_company
-from . import res_country
 from . import account_payment
 from . import hr_work_entry

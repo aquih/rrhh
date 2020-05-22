@@ -19,12 +19,9 @@ class HrPayslip(models.Model):
     def action_payslip_done(self):
         res = super(HrPayslip, self).action_payslip_done()
         for slip in self:
-            logging.warn('1')
             if slip.move_id:
-                logging.warn('2')
                 slip.move_id.button_cancel()
                 for line in slip.move_id.line_ids:
-                    logging.warn('3')
                     line.analytic_account_id = slip.contract_id.analytic_account_id.id
                 slip.move_id.post()
         return res
@@ -33,16 +30,17 @@ class HrPayslip(models.Model):
     def dias_trabajados_ultimos_meses(self,empleado_id,fecha):
         dias = {'days': 0}
         if empleado_id.contract_id.date_start:
-            fecha_nomina = datetime.datetime.strptime(str(fecha), '%Y-%m-%d').date()
-            fecha_contrato = datetime.datetime.strptime(str(empleado_id.contract_id.date_start), '%Y-%m-%d').date()
+            fecha_nomina = fecha
+            fecha_contrato = empleado_id.contract_id.date_start
             diferencia_meses = relativedelta(fecha_nomina,fecha_contrato)
+            logging.warn(diferencia_meses)
             empleado = self.env['hr.employee'].browse(empleado_id)
             if int(diferencia_meses.years) == 0:
-                dias = empleado_id._get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(fecha), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado_id._get_work_days_data(fields.Datetime.to_datetime(empleado_id.contract_id.date_start),fields.Datetime.to_datetime(fecha), calendar=empleado_id.contract_id.resource_calendar_id)
             else:
                 mes = relativedelta(months=12)
-                fecha_inicio = datetime.datetime.strptime(str(fecha_nomina - mes), '%Y-%m-%d').date()
-                dias = empleado_id._get_work_days_data(Datetime.from_string(fecha_inicio.strftime('%Y-%m-%d')), Datetime.from_string(fecha), calendar=empleado_id.contract_id.resource_calendar_id)
+                fecha_inicio = fecha_nomina - mes
+                dias = empleado_id._get_work_days_data(fields.Datetime.to_datetime(fecha_inicio),fields.Datetime.to_datetime(fecha), calendar=empleado_id.contract_id.resource_calendar_id)
         return dias['days']
 
     def compute_sheet(self):
@@ -55,14 +53,14 @@ class HrPayslip(models.Model):
                         entrada_id = self.env['hr.payslip.input'].create({'payslip_id': nomina.id,'input_type_id': entrada.id})
 
                 self.calculo_rrhh(nomina.contract_id,nomina,nomina.date_to)
-            mes_nomina = int(datetime.datetime.strptime(str(nomina.date_from), '%Y-%m-%d').date().strftime('%m'))
-            dia_nomina = int(datetime.datetime.strptime(str(nomina.date_to), '%Y-%m-%d').date().strftime('%d'))
-            anio_nomina = int(datetime.datetime.strptime(str(nomina.date_from), '%Y-%m-%d').date().strftime('%Y'))
+            mes_nomina = int(nomina.date_from.strftime('%m'))
+            dia_nomina = int(nomina.date_to.strftime('%d'))
+            anio_nomina = int(nomina.date_from.strftime('%Y'))
             valor_pago = 0
             porcentaje_pagar = 0
             for entrada in nomina.input_line_ids:
                 for prestamo in nomina.employee_id.prestamo_ids:
-                    anio_prestamo = int(datetime.datetime.strptime(str(prestamo.fecha_inicio), '%Y-%m-%d').date().strftime('%Y'))
+                    anio_prestamo = int(prestamo.fecha_inicio.strftime('%Y'))
                     if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
                         lista = []
                         for lineas in prestamo.prestamo_ids:
@@ -112,7 +110,7 @@ class HrPayslip(models.Model):
             mes = relativedelta(months=contador)
             resta_mes = fecha_hoy - mes
             for nomina in nomina_ids:
-                nomina_mes = datetime.datetime.strptime(str(nomina.date_from),"%Y-%m-%d")
+                nomina_mes = nomina.date_from
                 if nomina_mes.month == resta_mes.month and nomina_mes.year == resta_mes.year:
                     if resta_mes not in meses_nominas:
                         meses_nominas.append({resta_mes.month: resta_mes.month})
@@ -141,7 +139,6 @@ class HrPayslip(models.Model):
 
     def _get_worked_day_lines(self):
         res = super(HrPayslip, self)._get_worked_day_lines()
-        logging.warn('el res 2')
         datos = self.horas_sumar(res)
         for r in res:
             tipo_id = self.env['hr.work.entry.type'].search([('id','=',r['work_entry_type_id'])])
@@ -154,11 +151,11 @@ class HrPayslip(models.Model):
     @api.onchange('employee_id','struct_id','contract_id', 'date_from', 'date_to','porcentaje_prestamo')
     def _onchange_employee(self):
         res = super(HrPayslip, self)._onchange_employee()
-        mes_nomina = int(datetime.datetime.strptime(str(self.date_from), '%Y-%m-%d').date().strftime('%m'))
-        anio_nomina = int(datetime.datetime.strptime(str(self.date_from), '%Y-%m-%d').date().strftime('%Y'))
-        dia_nomina = int(datetime.datetime.strptime(str(self.date_to), '%Y-%m-%d').date().strftime('%d'))
+        mes_nomina = self.date_from.strftime('%m')
+        anio_nomina = self.date_from.strftime('%Y')
+        dia_nomina = self.date_to.strftime('%d')
         for prestamo in self.employee_id.prestamo_ids:
-            anio_prestamo = int(datetime.datetime.strptime(str(prestamo.fecha_inicio), '%Y-%m-%d').date().strftime('%Y'))
+            anio_prestamo = int(prestamo.fecha_inicio.strftime('%Y'))
             for entrada in self.input_line_ids:
                 if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
                     for lineas in prestamo.prestamo_ids:

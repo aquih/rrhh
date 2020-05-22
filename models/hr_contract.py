@@ -2,11 +2,6 @@
 
 from odoo import models, fields, api
 import logging
-# VERSION 13
-# class ContractType(models.Model):
-#     _inherit = "hr.contract.type"
-#
-#     calcula_indemnizacion = fields.Boolean('Calcula indemnizacion')
 
 class Contract(models.Model):
     _inherit = "hr.contract"

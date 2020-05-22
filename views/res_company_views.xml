@@ -1,4 +1,4 @@
-<openerp>
+<odoo>
   <data>
 
         <record id="rrhh.view_company_form" model="ir.ui.view">
@@ -114,4 +114,4 @@
 	    </record>
 
   </data>
-</openerp>
+</odoo>

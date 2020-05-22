@@ -32,7 +32,7 @@ class hr_employee(models.Model):
     contacto_emergencia = fields.Many2one('res.partner','Contacto de Emergencia')
     marital = fields.Selection(selection_add=[('separado', 'Separado(a)'),('unido', 'Unido(a)')])
     # edad = fields.Integer(compute='_get_edad',string='Edad')
-    edad = fields.Integer(string='Edad')
+    edad = fields.Integer(string='Edad',compute="_get_edad")
     vecindad_dpi = fields.Char('Vecindad DPI')
     tarjeta_salud = fields.Boolean('Tarjeta de salud')
     tarjeta_manipulacion = fields.Boolean('Tarjeta de manipulación')
@@ -67,9 +67,9 @@ class hr_employee(models.Model):
     def _get_edad(self):
         for employee in self:
             if employee.birthday:
-                dia_nacimiento = int(datetime.datetime.strptime(str(employee.birthday),'%Y-%m-%d').date().strftime('%d'))
-                mes_nacimiento = int(datetime.datetime.strptime(str(employee.birthday),'%Y-%m-%d').date().strftime('%m'))
-                anio_nacimiento = int(datetime.datetime.strptime(str(employee.birthday),'%Y-%m-%d').date().strftime('%Y'))
+                dia_nacimiento = int(employee.birthday.strftime('%d'))
+                mes_nacimiento = int(employee.birthday.strftime('%m'))
+                anio_nacimiento = int(employee.birthday.strftime('%Y'))
                 dia_actual = int(datetime.date.today().strftime('%d'))
                 mes_actual = int(datetime.date.today().strftime('%m'))
                 anio_actual = int(datetime.date.today().strftime('%Y'))
@@ -85,6 +85,8 @@ class hr_employee(models.Model):
                         resta_anio = resta_anio - 1
                     if (resta_dia > 0):
                         resta_anio = resta_anio
+                logging.warn(resta_anio)
+                logging.warn('HOLA')
                 employee.edad = resta_anio
 
     def _compute_cantidad_prestamos(self):

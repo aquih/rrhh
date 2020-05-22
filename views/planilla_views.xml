@@ -1,4 +1,4 @@
-<openerp>
+<odoo>
   <data>
 
         <record id="view_planilla_tree" model="ir.ui.view">
@@ -153,4 +153,4 @@
 
 
   </data>
-</openerp>
+</odoo>

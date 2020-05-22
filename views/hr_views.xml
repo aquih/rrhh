@@ -1,4 +1,4 @@
-<openerp>
+<odoo>
   <data>
 
         <record id="act_rrhh_prestamo" model="ir.actions.act_window">
@@ -210,4 +210,4 @@
             sequence="5"
             groups="hr.group_hr_manager"/>
   </data>
-</openerp>
+</odoo>
