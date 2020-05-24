@@ -24,7 +24,6 @@ class rrhh_planilla_wizard(models.TransientModel):
         datas['form'] = res
         return self.env.ref('rrhh.action_planilla_pdf').report_action([], data=datas)
 
-    @api.multi
     def print_report(self):
         data = {
              'ids': [],
