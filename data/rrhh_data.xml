@@ -10,7 +10,7 @@
 
         <record id="EstructuraBase" model="hr.payroll.structure">
             <field name="name">Estructura Base</field>
-            <field name="type_id">TipoEstructuraEmpleado</field>
+            <field name="type_id" ref="TipoEstructuraEmpleado"/>
         </record>
 
         <record id="HrSalaryRule_01" model="hr.salary.rule">
@@ -23,7 +23,7 @@
             <field name="amount_percentage_base">contract.wage/2</field>
             <field name="quantity">1.1</field>
             <field name="amount_percentage">100.00</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_02" model="hr.salary.rule">
@@ -36,7 +36,7 @@
             <field name="amount_percentage_base">250/2</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">100.00</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_03" model="hr.salary.rule">
@@ -49,7 +49,7 @@
             <field name="amount_percentage_base">contract.wage/2</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">8.3330</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_04" model="hr.salary.rule">
@@ -62,7 +62,7 @@
             <field name="amount_percentage_base">contract.wage/2</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">8.3330</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_05" model="hr.salary.rule">
@@ -75,7 +75,7 @@
             <field name="amount_percentage_base">contract.wage/2</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">4.1700</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_06" model="hr.salary.rule">
@@ -88,7 +88,7 @@
             <field name="amount_percentage_base">contract.wage/2</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">9.7200</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_07" model="hr.salary.rule">
@@ -100,7 +100,7 @@
             <field name="amount_select">fix</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">0</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_08" model="hr.salary.rule">
@@ -112,7 +112,7 @@
             <field name="amount_select">fix</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">0</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_10" model="hr.salary.rule">
@@ -125,7 +125,7 @@
             <field name="amount_percentage_base">contract.wage/2</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">-4.8300</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_11" model="hr.salary.rule">
@@ -138,7 +138,7 @@
             <field name="amount_percentage_base">contract.wage/2</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">12.6700</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
         <record id="HrSalaryRule_12" model="hr.salary.rule">
@@ -150,7 +150,7 @@
             <field name="amount_select">fix</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">0</field>
-            <field name="struct_id">EstructuraBase</field>
+            <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
     </data>
