@@ -75,8 +75,8 @@ class HrPayslip(models.Model):
                             prestamo.estado = "pagado"
         return res
 
-    def salario_promedio(self, empleado_id, reglas):
-        fecha_hoy = datetime.datetime.now()
+    def salario_promedio(self,fecha_hasta, empleado_id, reglas):
+        fecha_hasta = datetime.datetime.strptime(str(fecha_hasta), '%Y-%m-%d').date()
         salario = 0
         nomina_ids = self.env['hr.payslip'].search([['employee_id', '=', empleado_id.id]])
         nominas = []
@@ -84,7 +84,7 @@ class HrPayslip(models.Model):
         meses_nominas = []
         while contador <= 12:
             mes = relativedelta(months=contador)
-            resta_mes = fecha_hoy - mes
+            resta_mes = fecha_hasta - mes
             for nomina in nomina_ids:
                 nomina_mes = datetime.datetime.strptime(str(nomina.date_from),"%Y-%m-%d")
                 if nomina_mes.month == resta_mes.month and nomina_mes.year == resta_mes.year:
@@ -122,7 +122,7 @@ class HrPayslip(models.Model):
                                     if active_id:
                                         [data] = self.env['hr.payslip.run'].browse(active_id).read(['porcentaje_prestamo'])
                                         r['amount'] = lineas.monto*(data.get('porcentaje_prestamo')/100)
-            salario = self.salario_promedio(contract.employee_id,contract.company_id.salario_ids.ids)
+            salario = self.salario_promedio(date_to,contract.employee_id,contract.company_id.salario_ids.ids)
             res.append({'name': 'Salario promedio', 'code': 'SalarioPromedio','amount': salario,'contract_id': contract.id})
             dias = self.dias_trabajados_ultimos_meses(contract.employee_id,date_to)
             res.append({'name': 'Dias Trabajados 12 Meses','code':'DiasTrabajados12Meses','amount': dias,'contract_id': contract.id})
