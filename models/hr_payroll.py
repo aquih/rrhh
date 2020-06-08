@@ -44,7 +44,6 @@ class HrPayslip(models.Model):
         return dias['days']
 
     def compute_sheet(self):
-        res =  super(HrPayslip, self).compute_sheet()
         for nomina in self:
             if nomina.contract_id:
                 entradas = self._obtener_entrada(nomina.contract_id)
@@ -80,6 +79,7 @@ class HrPayslip(models.Model):
                             prestamo.estado = "proceso"
                         if cantidad_pagados == cantidad_pagos and cantidad_pagos > 0:
                             prestamo.estado = "pagado"
+        res =  super(HrPayslip, self).compute_sheet()
         return res
 
     def _obtener_entrada(self,contrato_id):
