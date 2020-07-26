@@ -8,6 +8,12 @@
             <field name="default_work_entry_type_id">1</field>
         </record>
 
+        <record id="TipoEntradaTrabjo" model="hr.work.entry.type">
+            <field name="name">Trabajo 100</field>
+            <field name="code">TRABAJO100</field>
+            <field name="sequence">50</field>
+        </record>
+
         <record id="EstructuraBase" model="hr.payroll.structure">
             <field name="name">Estructura Base</field>
             <field name="type_id" ref="TipoEstructuraEmpleado"/>

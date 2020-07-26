@@ -138,12 +138,45 @@ class HrPayslip(models.Model):
 
     def _get_worked_day_lines(self):
         res = super(HrPayslip, self)._get_worked_day_lines()
+        tipos_ausencias_ids = self.env['hr.leave.type'].search([])
         datos = self.horas_sumar(res)
+        ausencias_restar = []
+        dias_ausentados_restar = 0
+        if self.employee_id.contract_id:
+            contracts = self.employee_id.contract_id
+
+        for ausencia in tipos_ausencias_ids:
+            if ausencia.work_entry_type_id and ausencia.work_entry_type_id.descontar_nomina:
+                logging.warn(ausencia.work_entry_type_id.code)
+                ausencias_restar.append(ausencia.work_entry_type_id.id)
+
         for r in res:
             tipo_id = self.env['hr.work.entry.type'].search([('id','=',r['work_entry_type_id'])])
             if tipo_id and tipo_id.is_leave == False:
                 r['number_of_hours'] += datos['horas']
                 r['number_of_days'] += datos['dias']
+
+            trabajo_id = self.env['hr.work.entry.type'].search([('code','=','TRABAJO100')])
+            if len(ausencias_restar)>0:
+                logging.warn('EL R')
+                logging.warn(r)
+                if r['work_entry_type_id'] in ausencias_restar:
+                    dias_ausentados_restar += r['number_of_days']
+
+        if contracts.date_start and self.date_from <= contracts.date_start <= self.date_to:
+            dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
+            dia_inicio_contrato = int(datetime.datetime.strptime(str(contracts.date_start), '%Y-%m-%d').date().strftime('%d'))
+            res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar) if (dias_laborados['days'] - dias_ausentados_restar) <= 30 else 30})
+        elif contracts.date_end and date_from <= contracts.date_end <= date_to:
+            dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(contracts.date_end), calendar=contracts.resource_calendar_id)
+            dias_trabajo = int(datetime.datetime.strptime(str(contracts.date_end), '%Y-%m-%d').date().strftime('%d'))
+            res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) <= 30 else 30})
+        else:
+            if contracts.schedule_pay == 'monthly':
+                res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
+            if contracts.schedule_pay == 'bi-monthly':
+                res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
+
         logging.warn(res)
         return res
 
