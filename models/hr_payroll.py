@@ -158,8 +158,6 @@ class HrPayslip(models.Model):
 
             trabajo_id = self.env['hr.work.entry.type'].search([('code','=','TRABAJO100')])
             if len(ausencias_restar)>0:
-                logging.warn('EL R')
-                logging.warn(r)
                 if r['work_entry_type_id'] in ausencias_restar:
                     dias_ausentados_restar += r['number_of_days']
 
