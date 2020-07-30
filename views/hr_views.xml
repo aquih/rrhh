@@ -85,6 +85,24 @@
                                 </group>
                             </group>
                         </page>
+                        <page name="igss" string="IGSS">
+                            <group>
+                                <group>
+                                    <field name="primer_nombre"/>
+                                    <field name="segundo_nombre"/>
+                                    <field name="primer_apellido"/>
+                                    <field name="segundo_apellido"/>
+                                    <field name="apellido_casada"/>
+                                </group>
+                                <group>
+                                    <field name="igss"/>
+                                    <field name="centro_trabajo_id"/>
+                                    <field name="nit"/>
+                                    <field name="codigo_ocupacion"/>
+                                    <field name="condicion_laboral"/>
+                                </group>
+                            </group>
+                        </page>
                     </page>
                     <field name="birthday" position="after">
                         <field name="edad"/>
