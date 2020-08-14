@@ -4,6 +4,11 @@ from odoo import models, fields, api
 import datetime
 import logging
 
+class HrEmployeeBase(models.AbstractModel):
+    _inherit = "hr.employee.base"
+
+    codigo_empleado = fields.Char('Código del empleado')
+
 class hr_employee(models.Model):
     _inherit = 'hr.employee'
 
