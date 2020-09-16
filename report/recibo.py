@@ -30,7 +30,7 @@ class ReportRecibo(models.AbstractModel):
 
             entradas = {}
             for l in o.input_line_ids:
-                input_id = self.env['hr.rule.input'].search([('code', '=', l.code )])
+                input_id = self.env['hr.payslip.input.type'].search([('code', '=', l.code )])
                 if len(input_id):
                     if input_id[0].code not in entradas:
                         entradas[input_id[0].code] = 0
