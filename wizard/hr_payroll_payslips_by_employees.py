@@ -20,8 +20,6 @@ class HrPayslipEmployees(models.TransientModel):
         from_date = run_data.get('date_start')
         to_date = run_data.get('date_end')
         estructura = self.estructura_id
-        logging.warn('estructura')
-        logging.warn(estructura)
         if not data['employee_ids']:
             raise UserError(_("You must select employee(s) to generate payslip(s)."))
         for employee in self.env['hr.employee'].browse(data['employee_ids']):
