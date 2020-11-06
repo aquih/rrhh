@@ -7,3 +7,4 @@ from . import rrhh_informe_empleador
 from . import igss
 from . import cerrar_nominas
 from . import vacaciones
+from . import hr_payroll_payslips_by_employees
