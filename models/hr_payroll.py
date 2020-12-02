@@ -141,7 +141,7 @@ class HrPayslip(models.Model):
         tipos_ausencias_ids = self.env['hr.leave.type'].search([])
         datos = self.horas_sumar(res)
         ausencias_restar = []
-        catorcenal = True
+        
         dias_ausentados_restar = 0
         if self.employee_id.contract_id:
             contracts = self.employee_id.contract_id
