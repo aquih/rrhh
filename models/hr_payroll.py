@@ -141,7 +141,7 @@ class HrPayslip(models.Model):
         tipos_ausencias_ids = self.env['hr.leave.type'].search([])
         datos = self.horas_sumar(res)
         ausencias_restar = []
-        
+
         dias_ausentados_restar = 0
         if self.employee_id.contract_id:
             contracts = self.employee_id.contract_id
@@ -175,6 +175,7 @@ class HrPayslip(models.Model):
                 res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
             if contracts.schedule_pay == 'bi-monthly':
                 res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
+            # Cálculo de días para catorcena
             if contracts.schedule_pay == 'bi-weekly':
                 dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
                 res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
