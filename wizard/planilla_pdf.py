@@ -13,7 +13,7 @@ class report_planilla_pdf(models.AbstractModel):
         nomina = self.env['hr.payslip.run'].browse(datos['nomina_id'][0])
         logging.getLogger('nomina.name').warn(nomina.name)
         reporte = {}
-        reporte['encabezado'] = {} 
+        reporte['encabezado'] = {}
         reporte['encabezado']['nomina'] = nomina.name
         reporte['cuentas_analiticas'] = []
         reporte['puestos'] = {}
@@ -24,7 +24,7 @@ class report_planilla_pdf(models.AbstractModel):
         totals1 = [0 for c in planilla.columna_id]
         totals1.append(0)
         reporte['total'] = totals1
-        
+
         columnas = []
         for columna in planilla.columna_id:
             columnas.append(columna.name)
@@ -34,15 +34,20 @@ class report_planilla_pdf(models.AbstractModel):
         lineas = {}
         numero = 1
         for slip in nomina.slip_ids:
-            if slip.contract_id.analytic_account_id.name:
-                llave = slip.contract_id.analytic_account_id.name
+            if slip.move_id:
+                if len(slip.move_id.line_ids) > 0 and slip.move_id.line_ids[0].analytic_account_id:
+                    llave = slip.move_id.line_ids[0].analytic_account_id.name
+                else:
+                    llave = 'Indefinido'
             else:
-                llave = 'Indefinido'
-            
-            
+                if slip.contract_id.analytic_account_id.name:
+                    llave = l.contract_id.analytic_account_id.name
+                else:
+                    llave = 'Indefinido'
+
             if llave not in lineas:
                 lineas[llave] = {}
-                
+
             if slip.employee_id.job_id.name not in lineas[llave]:
                 lineas[llave][slip.employee_id.job_id.name] = {}
                 lineas[llave][slip.employee_id.job_id.name]['datos'] = []
@@ -63,7 +68,7 @@ class report_planilla_pdf(models.AbstractModel):
 
             if llave not in reporte['puestos']:
                 reporte['puestos'][llave] = []
-            
+
             if slip.employee_id.job_id.name not in reporte['puestos'][llave]:
                 reporte['puestos'][llave].append(slip.employee_id.job_id.name)
 
@@ -103,19 +108,19 @@ class report_planilla_pdf(models.AbstractModel):
                         total_columna += r.amount
                 if c.sumar:
                     total_salario += total_columna
-                    
+
 
                 linea['dinamico'].append(total_columna)
                 lineas[llave][slip.employee_id.job_id.name]['totales'][x] += total_columna
                 reporte['suma'][llave][x] += total_columna
                 reporte['total'][x] += total_columna
                 x += 1
-            
+
             linea['dinamico'].append(total_salario)
             lineas[llave][slip.employee_id.job_id.name]['totales'][- 1] += total_salario
             reporte['suma'][llave][- 1] += total_salario
             reporte['total'][- 1] += total_salario
-            
+
             linea['estatico']['banco_depositar'] = slip.employee_id.bank_account_id.bank_id.name
             linea['estatico']['cuenta_depositar'] = slip.employee_id.bank_account_id.acc_number
             linea['estatico']['observaciones'] = slip.note
@@ -124,18 +129,18 @@ class report_planilla_pdf(models.AbstractModel):
             else:
                 linea['estatico']['cuenta_analitica'] = llave
             lineas[llave][slip.employee_id.job_id.name]['datos'].append(linea)
-            
-        
+
+
         reporte['columnas'] = columnas
         reporte['lineas'] = lineas
 
         logging.getLogger('reporte').warn(reporte)
         return reporte
-    
+
     @api.model
     def _get_report_values(self, docids, data=None):
         return self.get_report_values(docids, data)
-    
+
     @api.model
     def get_report_values(self, docids, data=None):
         model = self.env.context.get('active_model')
