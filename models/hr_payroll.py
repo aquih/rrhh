@@ -28,18 +28,18 @@ class HrPayslip(models.Model):
         return res
 
     # Dias trabajdas de los ultimos 12 meses hasta la fecha
-    def dias_trabajados_ultimos_meses(self,empleado_id,fecha):
+    def dias_trabajados_ultimos_meses(self,empleado_id,fecha_desde,fecha_hasta):
         dias = {'days': 0}
         if empleado_id.contract_id.date_start:
-            fecha_nomina = datetime.datetime.strptime(str(fecha), '%Y-%m-%d').date()
-            fecha_contrato = datetime.datetime.strptime(str(empleado_id.contract_id.date_start), '%Y-%m-%d').date()
-            diferencia_meses = relativedelta(fecha_nomina,fecha_contrato)
+            fecha_nomina_desde = datetime.datetime.strptime(str(fecha_hasta), '%Y-%m-%d').date()
+            fecha_nomina_hasta = datetime.datetime.strptime(str(fecha_desde), '%Y-%m-%d').date()
+            diferencia_meses = relativedelta(fecha_nomina_desde,fecha_nomina_hasta)
             if int(diferencia_meses.years) == 0:
-                dias = empleado_id.get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(fecha), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado_id.get_work_days_data(Datetime.from_string(fecha_desde), Datetime.from_string(fecha_hasta), calendar=empleado_id.contract_id.resource_calendar_id)
             else:
                 mes = relativedelta(months=12)
-                fecha_inicio = datetime.datetime.strptime(str(fecha_nomina - mes), '%Y-%m-%d').date()
-                dias = empleado_id.get_work_days_data(Datetime.from_string(fecha_inicio.strftime('%Y-%m-%d')), Datetime.from_string(fecha), calendar=empleado_id.contract_id.resource_calendar_id)
+                fecha_inicio = datetime.datetime.strptime(str(fecha_nomina_desde - mes), '%Y-%m-%d').date()
+                dias = empleado_id.get_work_days_data(Datetime.from_string(fecha_inicio.strftime('%Y-%m-%d')), Datetime.from_string(fecha_hasta), calendar=empleado_id.contract_id.resource_calendar_id)
         return dias['days']
 
     @api.multi
@@ -124,7 +124,7 @@ class HrPayslip(models.Model):
                                         r['amount'] = lineas.monto*(data.get('porcentaje_prestamo')/100)
             salario = self.salario_promedio(date_to,contract.employee_id,contract.company_id.salario_ids.ids)
             res.append({'name': 'Salario promedio', 'code': 'SalarioPromedio','amount': salario,'contract_id': contract.id})
-            dias = self.dias_trabajados_ultimos_meses(contract.employee_id,date_to)
+            dias = self.dias_trabajados_ultimos_meses(contract.employee_id,date_from,date_to)
             res.append({'name': 'Dias Trabajados 12 Meses','code':'DiasTrabajados12Meses','amount': dias,'contract_id': contract.id})
         return res
 
@@ -149,13 +149,6 @@ class HrPayslip(models.Model):
         res = super(HrPayslip, self).get_worked_day_lines(contracts,date_from,date_to)
         tipos_ausencias_ids = []
 
-        fecha_desde = datetime.datetime.strptime(str(date_from), '%Y-%m-%d').date()
-        fecha_hasta = datetime.datetime.strptime(str(date_to), '%Y-%m-%d').date()
-        diferencia_dias = (fecha_hasta-fecha_desde).days
-
-        dia_inicio_contrato = int(datetime.datetime.strptime(str(contracts.date_start), '%Y-%m-%d').date().strftime('%d'))
-        dias_laborados_fechas = self.employee_id.get_work_days_data(Datetime.from_string(date_from), Datetime.from_string(date_to), calendar=contracts.resource_calendar_id)
-
         if self.employee_id.contract_id:
             contracts = self.employee_id.contract_id
         if version_info[0] == 12:
@@ -173,19 +166,13 @@ class HrPayslip(models.Model):
         if contracts.date_start and date_from <= contracts.date_start <= date_to:
             dias_laborados = self.employee_id.get_work_days_data(Datetime.from_string(contracts.date_start), Datetime.from_string(date_to), calendar=contracts.resource_calendar_id)
             dia_inicio_contrato = int(datetime.datetime.strptime(str(contracts.date_start), '%Y-%m-%d').date().strftime('%d'))
-            if version_info[0] == 12:
-                if diferencia_dias >= 120:
-                    res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': dias_laborados_fechas['days']+ 1, 'contract_id': contracts.id})
-                else:
-                    res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) <= 30 else 30, 'contract_id': contracts.id})
-                    res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
-            else:
-                if diferencia_dias >= 120:
-                    res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days':  dias_laborados_fechas['days'], 'contract_id': contracts.id})
 
-                else:
-                    res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados['days'] - dias_ausentados_restar) if (dias_laborados['days'] - dias_ausentados_restar) <= 30 else 30, 'contract_id': contracts.id})
-                    res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
+            if version_info[0] == 12:
+                res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) <= 30 else 30, 'contract_id': contracts.id})
+                res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
+            else:
+                res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados['days'] - dias_ausentados_restar) if (dias_laborados['days'] - dias_ausentados_restar) <= 30 else 30, 'contract_id': contracts.id})
+                res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
         elif contracts.date_end and date_from <= contracts.date_end <= date_to:
             dias_laborados = self.employee_id.get_work_days_data(Datetime.from_string(date_from), Datetime.from_string(contracts.date_end), calendar=contracts.resource_calendar_id)
             dias_trabajo = int(datetime.datetime.strptime(str(contracts.date_end), '%Y-%m-%d').date().strftime('%d'))
@@ -193,17 +180,11 @@ class HrPayslip(models.Model):
             res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (dias_trabajo - dias_ausentados_restar), 'contract_id': contracts.id})
         else:
             if contracts.schedule_pay == 'monthly':
-                if diferencia_dias >= 120:
-                    res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days':  dias_laborados_fechas['days'] , 'contract_id': contracts.id})
-                else:
-                    res.append({'name': 'Dias trabajados','sequence': 10,'code': 'TRABAJO100','number_of_days': 30 - dias_ausentados_restar, 'contract_id': contracts.id})
-                    res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30 - dias_ausentados_restar), 'contract_id': contracts.id})
+                res.append({'name': 'Dias trabajados','sequence': 10,'code': 'TRABAJO100','number_of_days': 30 - dias_ausentados_restar, 'contract_id': contracts.id})
+                res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30 - dias_ausentados_restar), 'contract_id': contracts.id})
             if contracts.schedule_pay == 'bi-monthly':
-                if diferencia_dias >= 120:
-                    res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days':  dias_laborados_fechas['days'] , 'contract_id': contracts.id})
-                else:
-                    res.append({'name': 'Dias trabajados','sequence': 10,'code': 'TRABAJO100','number_of_days': 15 - dias_ausentados_restar, 'contract_id': contracts.id})
-                    res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30 - dias_ausentados_restar), 'contract_id': contracts.id})
+                res.append({'name': 'Dias trabajados','sequence': 10,'code': 'TRABAJO100','number_of_days': 15 - dias_ausentados_restar, 'contract_id': contracts.id})
+                res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30 - dias_ausentados_restar), 'contract_id': contracts.id})
         return res
 
 class HrPayslipRun(models.Model):
