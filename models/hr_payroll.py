@@ -33,14 +33,20 @@ class HrPayslip(models.Model):
         if empleado_id.contract_id.date_start:
             fecha_nomina_desde = datetime.datetime.strptime(str(fecha_hasta), '%Y-%m-%d').date()
             fecha_nomina_hasta = datetime.datetime.strptime(str(fecha_desde), '%Y-%m-%d').date()
-            diferencia_meses = relativedelta(fecha_nomina_desde,fecha_nomina_hasta)
-            if int(diferencia_meses.years) == 0:
-                dias = empleado_id.get_work_days_data(Datetime.from_string(fecha_desde), Datetime.from_string(fecha_hasta), calendar=empleado_id.contract_id.resource_calendar_id)
-            else:
-                mes = relativedelta(months=12)
-                fecha_inicio = datetime.datetime.strptime(str(fecha_nomina_desde - mes), '%Y-%m-%d').date()
-                dias = empleado_id.get_work_days_data(Datetime.from_string(fecha_inicio.strftime('%Y-%m-%d')), Datetime.from_string(fecha_hasta), calendar=empleado_id.contract_id.resource_calendar_id)
-        return dias['days']
+            # diferencia_meses = relativedelta(fecha_nomina_desde,fecha_nomina_hasta)
+            diferencia_meses = (fecha_nomina_desde - fecha_nomina_hasta)
+            if empleado_id.contract_id.date_start <= fecha_hasta and empleado_id.contract_id.date_start >= fecha_desde:
+                fecha_contrato_inicio = datetime.datetime.strptime(str(empleado_id.contract_id.date_start), '%Y-%m-%d').date()
+
+                diferencia_meses = fecha_contrato_inicio - fecha_nomina_hasta
+            # if int(diferencia_meses.years) == 0:
+            #     dias = empleado_id.get_work_days_data(Datetime.from_string(fecha_desde), Datetime.from_string(fecha_hasta), calendar=empleado_id.contract_id.resource_calendar_id)
+            # else:
+            #     mes = relativedelta(months=12)
+            #     fecha_inicio = datetime.datetime.strptime(str(fecha_nomina_desde - mes), '%Y-%m-%d').date()
+            #     dias = empleado_id.get_work_days_data(Datetime.from_string(fecha_inicio.strftime('%Y-%m-%d')), Datetime.from_string(fecha_hasta), calendar=empleado_id.contract_id.resource_calendar_id)
+        # return dias['days']
+        return diferencia_meses.days
 
     @api.multi
     def compute_sheet(self):
