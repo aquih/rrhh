@@ -148,7 +148,7 @@ class HrPayslip(models.Model):
     def get_worked_day_lines(self, contracts, date_from, date_to):
         res = super(HrPayslip, self).get_worked_day_lines(contracts,date_from,date_to)
         tipos_ausencias_ids = []
-        logging.warn(date_from)
+
         fecha_desde = datetime.datetime.strptime(str(date_from), '%Y-%m-%d').date()
         fecha_hasta = datetime.datetime.strptime(str(date_to), '%Y-%m-%d').date()
         diferencia_dias = (fecha_hasta-fecha_desde).days
