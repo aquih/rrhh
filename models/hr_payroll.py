@@ -28,7 +28,7 @@ class HrPayslip(models.Model):
         return res
 
     # Dias trabajdas de los ultimos 12 meses hasta la fecha
-    def dias_trabajados_ultimos_meses(self,empleado_id,fecha,fecha_desde,fecha_hasta):
+    def dias_trabajados_ultimos_meses(self,empleado_id,fecha_desde,fecha_hasta):
         dias = {'days': 0}
         if empleado_id.contract_id.date_start:
             fecha_nomina_desde = datetime.datetime.strptime(str(fecha_hasta), '%Y-%m-%d').date()
