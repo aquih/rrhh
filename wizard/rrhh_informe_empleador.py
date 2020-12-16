@@ -29,7 +29,7 @@ class rrhh_informe_empleador(models.TransientModel):
                 for contrato in empleado.contract_ids:
                     if contrato.state == 'open':
                         anio_fin_contrato = 0
-                        anio_inicio_contrato = datetime.strptime(contrato.date_start, "%Y-%m-%d").year
+                        anio_inicio_contrato = contrato.date_start.year
                         if contrato.date_end:
                             anio_fin_contrato = datetime.strptime(contrato.date_end, "%Y-%m-%d").year
                         if anio_inicio_contrato < anio and (contrato.date_end == False or anio_fin_contrato < anio) :
