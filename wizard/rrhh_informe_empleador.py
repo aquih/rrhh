@@ -31,7 +31,7 @@ class rrhh_informe_empleador(models.TransientModel):
                         anio_fin_contrato = 0
                         anio_inicio_contrato = contrato.date_start.year
                         if contrato.date_end:
-                            anio_fin_contrato = datetime.strptime(contrato.date_end, "%Y-%m-%d").year
+                            anio_fin_contrato = contrato.date_end.year
                         if anio_inicio_contrato < anio and (contrato.date_end == False or anio_fin_contrato < anio) :
                             empleados += 1
         return empleados
@@ -42,11 +42,11 @@ class rrhh_informe_empleador(models.TransientModel):
         for empleado in empleado_ids:
             if empleado.contract_ids:
                 for contrato in empleado.contract_ids:
-                    if contrato.state == 'open':
+                    if contrato.state in ['open']:
                         anio_fin_contrato = 0
-                        anio_inicio_contrato = datetime.strptime(contrato.date_start, "%Y-%m-%d").year
+                        anio_inicio_contrato = contrato.date_start.year
                         if contrato.date_end:
-                            anio_fin_contrato = datetime.strptime(contrato.date_end, "%Y-%m-%d").year
+                            anio_fin_contrato = contrato.date_end.year
                         if anio_inicio_contrato <= anio and (contrato.date_end == False or anio_fin_contrato <= anio) :
                             empleados += 1
         return empleados
