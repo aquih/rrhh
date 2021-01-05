@@ -312,7 +312,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     bonificacion_decreto = 0
                     indemnizacion = 0
                     for nomina in nomina_id:
-                        nomina_anio = datetime.strptime(nomina.date_from, "%Y-%m-%d").year
+                        nomina_anio = datetime.strptime(str(nomina.date_from), "%Y-%m-%d").year
                         if w['anio'] == nomina_anio:
                             if nomina.input_line_ids:
                                 for entrada in nomina.input_line_ids:
