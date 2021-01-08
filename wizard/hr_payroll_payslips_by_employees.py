@@ -51,5 +51,5 @@ class HrPayslipEmployees(models.TransientModel):
         if estructura and datos_anteriores:
             for dato in datos_anteriores:
                 dato['contrato'].struct_id = dato['estructura_anterior'].id
-        res = super(HrPayslipEmployees, self).compute_sheet()
+
         return {'type': 'ir.actions.act_window_close'}
