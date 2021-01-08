@@ -6,6 +6,7 @@ import datetime
 from datetime import date
 from datetime import datetime, date, time
 from odoo.fields import Date, Datetime
+from odoo.release import version_info
 import logging
 
 class ReportLibroSalarios(models.AbstractModel):
@@ -37,7 +38,12 @@ class ReportLibroSalarios(models.AbstractModel):
         dias = 0
         if employee_id.contract_id:
             contracts = employee_id.contract_id
-        tipos_ausencias_ids = self.env['hr.holidays.status'].search([])
+
+        tipos_ausencias_ids=[]    
+        if version_info[0] == 12:
+            tipos_ausencias_ids = self.env['hr.leave.type'].search([])
+        else:
+            tipos_ausencias_ids = self.env['hr.holidays.status'].search([])
         ausencias_restar = []
         dias_ausentados_restar = 0
         for ausencia in tipos_ausencias_ids:
@@ -83,7 +89,7 @@ class ReportLibroSalarios(models.AbstractModel):
         nominas_lista = []
         numero_orden = 0
         for nomina in nomina_id:
-            nomina_anio = datetime.strptime(nomina.date_to, "%Y-%m-%d").year
+            nomina_anio = nomina.date_to.year
             contiene_bono = False
             if anio == nomina_anio:
                 salario = 0
@@ -199,7 +205,7 @@ class ReportLibroSalarios(models.AbstractModel):
         return nominas_lista
 
     @api.model
-    def get_report_values(self, docids, data=None):
+    def _get_report_values(self, docids, data=None):
         data = data if data is not None else {}
         self.model = 'hr.employee'
         docs = data.get('ids', data.get('active_ids'))
