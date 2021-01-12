@@ -45,12 +45,11 @@ class HrPayslipEmployees(models.TransientModel):
                 'date_to': to_date,
                 'credit_note': run_data.get('credit_note'),
             }
-            logging.warn(res)
             payslips += self.env['hr.payslip'].create(res)
         payslips.compute_sheet()
 
         if estructura and datos_anteriores:
             for dato in datos_anteriores:
                 dato['contrato'].struct_id = dato['estructura_anterior'].id
-        res = super(HrPayslipEmployees, self).compute_sheet()
+
         return {'type': 'ir.actions.act_window_close'}
