@@ -12,6 +12,7 @@
                     </field>
                     <field name="date_start" position="after">
                         <field name="fecha_reinicio_labores"/>
+                        <field name="calcula_indemnizacion"/>
                     </field>
                     <!-- <notebook position="inside">
                         <page string="Planilla">
