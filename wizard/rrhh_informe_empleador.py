@@ -45,6 +45,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     if contrato.state in ['open']:
                         anio_fin_contrato = 0
                         anio_inicio_contrato = contrato.date_start.year
+                        logging.warn('hola')
                         if contrato.date_end:
                             anio_fin_contrato = contrato.date_end.year
                         if anio_inicio_contrato <= anio and (contrato.date_end == False or anio_fin_contrato <= anio) :

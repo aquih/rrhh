@@ -29,3 +29,4 @@ class Contract(models.Model):
     wage = fields.Monetary('Wage', digits=(16, 2), required=True, help="Employee's monthly gross wage.",track_visibility='onchange')
     fecha_reinicio_labores = fields.Date('Fecha de reinicio labores')
     temporalidad_contrato = fields.Char('Teporalidad del contrato')
+    calcula_indemnizacion = fields.Boolean('Calcula indemnizacion')
