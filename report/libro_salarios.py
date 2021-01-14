@@ -39,7 +39,7 @@ class ReportLibroSalarios(models.AbstractModel):
         if employee_id.contract_id:
             contracts = employee_id.contract_id
 
-        tipos_ausencias_ids=[]    
+        tipos_ausencias_ids=[]
         if version_info[0] == 12:
             tipos_ausencias_ids = self.env['hr.leave.type'].search([])
         else:
@@ -89,7 +89,7 @@ class ReportLibroSalarios(models.AbstractModel):
         nominas_lista = []
         numero_orden = 0
         for nomina in nomina_id:
-            nomina_anio = nomina.date_to.year
+            nomina_anio = int(datetime.strptime(str(nomina.date_to),'%Y-%m-%d').date().strftime('%Y'))
             contiene_bono = False
             if anio == nomina_anio:
                 salario = 0
@@ -206,6 +206,10 @@ class ReportLibroSalarios(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        return self.get_report_values(docids, data)
+
+    @api.model
+    def get_report_values(self, docids, data=None):
         data = data if data is not None else {}
         self.model = 'hr.employee'
         docs = data.get('ids', data.get('active_ids'))
