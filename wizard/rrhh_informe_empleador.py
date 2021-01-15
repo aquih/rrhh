@@ -278,7 +278,9 @@ class rrhh_informe_empleador(models.TransientModel):
             hoja_empleado.write(0, 33, 'Salario Mensual Nominal')
             hoja_empleado.write(0, 34, 'Salario Anual Nominal')
             hoja_empleado.write(0, 35, 'Bonificación Decreto 78-89  (Q.250.00)')
+            #Total Horas Extras Anuales Numero de horas (en cantidad 1, 2 o 3 horas)
             hoja_empleado.write(0, 36, 'Total Horas Extras Anuales')
+            #Valor de Hora Extra sumas todas las horas en Q y dividir dentrode horas extras anuales (numero de horas)
             hoja_empleado.write(0, 37, 'Valor de Hora Extra')
             hoja_empleado.write(0, 38, 'Monto Aguinaldo Decreto 76-78')
             hoja_empleado.write(0, 39, 'Monto Bono 14  Decreto 42-92')
@@ -293,6 +295,7 @@ class rrhh_informe_empleador(models.TransientModel):
             empleado_numero = 1
             numero = 1
             for empleado in empleados:
+                logging.warn(empleado)
                 nombre_empleado = empleado.name.split( )
                 if len(nombre_empleado) >=4:
                     nominas_lista = []
@@ -306,7 +309,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     aguinaldo = 0
                     bono = 0
                     bonificaciones_adicionales = 0
-                    valor_horas_extras = 0
+                    numero_horas_extra = 0
                     retribucion_comisiones = 0
                     viaticos = 0
                     retribucion_vacaciones = 0
@@ -319,7 +322,7 @@ class rrhh_informe_empleador(models.TransientModel):
                                 for entrada in nomina.input_line_ids:
                                     for horas_entrada in nomina.company_id.numero_horas_extras_ids:
                                         if entrada.code == horas_entrada.code:
-                                            valor_horas_extras += entrada.amount
+                                            numero_horas_extra += entrada.amount
                             for linea in nomina.worked_days_line_ids:
                                 dias_trabajados += linea.number_of_days
                             for linea in nomina.line_ids:
@@ -399,8 +402,11 @@ class rrhh_informe_empleador(models.TransientModel):
                     # hoja_empleado.write(fila, 34, salario_anual_nominal,estilo_borde)
                     hoja_empleado.write(fila, 34, (contrato.wage + contrato.base_extra) * 12,estilo_borde)
                     hoja_empleado.write(fila, 35, bonificacion_decreto,estilo_borde)
-                    hoja_empleado.write(fila, 36, horas_extras,estilo_borde)
-                    hoja_empleado.write(fila, 37, ((horas_extras / valor_horas_extras) if valor_horas_extras > 0 else horas_extras),estilo_borde)
+                    hoja_empleado.write(fila, 36, numero_horas_extra,estilo_borde)
+
+                    # hoja_empleado.write(fila, 36, horas_extras,estilo_borde)
+                    # hoja_empleado.write(fila, 37, ((horas_extras / numero_horas_extra) if numero_horas_extra > 0 else horas_extras),estilo_borde)
+                    hoja_empleado.write(fila, 37, numero_horas_extra/horas_extras if numero_horas_extra > 0 else 0,estilo_borde)
                     hoja_empleado.write(fila, 38, aguinaldo,estilo_borde)
                     hoja_empleado.write(fila, 39, bono,estilo_borde)
                     hoja_empleado.write(fila, 40, retribucion_comisiones,estilo_borde)

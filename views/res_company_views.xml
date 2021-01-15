@@ -14,6 +14,9 @@
                                     <field name="version_mensaje"/>
                                     <field name="numero_patronal"/>
                                     <field name="marca"/>
+                                    <field name="barrio_colonia"/>
+                                    <field name="nomenclatura"/>
+                                    <field name="sindicato"/>
                                 </group>
                                 <group>
                                     <field name="tipo_planilla"/>
