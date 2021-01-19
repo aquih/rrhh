@@ -406,7 +406,7 @@ class rrhh_informe_empleador(models.TransientModel):
 
                     # hoja_empleado.write(fila, 36, horas_extras,estilo_borde)
                     # hoja_empleado.write(fila, 37, ((horas_extras / numero_horas_extra) if numero_horas_extra > 0 else horas_extras),estilo_borde)
-                    hoja_empleado.write(fila, 37, numero_horas_extra/horas_extras if numero_horas_extra > 0 else 0,estilo_borde)
+                    hoja_empleado.write(fila, 37, horas_extras/numero_horas_extra if numero_horas_extra > 0 else 0,estilo_borde)
                     hoja_empleado.write(fila, 38, aguinaldo,estilo_borde)
                     hoja_empleado.write(fila, 39, bono,estilo_borde)
                     hoja_empleado.write(fila, 40, retribucion_comisiones,estilo_borde)
