@@ -78,10 +78,12 @@ class ReportLibroSalarios(models.AbstractModel):
                     trabajo = linea.number_of_days
                 elif linea.code == 'WORK100':
                     work = linea.number_of_days
-            if trabajo >= 0:
+            if trabajo >= 0 and trabajo <= 31:
                 dias_trabajados += trabajo
-            else:
+            elif work >= 0 and work <= 31:
                 dias_trabajados += work
+            else:
+                dias_trabajados += 0
         return dias_trabajados
 
     def _get_nominas(self,id,anio):
