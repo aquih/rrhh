@@ -78,10 +78,12 @@ class ReportLibroSalarios(models.AbstractModel):
                     trabajo = linea.number_of_days
                 elif linea.code == 'WORK100':
                     work = linea.number_of_days
-            if trabajo >= 0:
+            if trabajo >= 0 and trabajo <= 31:
                 dias_trabajados += trabajo
-            else:
+            elif work >= 0 and work <= 31:
                 dias_trabajados += work
+            else:
+                dias_trabajados += 0
         return dias_trabajados
 
     def _get_nominas(self,id,anio):
@@ -175,6 +177,11 @@ class ReportLibroSalarios(models.AbstractModel):
                 total_deducciones = igss + otras_deducciones + isr
                 bono_agui_indem = bono + aguinaldo + indemnizacion
                 numero_orden += 1
+                logging.warn('123123')
+                logging.warn(dias_laborados)
+                logging.warn(dias_laborados_netos)
+                logging.warn(dias_calculados)
+                logging.warn(nomina.date_from)
                 nominas_lista.append({
                     'orden': numero_orden,
                     'fecha_inicio': nomina.date_from,
