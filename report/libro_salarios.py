@@ -177,11 +177,6 @@ class ReportLibroSalarios(models.AbstractModel):
                 total_deducciones = igss + otras_deducciones + isr
                 bono_agui_indem = bono + aguinaldo + indemnizacion
                 numero_orden += 1
-                logging.warn('123123')
-                logging.warn(dias_laborados)
-                logging.warn(dias_laborados_netos)
-                logging.warn(dias_calculados)
-                logging.warn(nomina.date_from)
                 nominas_lista.append({
                     'orden': numero_orden,
                     'fecha_inicio': nomina.date_from,
