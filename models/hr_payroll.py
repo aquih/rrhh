@@ -168,7 +168,7 @@ class HrPayslip(models.Model):
                 dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
                 dia_inicio_contrato = int(contracts.date_start.strftime('%d'))
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar) if (dias_laborados['days'] - dias_ausentados_restar) <= 30 else 30})
-            elif contracts.date_end and date_from <= contracts.date_end <= date_to:
+            elif contracts.date_end and self.date_from <= contracts.date_end <= date_to:
                 dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(contracts.date_end), calendar=contracts.resource_calendar_id)
                 dias_trabajo = int(contracts.date_end.strftime('%d'))
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) <= 30 else 30})
