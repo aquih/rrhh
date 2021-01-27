@@ -297,7 +297,7 @@ class rrhh_informe_empleador(models.TransientModel):
             for empleado in empleados:
                 logging.warn(empleado)
                 nombre_empleado = empleado.name.split( )
-                if len(nombre_empleado) >=4:
+                if len(nombre_empleado) >=3:
                     nominas_lista = []
                     contrato = self.env['hr.contract'].search([('employee_id', '=', empleado.id),('state','=','open')])
                     nomina_id = self.env['hr.payslip'].search([['employee_id', '=', empleado.id]])
