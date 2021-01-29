@@ -214,6 +214,7 @@ class ReportLibroSalarios(models.AbstractModel):
                     'variable': variable,
                     'dev_isr_otro': dev_isr_otro,
                     'bono_agui_indem': bono_agui_indem,
+                    'otros_salarios': otros_salarios,
                     'liquido_recibir': total_salario_devengado + boni_incentivo_decreto +dev_isr_otro
 
                     # 'liquido_recibir': total_salario_devengado + total_deducciones + bono_agui_indem + decreto + fija + variable
