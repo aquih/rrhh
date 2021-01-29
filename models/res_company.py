@@ -80,6 +80,9 @@ class res_company(models.Model):
     salario_promedio_ids = fields.Many2many('hr.salary.rule','rrhh_salario_promedio_rel', string="Salario promedio")
     numero_horas_extras_ids = fields.Many2many('hr.rule.input','rrhh_num_horas_extras_rel', string='Numero horas extras')
     centro_trabajo_ids = fields.One2many('res.company.centro_trabajo','company_id',string="Centros de trabajo")
+    otro_salario_ids = fields.Many2many('hr.salary.rule','rrhh_otro_salario_rel',string='Otros salarios')
+    boni_incentivo_decreto_ids = fields.Many2many('hr.salary.rule','rrhh_boni_incentivo_decreto_rel',string='Bonificacion incentivo decreto')
+
 
 class res_company_centro_trabajo(models.Model):
     _name = 'res.company.centro_trabajo'

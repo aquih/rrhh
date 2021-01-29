@@ -165,20 +165,25 @@
                                     <th>Salario en Quetzales</th>
                                     <th>Dias Trabajados</th>
                                     <th>Ordinarias</th>
-                                    <th>Extras Ordinarias</th>
+                                    <th>Extraordinarias</th>
                                     <th>Ordinario</th>
-                                    <th>Extra Ordinario</th>
+                                    <th>Extraordinario</th>
+                                    <th>Otros salarios</th>
                                     <th>Septimos y asuetos</th>
                                     <th>Vacaciones</th>
                                     <th>SALARIO TOTAL</th>
-                                    <th>IGSS</th>
-                                    <th>ISR</th>
+                                    <th>Cuota laboral IGSS</th>
+                                    <th>Descuentos ISR</th>
                                     <th>Otras deducciones</th>
-                                    <th>Total deducciones</th>
-                                    <th>Decreto 42-92, Aguinaldo, y otros</th>
-                                    <th>Decreto</th>
-                                    <th>Fija</th>
-                                    <th>Variable</th>
+                                    <th>Total</th>
+                                    <th>Bonificación anual 42-92,Aguinaldo Decreto 76-78</th>
+                                    <th>Bonificación Incentivo Decreto 37-2001</th>
+
+                                    <!-- <th>Decreto</th> -->
+                                    <th>Devoluciones I.S.R. y otras</th>
+
+                                    <!-- <th>Fija</th>
+                                    <th>Variable</th> -->
                                     <th>Liquido a Recibir</th>
                                     <th>Firma</th>
                                     <th>Observaciones</th>
@@ -194,6 +199,7 @@
                                     <td><span t-esc="nomina['extra_ordinarias']"/></td>
                                     <td><span t-esc="nomina['ordinario']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
                                     <td><span t-esc="nomina['extra_ordinario']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
+                                    <td><span t-esc="nomina['otros_salarios']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
                                     <td><span t-esc="nomina['septimos_asuetos']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
                                     <td><span t-esc="nomina['vacaciones']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
                                     <td><span t-esc="nomina['total_salario_devengado']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
@@ -202,9 +208,12 @@
                                     <td><span t-esc="nomina['otras_deducciones']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
                                     <td><span t-esc="nomina['total_deducciones']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
                                     <td><span t-esc="nomina['bono_agui_indem']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
-                                    <td><span t-esc="nomina['decreto']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
-                                    <td><span t-esc="nomina['fija']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
-                                    <td><span t-esc="nomina['variable']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
+                                    <td><span t-esc="nomina['boni_incentivo_decreto']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
+                                    <!-- <td><span t-esc="nomina['decreto']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td> -->
+                                    <td><span t-esc="nomina['dev_isr_otro']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
+
+                                    <!-- <td><span t-esc="nomina['fija']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
+                                    <td><span t-esc="nomina['variable']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td> -->
                                     <td><span t-esc="nomina['liquido_recibir']" t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>
                                     <td></td>
                                     <td></td>
