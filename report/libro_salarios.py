@@ -113,6 +113,9 @@ class ReportLibroSalarios(models.AbstractModel):
                 fija = 0
                 variable = 0
                 otras_deducciones = 0
+                otros_salarios = 0
+                boni_incentivo_decreto = 0
+                dev_isr_otro = 0
                 work = -1
                 trabajo = -1
                 dias_calculados = self.dias_trabajados(nomina.employee_id,nomina)
@@ -171,7 +174,14 @@ class ReportLibroSalarios(models.AbstractModel):
                         fija += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.variable_ids.ids:
                         variable += linea.total
-                total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones
+                    if linea.salary_rule_id.id in nomina.company_id.otro_salario_ids.ids:
+                        otros_salarios += linea.total
+                    if linea.salary_rule_id.id in nomina.company_id.boni_incentivo_decreto_ids.ids:
+                        boni_incentivo_decreto += linea.total
+                    if linea.salary_rule_id.id in nomina.company_id.boni_incentivo_decreto_ids.ids:
+                        dev_isr_otro += linea.total
+
+                total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones + otros_salarios
                 # total_descuentos = igss + isr + anticipos
                 otras_deducciones = anticipos
                 total_deducciones = igss + otras_deducciones + isr
@@ -198,11 +208,15 @@ class ReportLibroSalarios(models.AbstractModel):
                     'otras_deducciones': otras_deducciones,
                     'total_deducciones': total_deducciones,
                     'bonificacion_id': bonificacion,
-                    'decreto': decreto,
-                    'fija': fija,
+                    # 'decreto': decreto,
+                    'boni_incentivo_decreto': boni_incentivo_decreto,
+                    # 'fija': fija,
                     'variable': variable,
+                    'dev_isr_otro': dev_isr_otro,
                     'bono_agui_indem': bono_agui_indem,
-                    'liquido_recibir': total_salario_devengado + total_deducciones + bono_agui_indem + decreto + fija + variable
+                    'liquido_recibir': total_salario_devengado + boni_incentivo_decreto +dev_isr_otro
+
+                    # 'liquido_recibir': total_salario_devengado + total_deducciones + bono_agui_indem + decreto + fija + variable
                 })
         return nominas_lista
 
