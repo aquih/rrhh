@@ -178,7 +178,7 @@ class ReportLibroSalarios(models.AbstractModel):
                         otros_salarios += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.boni_incentivo_decreto_ids.ids:
                         boni_incentivo_decreto += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.boni_incentivo_decreto_ids.ids:
+                    if linea.salary_rule_id.id in nomina.company_id.devolucion_isr_otro_ids.ids:
                         dev_isr_otro += linea.total
 
                 total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones + otros_salarios
@@ -215,8 +215,8 @@ class ReportLibroSalarios(models.AbstractModel):
                     'dev_isr_otro': dev_isr_otro,
                     'bono_agui_indem': bono_agui_indem,
                     'otros_salarios': otros_salarios,
-                    'liquido_recibir': total_salario_devengado + boni_incentivo_decreto +dev_isr_otro
-
+                    # 'liquido_recibir': total_salario_devengado + boni_incentivo_decreto +dev_isr_otro
+                    'liquido_recibir': total_salario_devengado + total_deducciones +bono_agui_indem+ boni_incentivo_decreto + dev_isr_otro
                     # 'liquido_recibir': total_salario_devengado + total_deducciones + bono_agui_indem + decreto + fija + variable
                 })
         return nominas_lista
