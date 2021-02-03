@@ -74,7 +74,8 @@
                                     <field name="extras_ids" widget="many2many_tags"/>
                                     <field name="descuentos_ids" widget="many2many_tags"/>
                                     <field name="septimos_asuetos_ids" widget="many2many_tags"/>
-                                    <!-- <field name="numero_horas_extras_ids" widget="many2many_tags"/> -->
+                                    <field name="vacaciones_ids" widget="many2many_tags"/>
+                                    <field name="numero_horas_extras_ids" widget="many2many_tags"/>
                                 </group>
                                 <group>
                                     <field name="igss_ids" widget="many2many_tags"/>
