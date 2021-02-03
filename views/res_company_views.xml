@@ -90,9 +90,13 @@
                                     <field name="decreto_ids" widget="many2many_tags"/>
                                     <field name="fija_ids" widget="many2many_tags"/>
                                     <field name="variable_ids" widget="many2many_tags"/>
+                                    <field name="otro_salario_ids" widget="many2many_tags"/>
+                                    <field name="boni_incentivo_decreto_ids" widget="many2many_tags"/>
+                                    <field name="devolucion_isr_otro_ids" widget="many2many_tags"/>
+
                                 </group>
                             </group>
-                            <!-- <label for="centro" string="Centros de trabajo"/>
+                            <label for="centro" string="Centros de trabajo"/>
                             <field name="centro_trabajo_ids">
                                 <tree string="Centros" editable="bottom">
                                     <field name="codigo"/>
@@ -107,7 +111,7 @@
                                     <field name="codigo_municipio"/>
                                     <field name="codigo_actividad_economica"/>
                                 </tree>
-                            </field> -->
+                            </field>
                         </page>
                     </notebook>
                 </data>
