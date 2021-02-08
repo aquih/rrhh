@@ -73,7 +73,7 @@ class res_company(models.Model):
     extras_ids = fields.Many2many('hr.salary.rule','rrhh_extras_rel',string='Extras')
     descuentos_ids = fields.Many2many('hr.salary.rule','rrhh_descuentos_rel',string='Descuentos')
     septimos_asuetos_ids = fields.Many2many('hr.salary.rule','rrhh_septimos_asuetos_rel', string="Septimos y asuetos")
-    vacaciones_ids = fields.Many2many('hr.salary.rule','rrhh_vacaiones_rel', string="Vacaiones")
+    vacaciones_ids = fields.Many2many('hr.salary.rule','rrhh_vacaiones_rel', string="Vacaciones")
     decreto_ids = fields.Many2many('hr.salary.rule','rrhh_decretro_rel', string="Decreto")
     fija_ids = fields.Many2many('hr.salary.rule','rrhh_fija_rel', string="Fija")
     variable_ids = fields.Many2many('hr.salary.rule','rrhh_variable_rel', string="Variable")
