@@ -259,7 +259,7 @@ class rrhh_informe_empleador(models.TransientModel):
             for empleado in empleados:
                 logging.warn(empleado)
                 nombre_empleado = empleado.name.split( )
-                if len(nombre_empleado) >=4:
+                if nombre.primer_nombre:
                     nominas_lista = []
                     contrato = self.env['hr.contract'].search([('employee_id', '=', empleado.id),('state','=','open')])
                     nomina_id = self.env['hr.payslip'].search([['employee_id', '=', empleado.id]])
@@ -328,10 +328,10 @@ class rrhh_informe_empleador(models.TransientModel):
                         estado_civil = 6
                     dias_trabajados_anual = self.dias_trabajados_anual(empleado,w['anio'])
                     hoja_empleado.write(fila, 0, empleado_numero)
-                    hoja_empleado.write(fila, 1, nombre_empleado[0])
-                    hoja_empleado.write(fila, 2, nombre_empleado[1])
-                    hoja_empleado.write(fila, 3, nombre_empleado[2])
-                    hoja_empleado.write(fila, 4, nombre_empleado[3])
+                    hoja_empleado.write(fila, 1, empleado.primer_nombre if empleado.primer_nombre else '')
+                    hoja_empleado.write(fila, 2, empleado.segundo_nombre if empleado.segundo_nombre else '')
+                    hoja_empleado.write(fila, 3, empleado.primer_apellido if empleado.primer_apellido else '')
+                    hoja_empleado.write(fila, 4, empleado.segundo_apellido if empleado.segundo_apellido else '')
                     hoja_empleado.write(fila, 5, empleado.country_id.name)
                     hoja_empleado.write(fila, 6, estado_civil)
                     hoja_empleado.write(fila, 7, empleado.documento_identificacion)
