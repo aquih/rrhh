@@ -42,7 +42,7 @@ class hr_employee(models.Model):
     tarjeta_salud = fields.Boolean('Tarjeta de salud',groups="hr.group_hr_user")
     tarjeta_manipulacion = fields.Boolean('Tarjeta de manipulación',groups="hr.group_hr_user")
     tarjeta_pulmones = fields.Boolean('Tarjeta de pulmones',groups="hr.group_hr_user")
-    tarjeta_fecha_vencimiento = fields.Date('Fecha de vencimiento tarjeta de salud')
+    tarjeta_fecha_vencimiento = fields.Date('Fecha de vencimiento tarjeta de salud',groups="hr.group_hr_user")
     codigo_empleado = fields.Char('Código del empleado',groups="hr.group_hr_user")
     prestamo_ids = fields.One2many('rrhh.prestamo','employee_id','Prestamo',groups="hr.group_hr_user")
     cantidad_prestamos = fields.Integer(compute='_compute_cantidad_prestamos', string='Prestamos',groups="hr.group_hr_user")
