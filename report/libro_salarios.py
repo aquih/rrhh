@@ -118,9 +118,9 @@ class ReportLibroSalarios(models.AbstractModel):
                 for linea in nomina.worked_days_line_ids:
                     if linea.number_of_days > 31:
                         contiene_bono = True
-                    if linea.code == 'TRABAJO100':
+                    if linea.work_entry_type_id.code == 'TRABAJO100':
                         trabajo = linea.number_of_days
-                    elif linea.code == 'WORK100':
+                    elif linea.work_entry_type_id.code == 'WORK100':
                         work = linea.number_of_days
                 if trabajo >= 0:
                     dias_trabajados += trabajo
