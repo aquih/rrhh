@@ -90,9 +90,9 @@ class hr_employee(models.Model):
                         resta_anio = resta_anio - 1
                     if (resta_dia > 0):
                         resta_anio = resta_anio
-                logging.warn(resta_anio)
-                logging.warn('HOLA')
                 employee.edad = resta_anio
+            else:
+                employee.edad = 0
 
     def _compute_cantidad_prestamos(self):
         contract_data = self.env['rrhh.prestamo'].sudo().read_group([('employee_id', 'in', self.ids)], ['employee_id'], ['employee_id'])
