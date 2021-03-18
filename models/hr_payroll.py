@@ -151,15 +151,14 @@ class HrPayslip(models.Model):
             if ausencia.work_entry_type_id and ausencia.work_entry_type_id.descontar_nomina:
                 logging.warn(ausencia.work_entry_type_id.code)
                 ausencias_restar.append(ausencia.work_entry_type_id.id)
-                
-        trabajo_id = False
+
+        trabajo_id = self.env['hr.work.entry.type'].search([('code','=','TRABAJO100')])
         for r in res:
             tipo_id = self.env['hr.work.entry.type'].search([('id','=',r['work_entry_type_id'])])
             if tipo_id and tipo_id.is_leave == False:
                 r['number_of_hours'] += datos['horas']
                 r['number_of_days'] += datos['dias']
 
-            trabajo_id = self.env['hr.work.entry.type'].search([('code','=','TRABAJO100')])
             if len(ausencias_restar)>0:
                 if r['work_entry_type_id'] in ausencias_restar:
                     dias_ausentados_restar += r['number_of_days']
