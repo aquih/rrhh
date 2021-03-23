@@ -43,13 +43,26 @@ class HrPayslip(models.Model):
                 dias = empleado_id._get_work_days_data(fields.Datetime.to_datetime(fecha_inicio),fields.Datetime.to_datetime(fecha), calendar=empleado_id.contract_id.resource_calendar_id)
         return dias['days']
 
+
+    def existe_entrada(self,entrada_ids,entrada_id):
+        existe_entrada = False
+        for entrada in entrada_ids:
+            if entrada.input_type_id.id == entrada_id.id:
+                existe_entrada = True
+        return existe_entrada
+
     def compute_sheet(self):
         for nomina in self:
             if nomina.contract_id:
                 entradas = self._obtener_entrada(nomina.contract_id)
                 if entradas:
                     for entrada in entradas:
-                        entrada_id = self.env['hr.payslip.input'].create({'payslip_id': nomina.id,'input_type_id': entrada.id})
+                        existe_entrada = False
+                        if nomina.input_line_ids:
+                            existe_entrada = self.existe_entrada(nomina.input_line_ids,entrada)
+                            logging.warn(existe_entrada)
+                        if existe_entrada == False:
+                            entrada_id = self.env['hr.payslip.input'].create({'payslip_id': nomina.id,'input_type_id': entrada.id})
 
                 self.calculo_rrhh(nomina.contract_id,nomina,nomina.date_to)
             mes_nomina = int(nomina.date_from.strftime('%m'))
