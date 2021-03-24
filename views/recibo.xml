@@ -9,9 +9,9 @@
                 <div class="article">
                     <div class="page" style="font-size:13px">
                         <div class="copia">
-                            <div class="derecha" style="float:right">
-                                <img src="/web/binary/company_logo" style="height:75px"/>
-                            </div>
+                          <div class="text-right">
+                              <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 45px;" alt="Logo"/>
+                          </div>
                             <h2>Recibo</h2>
                             <strong>Compañia:</strong><span t-field="o.company_id.name"/>
                             <p t-field="o.name"/>
@@ -154,9 +154,9 @@
                         <br/>
                         <br/>
                         <div class="copia">
-                            <div class="derecha" style="float:right">
-                                <img src="/web/binary/company_logo" style="height:75px"/>
-                            </div>
+                          <div class="text-right">
+                              <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 45px;" alt="Logo"/>
+                          </div>
                             <h2>Recibo</h2>
                             <strong>Compañia:</strong><span t-field="o.company_id.name"/>
                             <p t-field="o.name"/>

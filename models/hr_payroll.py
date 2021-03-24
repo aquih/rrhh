@@ -53,18 +53,6 @@ class HrPayslip(models.Model):
 
     def compute_sheet(self):
         for nomina in self:
-            if nomina.contract_id:
-                entradas = self._obtener_entrada(nomina.contract_id)
-                if entradas:
-                    for entrada in entradas:
-                        existe_entrada = False
-                        if nomina.input_line_ids:
-                            existe_entrada = self.existe_entrada(nomina.input_line_ids,entrada)
-                            logging.warn(existe_entrada)
-                        if existe_entrada == False:
-                            entrada_id = self.env['hr.payslip.input'].create({'payslip_id': nomina.id,'input_type_id': entrada.id})
-
-                self.calculo_rrhh(nomina.contract_id,nomina,nomina.date_to)
             mes_nomina = int(nomina.date_from.strftime('%m'))
             dia_nomina = int(nomina.date_to.strftime('%d'))
             anio_nomina = int(nomina.date_from.strftime('%Y'))
@@ -102,10 +90,10 @@ class HrPayslip(models.Model):
                 entradas = [entrada for entrada in contrato_id.structure_type_id.default_struct_id.input_line_type_ids]
         return entradas
 
-    def calculo_rrhh(self,contrato_id,nomina,date_to):
-        salario = self.salario_promedio(date_to,contrato_id.employee_id,contrato_id.company_id.salario_ids.ids)
-        dias = self.dias_trabajados_ultimos_meses(contrato_id.employee_id,date_to)
-        for entrada in nomina.input_line_ids:
+    def calculo_rrhh(self,nomina):
+        salario = self.salario_promedio(self.date_to,self.contract_id.employee_id,self.contract_id.company_id.salario_ids.ids)
+        dias = self.dias_trabajados_ultimos_meses(self.contract_id.employee_id,self.date_to)
+        for entrada in self.input_line_ids:
             if entrada.input_type_id.code == 'SalarioPromedio':
                 entrada.amount = salario
             if entrada.input_type_id.code == 'DiasTrabajados12Meses':
@@ -204,6 +192,21 @@ class HrPayslip(models.Model):
         mes_nomina = self.date_from.strftime('%m')
         anio_nomina = self.date_from.strftime('%Y')
         dia_nomina = self.date_to.strftime('%d')
+        entradas_nomina = []
+        if self.contract_id:
+            entradas = self._obtener_entrada(self.contract_id)
+            if entradas:
+                for entrada in entradas:
+                    existe_entrada = False
+                    if self.input_line_ids:
+                        existe_entrada = self.existe_entrada(self.input_line_ids,entrada)
+                        logging.warn(existe_entrada)
+                    if existe_entrada == False:
+                        entradas_nomina.append((0, 0, {'input_type_id':entrada.id}))
+            if entradas_nomina:
+                self.input_line_ids = entradas_nomina
+            self.calculo_rrhh(self)
+
         for prestamo in self.employee_id.prestamo_ids:
             anio_prestamo = int(prestamo.fecha_inicio.strftime('%Y'))
             for entrada in self.input_line_ids:
