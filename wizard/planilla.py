@@ -45,16 +45,6 @@ class rrhh_planilla_wizard(models.TransientModel):
                         cuentas_analiticas.add(l.cuenta_analitica_id.name)
                     else:
                         cuentas_analiticas.add('Indefinido')
-                    # if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
-                    #     if l.move_id.line_ids[0].analytic_account_id:
-                    #         c
-                    #     else:
-                    #         cuentas_analiticas.add('Indefinido')
-                    # else:
-                    #     if l.contract_id.analytic_account_id.name:
-                    #         cuentas_analiticas.add(l.contract_id.analytic_account_id.name)
-                    #     else:
-                    #         cuentas_analiticas.add('Indefinido')
 
                 for i in cuentas_analiticas:
                     hoja = libro.add_worksheet(i)
@@ -326,16 +316,6 @@ class rrhh_planilla_wizard(models.TransientModel):
                         hoja.write(linea, columna+4, l.cuenta_analitica_id.name)
                     else:
                         hoja.write(linea, columna+4, 'indefinido')
-                    # if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
-                    #     if l.move_id.line_ids[0].analytic_account_id:
-                    #         hoja.write(linea, columna+4, l.move_id.line_ids[0].analytic_account_id.name)
-                    #     else:
-                    #         hoja.write(linea, columna+4, 'indefinido')
-                    # else:
-                    #     if l.contract_id.analytic_account_id.name:
-                    #         hoja.write(linea, columna+4, l.contract_id.analytic_account_id.name)
-                    #     else:
-                    #         hoja.write(linea, columna+4, 'indefinido')
                     linea += 1
                     num += 1
 

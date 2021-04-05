@@ -17,16 +17,6 @@ class HrPayslip(models.Model):
     etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids')
     cuenta_analitica_id = fields.Many2one('account.analytic.account','Cuenta analítica')
 
-    # def action_payslip_done(self):
-    #     res = super(HrPayslip, self).action_payslip_done()
-    #     for slip in self:
-    #         if slip.move_id:
-    #             slip.move_id.button_cancel()
-    #             for line in slip.move_id.line_ids:
-    #                 line.analytic_account_id = slip.contract_id.analytic_account_id.id
-    #             slip.move_id.post()
-    #     return res
-
     # Dias trabajdas de los ultimos 12 meses hasta la fecha
     def dias_trabajados_ultimos_meses(self,empleado_id,fecha):
         dias = {'days': 0}
@@ -246,11 +236,3 @@ class HrPayslipRun(models.Model):
                     }
                     pago_id = self.env['account.payment'].create(pago)
         return True
-
-    # def close_payslip_run(self):
-    #     for slip in self.slip_ids:
-    #         if slip.state == 'draft':
-    #             slip.action_payslip_done()
-    #
-    #     res = super(HrPayslipRun, self).close_payslip_run()
-    #     return res

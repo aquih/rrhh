@@ -145,10 +145,6 @@ class ReportLibroSalarios(models.AbstractModel):
                 for linea in nomina.line_ids:
                     if linea.salary_rule_id.id in nomina.company_id.salario_ids.ids:
                         salario += linea.total
-                    # if linea.salary_rule_id.id in nomina.company_id.ordinarias_ids.ids:
-                    #     for entrada in nomina.input_line_ids:
-                    #         if linea.code == entrada.code:
-                    #             ordinarias += entrada.amount
                     if linea.salary_rule_id.id in nomina.company_id.extras_ordinarias_ids.ids:
                         for entrada in nomina.input_line_ids:
                             if linea.code == entrada.code:
@@ -172,8 +168,6 @@ class ReportLibroSalarios(models.AbstractModel):
                         aguinaldo += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.indemnizacion_ids.ids:
                         indemnizacion += linea.total
-                    # if linea.salary_rule_id.id in nomina.company_id.septimos_asuetos_ids.ids:
-                    #     septimos_asuetos += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.vacaciones_ids.ids:
                         vacaciones += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.decreto_ids.ids:
