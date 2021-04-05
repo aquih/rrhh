@@ -6,6 +6,7 @@
                 <t t-set="reporte" t-value="reporte(data)"/>
                 <t t-foreach="reporte['cuentas_analiticas']" t-as="cuenta">
                     <div class="page">
+                        <br/>
                         <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="user.company_id.name"/></center></h2>
                         <t t-if="cuenta">
                             <h3><center><span t-esc="cuenta"/></center></h3><br/>
@@ -110,7 +111,8 @@
                         </table>
                     </div>
                 </t>
-                <div class="page"  style="page-break-after:always;">
+                <p style="page-break-before:always;"> </p>
+                <div class="page">
                     <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="user.company_id.name"/></center></h2>
                     <t t-if="cuenta">
                         <h3><center><span t-esc="cuenta"/></center></h3><br/>

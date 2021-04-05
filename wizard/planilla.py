@@ -37,19 +37,24 @@ class rrhh_planilla_wizard(models.TransientModel):
             f = io.BytesIO()
             libro = xlsxwriter.Workbook(f)
             formato_fecha = libro.add_format({'num_format': 'dd/mm/yy'})
+            logging.warn(w.agrupado)
             if w.agrupado:
                 cuentas_analiticas = set([])
                 for l in w.nomina_id.slip_ids:
-                    if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
-                        if l.move_id.line_ids[0].analytic_account_id:
-                            cuentas_analiticas.add(l.move_id.line_ids[0].analytic_account_id.name)
-                        else:
-                            cuentas_analiticas.add('Indefinido')
+                    if l.cuenta_analitica_id:
+                        cuentas_analiticas.add(l.cuenta_analitica_id.name)
                     else:
-                        if l.contract_id.analytic_account_id.name:
-                            cuentas_analiticas.add(l.contract_id.analytic_account_id.name)
-                        else:
-                            cuentas_analiticas.add('Indefinido')
+                        cuentas_analiticas.add('Indefinido')
+                    # if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
+                    #     if l.move_id.line_ids[0].analytic_account_id:
+                    #         c
+                    #     else:
+                    #         cuentas_analiticas.add('Indefinido')
+                    # else:
+                    #     if l.contract_id.analytic_account_id.name:
+                    #         cuentas_analiticas.add(l.contract_id.analytic_account_id.name)
+                    #     else:
+                    #         cuentas_analiticas.add('Indefinido')
 
                 for i in cuentas_analiticas:
                     hoja = libro.add_worksheet(i)
@@ -84,8 +89,8 @@ class rrhh_planilla_wizard(models.TransientModel):
                     hoja.write(linea, columna+3, 'Observaciones')
                     hoja.write(linea, columna+4, 'Cuenta analítica')
                     for l in w.nomina_id.slip_ids:
-                        if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
-                            if l.move_id.line_ids[0].analytic_account_id.name == i:
+                        if l.cuenta_analitica_id:
+                            if l.cuenta_analitica_id.name == i:
                                 linea += 1
                                 dias = 0
                                 total_salario = 0
@@ -131,11 +136,11 @@ class rrhh_planilla_wizard(models.TransientModel):
                                 hoja.write(linea, columna+1, l.employee_id.bank_account_id.bank_id.name)
                                 hoja.write(linea, columna+2, l.employee_id.bank_account_id.acc_number)
                                 hoja.write(linea, columna+3, l.note)
-                                hoja.write(linea, columna+4, l.move_id.line_ids[0].analytic_account_id.name)
+                                hoja.write(linea, columna+4, l.cuenta_analitica_id.name)
 
                                 num += 1
                         else:
-                            if l.contract_id.analytic_account_id.name == False and i == 'Indefinido':
+                            if l.cuenta_analitica_id == False and i == 'Indefinido':
                                 linea += 1
                                 dias = 0
                                 total_salario = 0
@@ -184,7 +189,7 @@ class rrhh_planilla_wizard(models.TransientModel):
                                 hoja.write(linea, columna+4, 'indefinido')
 
                                 num += 1
-                            if l.contract_id.analytic_account_id.name == i:
+                            if l.cuenta_analitica_id and l.cuenta_analitica_id.name == i:
                                 linea += 1
                                 dias = 0
                                 total_salario = 0
@@ -230,7 +235,7 @@ class rrhh_planilla_wizard(models.TransientModel):
                                 hoja.write(linea, columna+1, l.employee_id.bank_account_id.bank_id.name)
                                 hoja.write(linea, columna+2, l.employee_id.bank_account_id.acc_number)
                                 hoja.write(linea, columna+3, l.note)
-                                hoja.write(linea, columna+4, l.contract_id.analytic_account_id.name)
+                                hoja.write(linea, columna+4, l.cuenta_analitica_id.name)
 
                                 num += 1
                     columna = 6
@@ -317,16 +322,20 @@ class rrhh_planilla_wizard(models.TransientModel):
                     hoja.write(linea, columna+1, l.employee_id.bank_account_id.bank_id.name)
                     hoja.write(linea, columna+2, l.employee_id.bank_account_id.acc_number)
                     hoja.write(linea, columna+3, l.note)
-                    if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
-                        if l.move_id.line_ids[0].analytic_account_id:
-                            hoja.write(linea, columna+4, l.move_id.line_ids[0].analytic_account_id.name)
-                        else:
-                            hoja.write(linea, columna+4, 'indefinido')
+                    if l.cuenta_analitica_id:
+                        hoja.write(linea, columna+4, l.cuenta_analitica_id.name)
                     else:
-                        if l.contract_id.analytic_account_id.name:
-                            hoja.write(linea, columna+4, l.contract_id.analytic_account_id.name)
-                        else:
-                            hoja.write(linea, columna+4, 'indefinido')
+                        hoja.write(linea, columna+4, 'indefinido')
+                    # if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
+                    #     if l.move_id.line_ids[0].analytic_account_id:
+                    #         hoja.write(linea, columna+4, l.move_id.line_ids[0].analytic_account_id.name)
+                    #     else:
+                    #         hoja.write(linea, columna+4, 'indefinido')
+                    # else:
+                    #     if l.contract_id.analytic_account_id.name:
+                    #         hoja.write(linea, columna+4, l.contract_id.analytic_account_id.name)
+                    #     else:
+                    #         hoja.write(linea, columna+4, 'indefinido')
                     linea += 1
                     num += 1
 
