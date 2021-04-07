@@ -34,8 +34,8 @@ class report_planilla_pdf(models.AbstractModel):
         lineas = {}
         numero = 1
         for slip in nomina.slip_ids:
-            if slip.contract_id.analytic_account_id.name:
-                llave = slip.contract_id.analytic_account_id.name
+            if slip.cuenta_analitica_id:
+                llave = slip.cuenta_analitica_id.name
             else:
                 llave = 'Indefinido'
 
@@ -119,8 +119,8 @@ class report_planilla_pdf(models.AbstractModel):
             linea['estatico']['banco_depositar'] = slip.employee_id.bank_account_id.bank_id.name
             linea['estatico']['cuenta_depositar'] = slip.employee_id.bank_account_id.acc_number
             linea['estatico']['observaciones'] = slip.note
-            if slip.move_id and len(slip.move_id.line_ids) > 0 and slip.move_id.line_ids[0].analytic_account_id:
-                linea['estatico']['cuenta_analitica'] = slip.move_id.line_ids[0].analytic_account_id.name
+            if slip.cuenta_analitica_id:
+                linea['estatico']['cuenta_analitica'] = slip.cuenta_analitica_id.name
             else:
                 linea['estatico']['cuenta_analitica'] = llave
             lineas[llave][slip.employee_id.job_id.name]['datos'].append(linea)

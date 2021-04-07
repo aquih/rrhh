@@ -4,7 +4,7 @@ from odoo import api, models, fields
 import time
 import datetime
 from datetime import date
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from odoo.fields import Date, Datetime
 import logging
 
@@ -78,6 +78,22 @@ class ReportLibroSalarios(models.AbstractModel):
                 dias_trabajados += work
         return dias_trabajados
 
+    def _get_domingos_trabajados(self,fecha_inicio,fecha_fin):
+        cantidad_domingos = 0
+        contador = 0
+        fecha_desde =  datetime.strptime(str(fecha_inicio),"%Y-%m-%d")
+        fecha_hasta = datetime.strptime(str(fecha_fin),"%Y-%m-%d")
+        now = datetime.now()
+        cantidad_dias = fecha_hasta - fecha_desde
+        cantidad_dias = cantidad_dias.days
+        dias_a_trabajar = 0
+        while (contador <= cantidad_dias):
+            otro_tiempo  = fecha_desde + timedelta(days = contador)
+            if (otro_tiempo.strftime("%A") == 'Sunday'):
+                cantidad_domingos += 1
+            contador +=1
+        return cantidad_domingos
+
     def _get_nominas(self,id,anio):
         nomina_id = self.env['hr.payslip'].search([['employee_id', '=', id]],order="date_to asc")
         nominas_lista = []
@@ -129,10 +145,6 @@ class ReportLibroSalarios(models.AbstractModel):
                 for linea in nomina.line_ids:
                     if linea.salary_rule_id.id in nomina.company_id.salario_ids.ids:
                         salario += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.ordinarias_ids.ids:
-                        for entrada in nomina.input_line_ids:
-                            if linea.code == entrada.code:
-                                ordinarias += entrada.amount
                     if linea.salary_rule_id.id in nomina.company_id.extras_ordinarias_ids.ids:
                         for entrada in nomina.input_line_ids:
                             if linea.code == entrada.code:
@@ -156,8 +168,6 @@ class ReportLibroSalarios(models.AbstractModel):
                         aguinaldo += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.indemnizacion_ids.ids:
                         indemnizacion += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.septimos_asuetos_ids.ids:
-                        septimos_asuetos += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.vacaciones_ids.ids:
                         vacaciones += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.decreto_ids.ids:
@@ -173,19 +183,31 @@ class ReportLibroSalarios(models.AbstractModel):
                     if linea.salary_rule_id.id in nomina.company_id.devolucion_isr_otro_ids.ids:
                         dev_isr_otro += linea.total
 
-                total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones + otros_salarios
+                dias_trabajados = int(dias_laborados_netos) if dias_laborados_netos > 0 else int(dias_trabajados)
+                ordinarias = dias_trabajados*8 if dias_trabajados <= 31 else 0
+                domingos = self._get_domingos_trabajados(nomina.date_from,nomina.date_to)
+                sueldo_diario = 0
+                if dias_trabajados > 0:
+                    sueldo_diario = salario/30
+                else:
+                    sueldo_diario = 0
+
+                septimos_asuetos = sueldo_diario * domingos
+                ordinario_final = ordinario - septimos_asuetos
+                ordinario = ordinario_final
                 # total_descuentos = igss + isr + anticipos
                 otras_deducciones = anticipos
                 total_deducciones = igss + otras_deducciones + isr
                 bono_agui_indem = bono + aguinaldo + indemnizacion
                 numero_orden += 1
+                total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones + otros_salarios
                 nominas_lista.append({
                     'orden': numero_orden,
                     'fecha_inicio': nomina.date_from,
                     'fecha_fin': nomina.date_to,
                     'moneda_id': nomina.company_id.currency_id,
                     'salario': salario,
-                    'dias_trabajados': int(dias_laborados_netos) if dias_laborados_netos > 0 else int(dias_trabajados),
+                    'dias_trabajados': dias_trabajados,
                     'dias_calculados': int(dias_calculados),
                     'ordinarias': ordinarias,
                     'extra_ordinarias': extra_ordinarias,

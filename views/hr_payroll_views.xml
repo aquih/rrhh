@@ -26,6 +26,7 @@
                 <field name="name" position="after">
                     <field name="etiqueta_empleado_ids" widget="many2many_tags"/>
                     <field name="porcentaje_prestamo"/>
+                    <field name="cuenta_analitica_id"/>
                 </field>
             </field>
         </record>
