@@ -32,6 +32,17 @@ class rrhh_planilla_wizard(models.TransientModel):
         }
         return self.env.ref('rrhh.action_planilla_pdf').report_action(self, data=data)
 
+    def buscar_partida_nominas(self,slip_ids):
+        cantidad_nominas_partida = 0
+        partidas = {}
+        for slip in slip_ids:
+            if slip.move_id:
+                if slip.id not in partidas:
+                    partidas[slip.move_id.id] = 0
+        logging.warn(len(partidas))
+        logging.warn(partidas)
+        return partidas
+
     def generar(self):
         for w in self:
             f = io.BytesIO()
@@ -39,13 +50,24 @@ class rrhh_planilla_wizard(models.TransientModel):
             formato_fecha = libro.add_format({'num_format': 'dd/mm/yy'})
             logging.warn(w.agrupado)
             if w.agrupado:
+                # partidas_iguales, contiene un diccionario de todas las partidas de la nomina, en el caso de que unifiquen todas las nóminas
+                # en una partida o en el caso que no, asi mas adelante podemos clasificar por cuenta analítica de la partida o por la cuenta analítica de la nómina
+                partidas_iguales = self.buscar_partida_nominas(w.nomina_id.slip_ids)
                 cuentas_analiticas = set([])
                 for l in w.nomina_id.slip_ids:
                     if l.cuenta_analitica_id:
                         cuentas_analiticas.add(l.cuenta_analitica_id.name)
                     else:
-                        cuentas_analiticas.add('Indefinido')
-
+                        if len(partidas_iguales) > 1:
+                            logging.warn('si es mayor')
+                            if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
+                                cuentas_analiticas.add(l.move_id.line_ids[0].analytic_account_id.name)
+                            else:
+                                cuentas_analiticas.add('Indefinido')
+                        else:
+                            cuentas_analiticas.add('Indefinido')
+                logging.warn('cuentas_analiticas')
+                logging.warn(cuentas_analiticas)
                 for i in cuentas_analiticas:
                     hoja = libro.add_worksheet(i)
 
@@ -79,8 +101,17 @@ class rrhh_planilla_wizard(models.TransientModel):
                     hoja.write(linea, columna+3, 'Observaciones')
                     hoja.write(linea, columna+4, 'Cuenta analítica')
                     for l in w.nomina_id.slip_ids:
+                        cuenta_analitica = False
                         if l.cuenta_analitica_id:
-                            if l.cuenta_analitica_id.name == i:
+                            cuenta_analitica = l.cuenta_analitica_id.name
+                            logging.warn('if partida')
+                        else:
+                            logging.warn('else partidas')
+                            if len(partidas_iguales) > 1:
+                                if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
+                                    cuenta_analitica = l.move_id.line_ids[0].analytic_account_id.name
+                        if cuenta_analitica:
+                            if cuenta_analitica == i:
                                 linea += 1
                                 dias = 0
                                 total_salario = 0
@@ -130,7 +161,8 @@ class rrhh_planilla_wizard(models.TransientModel):
 
                                 num += 1
                         else:
-                            if l.cuenta_analitica_id == False and i == 'Indefinido':
+                            if cuenta_analitica == False and i == 'Indefinido':
+                                logging.warn('else indefinido')
                                 linea += 1
                                 dias = 0
                                 total_salario = 0
