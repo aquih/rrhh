@@ -60,17 +60,17 @@ class rrhh_igss_wizard(models.TransientModel):
                 if contrato_ids:
                     contrato = self.env['hr.contract'].browse([contrato_ids.id])
                     if contrato.date_end:
-                        mes_contrato= datetime.strptime(contrato.date_end, '%Y-%m-%d')
+                        mes_contrato= datetime.strptime(str(contrato.date_end), '%Y-%m-%d')
                         mes_final_contrato = mes_contrato.month
                         anio_final_contrato = mes_contrato.year
                         if mes_planilla == mes_final_contrato and anio_final_contrato == anio_planilla:
-                            datos += str(contrato.wage) + '|' + str(datetime.strptime(contrato.date_start,'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + str(datetime.strptime(contrato.date_end,'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|'
+                            datos += str(contrato.wage) + '|' + str(datetime.strptime(str(contrato.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + str(datetime.strptime(str(contrato.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|'
                     else:
                         mes_contrato = datetime.strptime(str(contrato.date_start), '%Y-%m-%d')
                         mes_final_contrato = mes_contrato.month
                         anio_final_contrato = mes_contrato.year
                         if mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla:
-                            datos += str(contrato.wage) + '|' + str(datetime.strptime(contrato.date_start,'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + '|'
+                            datos += str(contrato.wage) + '|' + str(datetime.strptime(str(contrato.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + '|'
                         else:
                             datos += str(contrato.wage) + '|' + '|' + '' + '|'
                 else:
