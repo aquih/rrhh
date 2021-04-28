@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <field name="color_name" position="after">
                     <field name="descontar_nomina"/>
+                    <field name="codigo"/>
                 </field>
             </field>
         </record>
