@@ -33,8 +33,8 @@ class rrhh_igss_wizard(models.TransientModel):
     clase_planilla = fields.Char('Clase de planilla')
     numero_liquidacion = fields.Char('Numero de liquidacion')
     tipo_planilla_liquidacion = fields.Char('Tipo de planilla de liquidación')
-    fecha_inicial = fields.Char('Fecha inicial liquidación')
-    fecha_final = fields.Char('Fecha final de liquidación')
+    fecha_inicial = fields.Date('Fecha inicial liquidación')
+    fecha_final = fields.Date('Fecha final de liquidación')
     tipo_liquidacion = fields.Char('Tipo de liquidación')
     numero_nota_cargo = fields.Char('Número nota de cargo')
 
@@ -48,13 +48,12 @@ class rrhh_igss_wizard(models.TransientModel):
             datos += '[tiposplanilla]' + '\r\n'
             datos += self.identificacion_tipo_planilla + '|' + self.nombre_tipo_planilla + '|' + self.tipo_afiliados + '|' + self.periodo_planilla + '|' + self.departamento_republica + '|' + self.actividad_economica + '|' + self.clase_planilla + '|' +'\r\n'
             datos += '[liquidaciones]' + '\r\n'
-            datos += self.numero_liquidacion + '|' + self.tipo_planilla_liquidacion + '|' + self.fecha_inicial + '|' + self.fecha_final + '|' + self.tipo_liquidacion + '|' + (self.numero_nota_cargo if self.numero_nota_cargo else '') + '|' +'\r\n'
+            datos += self.numero_liquidacion + '|' + self.tipo_planilla_liquidacion + '|' + str(datetime.strptime(str(self.fecha_inicial),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + str(datetime.strptime(str(self.fecha_final),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + self.tipo_liquidacion + '|' + (self.numero_nota_cargo if self.numero_nota_cargo else '') + '|' +'\r\n'
             datos += '[empleados]' + '\r\n'
             empleados = {}
             suspensiones = []
             for payslip_run in w.payslip_run_id:
                 for slip in payslip_run.slip_ids:
-                    logging.warn(slip)
                     if slip.contract_id:
                         if slip.employee_id.id not in empleados:
                             empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id.id,'informacion': [0] * 15,'suspension': ''}
@@ -102,20 +101,20 @@ class rrhh_igss_wizard(models.TransientModel):
 
             if empleados:
                 for empleado in empleados.values():
-                    logging.warn(empleado)
                     for dato in empleado['informacion']:
                         datos += str(dato) + '|'
                     datos += '\r\n'
 
                     ausencias = False
                     if version_info[0] == 12:
-                        ausencias = self.env['hr.leave.type'].search([('employee_id','=', empleado['empleado_id'])])
+                        ausencias = self.env['hr.leave'].search([('employee_id','=', empleado['empleado_id']),('date_from','>=',self.fecha_inicial),('date_to','<=',self.fecha_final)])
                     else:
                         ausencias = self.env['hr.holidays'].search([('employee_id','=',  empleado['empleado_id'])])
 
                     if ausencias:
+                        reglas = [x.code for x in slip.employee_id.company_id.igss_ids]
                         for ausencia in ausencias:
-                            if ausencia.holiday_status_id.codigo in [slip.employee_id.company_id.igss_ids.code]:
+                            if ausencia.holiday_status_id.codigo in reglas:
                                 fecha_inicio = str(datetime.strptime(str(ausencia.date_from),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
                                 fecha_fin = str(datetime.strptime(str(ausencia.date_to),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
                                 suspensiones.append(numero_liquidacion + '|' + numero_afiliado + '|' + primer_nombre + '|' + segundo_nombre + '|' + primer_apellido + '|' + segundo_apellido + '|' + apellido_casada + '|' + fecha_inicio + '|' + fecha_fin + '|' + '\r\n')
