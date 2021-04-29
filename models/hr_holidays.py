@@ -7,8 +7,10 @@ if version_info[0] == 12:
         _inherit = "hr.leave.type"
 
         descontar_nomina = fields.Boolean('Descontar en nómina')
+        codigo = fields.Char('codigo')
 else:
     class HolidaysStatus(models.Model):
         _inherit = "hr.holidays.status"
 
         descontar_nomina = fields.Boolean('Descontar en nómina')
+        codigo = fields.Char('codigo')
