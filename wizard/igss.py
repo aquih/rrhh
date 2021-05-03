@@ -72,7 +72,7 @@ class rrhh_igss_wizard(models.TransientModel):
                                 sueldo += linea.amount
 
                         mes_inicio_contrato = datetime.strptime(str(slip.contract_id.date_start), '%Y-%m-%d').month
-                        mes_final_contrato = datetime.strptime(str(slip.contract_id.date_end), '%Y-%m-%d').month
+                        mes_final_contrato = datetime.strptime(str(slip.contract_id.date_end), '%Y-%m-%d').month if slip.contract_id.date_end else ''
                         mes_planilla = datetime.strptime(str(payslip_run.date_start), '%Y-%m-%d').month
                         fecha_alta = str(datetime.strptime(str(slip.contract_id.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if mes_inicio_contrato == mes_planilla else ''
                         fecha_baja = str(datetime.strptime(str(slip.contract_id.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if mes_final_contrato == mes_planilla else ''
