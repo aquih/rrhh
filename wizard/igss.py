@@ -56,7 +56,7 @@ class rrhh_igss_wizard(models.TransientModel):
                 for slip in payslip_run.slip_ids:
                     if slip.contract_id:
                         if slip.employee_id.id not in empleados:
-                            empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id.id,'informacion': [0] * 15,'suspension': ''}
+                            empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id,'informacion': [0] * 15,'suspension': ''}
 
                         contrato_ids = self.env['hr.contract'].search( [['employee_id', '=', slip.employee_id.id]],offset=0,limit=1,order='date_start desc')
                         numero_liquidacion = str(slip.employee_id.numero_liquidacion) if slip.employee_id.numero_liquidacion else ''
@@ -107,16 +107,26 @@ class rrhh_igss_wizard(models.TransientModel):
 
                     ausencias = False
                     if version_info[0] == 12:
-                        ausencias = self.env['hr.leave'].search([('employee_id','=', empleado['empleado_id']),('date_from','>=',self.fecha_inicial),('date_to','<=',self.fecha_final)])
+                        ausencias = self.env['hr.leave'].search([('employee_id','=', empleado['empleado_id'].id),('date_from','>=',self.fecha_inicial),('date_to','<=',self.fecha_final)])
                     else:
-                        ausencias = self.env['hr.holidays'].search([('employee_id','=',  empleado['empleado_id'])])
+                        ausencias = self.env['hr.holidays'].search([('employee_id','=',  empleado['empleado_id'].id),('date_from','>=',self.fecha_inicial),('date_to','<=',self.fecha_final)])
 
                     if ausencias:
-                        reglas = [x.code for x in slip.employee_id.company_id.igss_ids]
+                        numero_liquidacion = str(empleado['empleado_id'].numero_liquidacion) if empleado['empleado_id'].numero_liquidacion else ''
+                        numero_afiliado = str(empleado['empleado_id'].igss) if empleado['empleado_id'].igss else ''
+                        primer_nombre = str(empleado['empleado_id'].primer_nombre) if empleado['empleado_id'].primer_nombre else ''
+                        segundo_nombre = str(empleado['empleado_id'].segundo_nombre) if empleado['empleado_id'].segundo_nombre else ''
+                        primer_apellido = str(empleado['empleado_id'].primer_apellido) if empleado['empleado_id'].primer_apellido else ''
+                        segundo_apellido = str(empleado['empleado_id'].segundo_apellido) if empleado['empleado_id'].segundo_apellido else ''
+                        apellido_casada = str(empleado['empleado_id'].apellido_casada) if empleado['empleado_id'].apellido_casada else ''
+
+                        reglas = [x.code for x in empleado['empleado_id'].company_id.igss_ids]
                         for ausencia in ausencias:
                             if ausencia.holiday_status_id.codigo in reglas:
-                                fecha_inicio = str(datetime.strptime(str(ausencia.date_from),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
-                                fecha_fin = str(datetime.strptime(str(ausencia.date_to),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
+                                fecha_inicio_tz = fields.Datetime.to_string(fields.Datetime.context_timestamp(self.with_context(tz=self.env.user.tz), fields.Datetime.from_string(ausencia.date_from)))
+                                fecha_fin_tz = fields.Datetime.to_string(fields.Datetime.context_timestamp(self.with_context(tz=self.env.user.tz), fields.Datetime.from_string(ausencia.date_to)))
+                                fecha_inicio = datetime.strptime(str(fecha_inicio_tz),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y')
+                                fecha_fin = datetime.strptime(str(fecha_fin_tz),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y')
                                 suspensiones.append(numero_liquidacion + '|' + numero_afiliado + '|' + primer_nombre + '|' + segundo_nombre + '|' + primer_apellido + '|' + segundo_apellido + '|' + apellido_casada + '|' + fecha_inicio + '|' + fecha_fin + '|' + '\r\n')
 
             datos += '[suspendidos]' + '\r\n'
