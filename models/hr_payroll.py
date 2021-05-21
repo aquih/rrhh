@@ -47,7 +47,7 @@ class HrPayslip(models.Model):
             #     fecha_inicio = datetime.datetime.strptime(str(fecha_nomina_desde - mes), '%Y-%m-%d').date()
             #     dias = empleado_id.get_work_days_data(Datetime.from_string(fecha_inicio.strftime('%Y-%m-%d')), Datetime.from_string(fecha_hasta), calendar=empleado_id.contract_id.resource_calendar_id)
         # return dias['days']
-        return diferencia_meses.days
+        return diferencia_meses.days + 1
 
     @api.multi
     def compute_sheet(self):
@@ -126,7 +126,7 @@ class HrPayslip(models.Model):
                     mes = relativedelta(months=contador_mes)
                     resta_mes = datetime.datetime.strptime(fecha_final_nomina,'%Y-%m-%d') - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
-                    llave = '01-'+str(resta_mes.month-1)+'-'+str(resta_mes.year)
+                    llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
                     if llave in salario_meses:
                         salario_meses[llave]['salario'] = linea['salario']
                         salario_total += linea['salario']
