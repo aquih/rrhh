@@ -435,10 +435,15 @@ class rrhh_informe_empleador(models.TransientModel):
                     viaticos = 0
                     retribucion_vacaciones = 0
                     bonificacion_decreto = 0
+                    numero_nominas_bono = 0
+                    salario_anual_nominal_promedio = 0
+                    numero_nominas_salario = 0
                     precision_currency = empleado.company_id.currency_id
                     indemnizacion = precision_currency.round(self._get_indemnizacion(empleado.id)) if empleado.contract_ids[0].date_end else 0
+                    nominas = {}
                     for nomina in nomina_id:
                         nomina_anio = datetime.strptime(str(nomina.date_from), "%Y-%m-%d").year
+                        nomina_mes = datetime.strptime(str(nomina.date_from), "%Y-%m-%d").month
                         if w['anio'] == nomina_anio:
                             if nomina.input_line_ids:
                                 for entrada in nomina.input_line_ids:
@@ -450,6 +455,10 @@ class rrhh_informe_empleador(models.TransientModel):
                             for linea in nomina.line_ids:
                                 if linea.salary_rule_id.id in nomina.company_id.salario_ids.ids:
                                     salario_anual_nominal += linea.total
+                                    if nomina_mes not in nominas:
+                                        nominas[nomina_mes] = {'salario': 0,'bonificacion':0}
+                                    nominas[nomina_mes]['salario'] += salario_anual_nominal
+                                    numero_nominas_salario += 1
                                 if linea.salary_rule_id.id in nomina.company_id.bonificacion_ids.ids:
                                     bonificacion += linea.total
                                 if linea.salary_rule_id.id in nomina.company_id.aguinaldo_ids.ids:
@@ -468,6 +477,12 @@ class rrhh_informe_empleador(models.TransientModel):
                                     bonificaciones_adicionales += linea.total
                                 if linea.salary_rule_id.id in nomina.company_id.decreto_ids.ids:
                                     bonificacion_decreto += linea.total
+                                    if nomina_mes not in nominas:
+                                        nominas[nomina_mes] = {'salario': 0,'bonificacion':0}
+                                    nominas[nomina_mes]['bonificacion'] += bonificacion_decreto
+                                    numero_nominas_bono += 1
+                    bonificacion_decreto = bonificacion_decreto / len(nominas) if bonificacion_decreto > 0 else 0
+                    salario_anual_nominal_promedio = salario_anual_nominal / len(nominas) if salario_anual_nominal > 0 else 0
                     if empleado.gender == 'male':
                         genero = 'H'
                     if empleado.gender == 'female':
@@ -518,9 +533,9 @@ class rrhh_informe_empleador(models.TransientModel):
                     hoja_empleado.write(fila, 30, empleado.jornada_trabajo,estilo_borde)
                     hoja_empleado.write(fila, 31, dias_trabajados_anual,estilo_borde)
                     hoja_empleado.write(fila, 32, empleado.permiso_trabajo,estilo_borde)
-                    hoja_empleado.write(fila, 33, contrato.wage,estilo_borde)
-                    # hoja_empleado.write(fila, 34, salario_anual_nominal,estilo_borde)
-                    hoja_empleado.write(fila, 34, (contrato.wage + contrato.base_extra) * 12,estilo_borde)
+                    hoja_empleado.write(fila, 33, salario_anual_nominal_promedio,estilo_borde)
+                    hoja_empleado.write(fila, 34, salario_anual_nominal,estilo_borde)
+                    # hoja_empleado.write(fila, 34, (contrato.wage + contrato.base_extra) * 12,estilo_borde)
                     hoja_empleado.write(fila, 35, bonificacion_decreto,estilo_borde)
                     hoja_empleado.write(fila, 36, numero_horas_extra,estilo_borde)
 
