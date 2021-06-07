@@ -58,6 +58,9 @@ class HrPayslip(models.Model):
             anio_nomina = int(datetime.datetime.strptime(str(nomina.date_from), '%Y-%m-%d').date().strftime('%Y'))
             valor_pago = 0
             porcentaje_pagar = 0
+            if nomina.payslip_run_id and nomina.payslip_run_id.estructura_id:
+                estructura_id = nomina.payslip_run_id.estructura_id
+                nomina.struct_id = estructura_id.id
             for entrada in nomina.input_line_ids:
                 for prestamo in nomina.employee_id.prestamo_ids:
                     anio_prestamo = int(datetime.datetime.strptime(str(prestamo.fecha_inicio), '%Y-%m-%d').date().strftime('%Y'))
@@ -80,6 +83,7 @@ class HrPayslip(models.Model):
                             prestamo.estado = "proceso"
                         if cantidad_pagados == cantidad_pagos and cantidad_pagos > 0:
                             prestamo.estado = "pagado"
+
         return res
 
     # SALARIO PROMEDIO POR 12 MESES LABORADOS O MENOS
@@ -234,6 +238,8 @@ class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 
     porcentaje_prestamo = fields.Float('Prestamo (%)')
+    estructura_id = fields.Many2one('hr.payroll.structure','Estructura')
+
 
     def generar_pagos(self):
         pagos = self.env['account.payment'].search([('nomina_id', '!=', False)])
