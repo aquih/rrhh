@@ -18,6 +18,14 @@ class HrPayslip(models.Model):
     etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids')
 
     @api.multi
+    def onchange_employee_id(self, date_from, date_to, employee_id=False, contract_id=False):
+        res = super(HrPayslip, self).onchange_employee_id(date_from,date_to,employee_id, contract_id=False)
+        payslip_run_id = self.env['hr.payslip.run'].search([('id','=',self.env.context.get('active_id'))])
+        if payslip_run_id and payslip_run_id.estructura_id:
+            res['value']['struct_id'] = payslip_run_id.estructura_id.id
+        return res
+
+    @api.multi
     def action_payslip_done(self):
         res = super(HrPayslip, self).action_payslip_done()
         for slip in self:
@@ -80,6 +88,7 @@ class HrPayslip(models.Model):
                             prestamo.estado = "proceso"
                         if cantidad_pagados == cantidad_pagos and cantidad_pagos > 0:
                             prestamo.estado = "pagado"
+
         return res
 
     # SALARIO PROMEDIO POR 12 MESES LABORADOS O MENOS
@@ -93,8 +102,8 @@ class HrPayslip(models.Model):
                 historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
 
             historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
-            fecha_inicio_contrato = datetime.datetime.strptime(empleado_id.contract_ids[0].date_start,"%Y-%m-%d")
-            fecha_final_contrato = datetime.datetime.strptime(fecha_final_nomina,"%Y-%m-%d")
+            fecha_inicio_contrato = datetime.datetime.strptime(str(empleado_id.contract_ids[0].date_start),"%Y-%m-%d")
+            fecha_final_contrato = datetime.datetime.strptime(str(fecha_final_nomina),"%Y-%m-%d")
             meses_laborados = (fecha_final_contrato.year - fecha_inicio_contrato.year) * 12 + (fecha_final_contrato.month - fecha_inicio_contrato.month)
 
             contador_mes = 0
@@ -124,7 +133,7 @@ class HrPayslip(models.Model):
                 while contador < diferencia_meses:
 
                     mes = relativedelta(months=contador_mes)
-                    resta_mes = datetime.datetime.strptime(fecha_final_nomina,'%Y-%m-%d') - mes
+                    resta_mes = datetime.datetime.strptime(str(fecha_final_nomina),'%Y-%m-%d') - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
                     if llave in salario_meses:
@@ -234,6 +243,8 @@ class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 
     porcentaje_prestamo = fields.Float('Prestamo (%)')
+    estructura_id = fields.Many2one('hr.payroll.structure','Estructura')
+
 
     def generar_pagos(self):
         pagos = self.env['account.payment'].search([('nomina_id', '!=', False)])
