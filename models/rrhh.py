@@ -98,6 +98,11 @@ class rrhh_prestamo(models.Model):
             self.generar_mensualidades()
         return True
 
+    def cancelar(self):
+        for prestamo in self:
+            prestamo.estado = 'proceso'
+        return True
+    
     @api.multi
     def unlink(self):
         for prestamo in self:
@@ -134,3 +139,4 @@ class rrhh_historial_salario(models.Model):
     salario = fields.Float('Salario')
     fecha = fields.Date('Fecha')
     contrato_id = fields.Many2one('hr.contract','Contato')
+    

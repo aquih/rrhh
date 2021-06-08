@@ -125,6 +125,7 @@
                 <form string="Prestamo">
                     <header>
                         <button string="Procesar" name="prestamos" type="object" class="oe_highlight"/>
+                        <button string="Pasar a Proceso" name="cancelar" type="object" groups="hr.group_hr_manager"  attrs="{'invisible':[('estado','!=','pagado')]}"/>
                         <field name="estado" widget="statusbar"/>
                     </header>
                     <group>
