@@ -18,6 +18,14 @@ class HrPayslip(models.Model):
     etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids')
 
     @api.multi
+    def onchange_employee_id(self, date_from, date_to, employee_id=False, contract_id=False):
+        res = super(HrPayslip, self).onchange_employee_id(date_from,date_to,employee_id, contract_id=False)
+        payslip_run_id = self.env['hr.payslip.run'].search([('id','=',self.env.context.get('active_id'))])
+        if payslip_run_id and payslip_run_id.estructura_id:
+            res['value']['struct_id'] = payslip_run_id.estructura_id.id
+        return res
+
+    @api.multi
     def action_payslip_done(self):
         res = super(HrPayslip, self).action_payslip_done()
         for slip in self:
@@ -58,9 +66,6 @@ class HrPayslip(models.Model):
             anio_nomina = int(datetime.datetime.strptime(str(nomina.date_from), '%Y-%m-%d').date().strftime('%Y'))
             valor_pago = 0
             porcentaje_pagar = 0
-            if nomina.payslip_run_id and nomina.payslip_run_id.estructura_id:
-                estructura_id = nomina.payslip_run_id.estructura_id
-                nomina.struct_id = estructura_id.id
             for entrada in nomina.input_line_ids:
                 for prestamo in nomina.employee_id.prestamo_ids:
                     anio_prestamo = int(datetime.datetime.strptime(str(prestamo.fecha_inicio), '%Y-%m-%d').date().strftime('%Y'))
