@@ -22,13 +22,9 @@ class HrPayslip(models.Model):
     def dias_trabajados_ultimos_meses(self,empleado_id,fecha_desde,fecha_hasta):
         dias = {'days': 0}
         if empleado_id.contract_id.date_start:
-            fecha_nomina_desde = datetime.datetime.strptime(str(fecha_hasta), '%Y-%m-%d').date()
-            fecha_nomina_hasta = datetime.datetime.strptime(str(fecha_desde), '%Y-%m-%d').date()
-            diferencia_meses = (fecha_nomina_desde - fecha_nomina_hasta)
+            diferencia_meses = (fecha_hasta - fecha_desde)
             if empleado_id.contract_id.date_start <= fecha_hasta and empleado_id.contract_id.date_start >= fecha_desde:
-                fecha_contrato_inicio = datetime.datetime.strptime(str(empleado_id.contract_id.date_start), '%Y-%m-%d').date()
-                fecha_nomina_hasta = datetime.datetime.strptime(str(fecha_hasta), '%Y-%m-%d').date()
-                diferencia_meses = fecha_nomina_hasta - fecha_contrato_inicio
+                diferencia_meses = fecha_hasta - empleado_id.contract_id.date_start
         return diferencia_meses.days + 1
 
     def existe_entrada(self,entrada_ids,entrada_id):
@@ -40,14 +36,14 @@ class HrPayslip(models.Model):
 
     def compute_sheet(self):
         for nomina in self:
-            mes_nomina = int(nomina.date_from.strftime('%m'))
-            dia_nomina = int(nomina.date_to.strftime('%d'))
-            anio_nomina = int(nomina.date_from.strftime('%Y'))
+            mes_nomina = int(nomina.date_from.month)
+            dia_nomina = int(nomina.date_to.day)
+            anio_nomina = int(nomina.date_from.year)
             valor_pago = 0
             porcentaje_pagar = 0
             for entrada in nomina.input_line_ids:
                 for prestamo in nomina.employee_id.prestamo_ids:
-                    anio_prestamo = int(prestamo.fecha_inicio.strftime('%Y'))
+                    anio_prestamo = int(prestamo.fecha_inicio.year)
                     if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
                         lista = []
                         for lineas in prestamo.prestamo_ids:
@@ -99,15 +95,13 @@ class HrPayslip(models.Model):
                 historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
 
             historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
-            fecha_inicio_contrato = datetime.datetime.strptime(str(empleado_id.contract_ids[0].date_start),"%Y-%m-%d")
-            fecha_final_contrato = datetime.datetime.strptime(str(fecha_final_nomina),"%Y-%m-%d")
-            meses_laborados = (fecha_final_contrato.year - fecha_inicio_contrato.year) * 12 + (fecha_final_contrato.month - fecha_inicio_contrato.month)
+            meses_laborados = (fecha_final_nomina.year - empleado_id.contract_ids[0].date_start.year) * 12 + (fecha_final_nomina.month - empleado_id.contract_ids[0].date_start.month)
 
             contador_mes = 0
             if meses_laborados >= 12:
                 while contador_mes < 12:
                     mes = relativedelta(months=contador_mes)
-                    resta_mes = fecha_final_contrato - mes
+                    resta_mes = fecha_final_nomina - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
                     salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'extra':0,'total':0}
@@ -116,7 +110,7 @@ class HrPayslip(models.Model):
 
                 while contador_mes <= meses_laborados:
                     mes = relativedelta(months=contador_mes)
-                    resta_mes = fecha_final_contrato - mes
+                    resta_mes = fecha_final_nomina - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
                     salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'extra':0,'total':0}
@@ -124,7 +118,7 @@ class HrPayslip(models.Model):
 
             contador_mes = 0
             fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[0]['fecha']), '%Y-%m-%d')
-            diferencia_meses = relativedelta(fecha_final_contrato, fecha_inicio_diferencia).months + 1
+            diferencia_meses = relativedelta(fecha_final_nomina, fecha_inicio_diferencia).months + 1
             for linea in historial_salario_ordenado:
                 contador = 0
                 while contador < diferencia_meses:
@@ -193,11 +187,11 @@ class HrPayslip(models.Model):
         if contracts:
             if contracts.date_start and self.date_from <= contracts.date_start <= self.date_to:
                 dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
-                dia_inicio_contrato = int(contracts.date_start.strftime('%d'))
+                dia_inicio_contrato = int(contracts.date_start.day)
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar) if (dias_laborados['days'] - dias_ausentados_restar) <= 30 else 30})
             elif contracts.date_end and self.date_from <= contracts.date_end <= self.date_to:
                 dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(contracts.date_end), calendar=contracts.resource_calendar_id)
-                dias_trabajo = int(contracts.date_end.strftime('%d'))
+                dias_trabajo = int(contracts.date_end.day)
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) <= 30 else 30})
             else:
                 if contracts.schedule_pay == 'monthly':
@@ -213,9 +207,9 @@ class HrPayslip(models.Model):
     @api.onchange('employee_id','struct_id','contract_id', 'date_from', 'date_to','porcentaje_prestamo')
     def _onchange_employee(self):
         res = super(HrPayslip, self)._onchange_employee()
-        mes_nomina = self.date_from.strftime('%m')
-        anio_nomina = self.date_from.strftime('%Y')
-        dia_nomina = self.date_to.strftime('%d')
+        mes_nomina = self.date_from.month
+        anio_nomina = self.date_from.year
+        dia_nomina = self.date_to.day
         entradas_nomina = []
         if self.contract_id:
             entradas = self._obtener_entrada(self.contract_id)
@@ -233,7 +227,7 @@ class HrPayslip(models.Model):
             self.calculo_rrhh(self)
 
         for prestamo in self.employee_id.prestamo_ids:
-            anio_prestamo = int(prestamo.fecha_inicio.strftime('%Y'))
+            anio_prestamo = int(prestamo.fecha_inicio.year)
             for entrada in self.input_line_ids:
                 if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
                     for lineas in prestamo.prestamo_ids:

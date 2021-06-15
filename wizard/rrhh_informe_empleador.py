@@ -69,14 +69,12 @@ class rrhh_informe_empleador(models.TransientModel):
                 historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
 
             historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
-            fecha_inicio_contrato = datetime.strptime(str(empleado_id.contract_ids[0].date_start),"%Y-%m-%d")
-            fecha_final_contrato = datetime.strptime(str(empleado_id.contract_id.date_end),"%Y-%m-%d") + relativedelta(months=-1)
-            meses_laborados = (fecha_final_contrato.year - fecha_inicio_contrato.year) * 12 + (fecha_final_contrato.month - fecha_inicio_contrato.month)
+            meses_laborados = (empleado_id.contract_id.date_end.year - empleado_id.contract_ids[0].date_start.year) * 12 + (empleado_id.contract_id.date_end.month - empleado_id.contract_ids[0].date_start.month)
             contador_mes = 0
             if meses_laborados >= 6:
                 while contador_mes < 6:
                     mes = relativedelta(months=contador_mes)
-                    resta_mes = fecha_final_contrato - mes
+                    resta_mes = empleado_id.contract_id.date_end - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
                     salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'mes_numero':resta_mes.month-1,'extra':0,'total':0}
@@ -84,7 +82,7 @@ class rrhh_informe_empleador(models.TransientModel):
             else:
                 while contador_mes <= meses_laborados:
                     mes = relativedelta(months=contador_mes)
-                    resta_mes = fecha_final_contrato - mes
+                    resta_mes = empleado_id.contract_id.date_end - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
                     salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'mes_numero':resta_mes.month-1,'extra':0,'total':0}
@@ -92,7 +90,7 @@ class rrhh_informe_empleador(models.TransientModel):
 
             contador_mes = 0
             fecha_inicio_diferencia = datetime.strptime(str(historial_salario_ordenado[0]['fecha']), '%Y-%m-%d')
-            diferencia_meses = (fecha_final_contrato.year - fecha_inicio_diferencia.year) * 12 + (fecha_final_contrato.month - fecha_inicio_diferencia.month)
+            diferencia_meses = (empleado_id.contract_id.date_end.year - fecha_inicio_diferencia.year) * 12 + (empleado_id.contract_id.date_end.month - fecha_inicio_diferencia.month)
 
             posicion_siguiente = 0
             for linea in historial_salario_ordenado:
@@ -103,7 +101,7 @@ class rrhh_informe_empleador(models.TransientModel):
                 while contador < (diferencia_meses):
 
                     mes = relativedelta(months=contador_mes)
-                    resta_mes = fecha_final_contrato - mes
+                    resta_mes = empleado_id.contract_id.date_end - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
                     if llave in salario_meses:
@@ -124,9 +122,8 @@ class rrhh_informe_empleador(models.TransientModel):
             nomina_ids = self.env['hr.payslip'].search([('employee_id', '=', empleado_id.id)], order='date_to asc')
             if nomina_ids:
                 for nomina in nomina_ids:
-                    fecha_fin_nomina = datetime.strptime(str(nomina.date_to),'%Y-%m-%d')
-                    mes_nomina = fecha_fin_nomina.month
-                    anio_nomina = fecha_fin_nomina.year
+                    mes_nomina = nomina.date_to.month
+                    anio_nomina = nomina.date_to.year
                     llave = '01-'+str(mes_nomina)+'-'+str(anio_nomina)
                     extra_ordinario_ids = nomina.company_id.extra_ordinario_ids
                     if llave in salario_meses:
@@ -178,13 +175,13 @@ class rrhh_informe_empleador(models.TransientModel):
         return self.env.ref('rrhh.action_informe_empleador').report_action([], data=datas)
 
     def dias_trabajados_anual(self,empleado_id,anio):
-        anio_inicio_contrato = int(empleado_id.contract_id.date_start.strftime('%Y'))
+        anio_inicio_contrato = int(empleado_id.contract_id.date_start.year)
         anio_inicio = datetime.strptime(str(anio)+'-01'+'-01', '%Y-%m-%d').date().strftime('%Y-%m-%d')
         anio_fin = datetime.strptime(str(anio)+'-12'+'-31', '%Y-%m-%d').date().strftime('%Y-%m-%d')
         dias_laborados = 0
         empleado = self.env['hr.employee'].browse(empleado_id.id)
         if empleado_id.contract_id.date_start and empleado_id.contract_id.date_end:
-            anio_fin_contrato = int(empleado_id.contract_id.date_end.strftime('%Y'))
+            anio_fin_contrato = int(empleado_id.contract_id.date_end.year)
             if anio_inicio_contrato == anio and anio_fin_contrato == anio:
                 dias = empleado._get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
