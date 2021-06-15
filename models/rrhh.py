@@ -100,6 +100,11 @@ class rrhh_prestamo(models.Model):
             self.generar_mensualidades()
         return True
 
+    def cancelar(self):
+        for prestamo in self:
+            prestamo.estado = 'proceso'
+        return True
+
     def unlink(self):
         for prestamo in self:
             if not prestamo.estado == 'nuevo':

@@ -22,8 +22,8 @@
         <record id="rrhh.view_employee_form" model="ir.ui.view">
             <field name="name">rrhh.hr.employee.form</field>
             <field name="model">hr.employee</field>
-	        <field name="inherit_id" ref="hr.view_employee_form"/>
-	        <field name="arch" type="xml">
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
                 <data>
                     <div name="button_box" position="inside">
                         <button name="%(act_rrhh_prestamo_2)d"
@@ -95,8 +95,8 @@
                         </div>
                     </field>
                 </data>
-	        </field>
-	    </record>
+            </field>
+        </record>
 
         <record id="rrhh_view_employee_prestamo_form" model="ir.ui.view">
             <field name="name">rrhh.employee.prestamo</field>
@@ -104,24 +104,24 @@
             <field name="arch" type="xml">
                 <form string="Prestamo">
                     <header>
-                        <button string="Procesar" name="prestamos" type="object" class="oe_highlight"/>
+                        <button string="Procesar" name="prestamos" type="object" class="oe_highlight"  attrs="{'invisible':[('estado','!=','nuevo')]}"/>
+                        <button string="Pasar a Proceso" name="cancelar" type="object" groups="hr.group_hr_manager"  attrs="{'invisible':[('estado','!=','pagado')]}"/>
                         <field name="estado" widget="statusbar"/>
                     </header>
                     <group>
                         <group>
-                            <field name="fecha_inicio"/>
-                            <field name="numero_descuentos"/>
-                            <field name="employee_id"/>
-                            <field name="pendiente_pagar_prestamo"/>
+                            <field name="fecha_inicio" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
+                            <field name="numero_descuentos" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
+                            <field name="employee_id" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
+                            <field name="pendiente_pagar_prestamo" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
                         </group>
                         <group>
-                            <field name="total"/>
-                            <field name="mensualidad"/>
+                            <field name="total" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
+                            <field name="mensualidad" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
                             <field name="descripcion"/>
                             <field name="codigo"/>
                         </group>
                     </group>
-                    <group>
                     <field name="prestamo_ids">
                         <tree editable="bottom">
                             <field name="mes" attrs="{'readonly':[('nomina_id','!=',False)]}"/>
@@ -130,7 +130,6 @@
                             <field name="nomina_id" widget="many2many_tags"/>
                         </tree>
                     </field>
-                    </group>
                 </form>
             </field>
         </record>
@@ -211,3 +210,4 @@
             groups="hr.group_hr_manager"/>
   </data>
 </odoo>
+
