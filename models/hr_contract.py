@@ -16,3 +16,4 @@ class Contract(models.Model):
     fecha_reinicio_labores = fields.Date('Fecha de reinicio labores')
     temporalidad_contrato = fields.Char('Teporalidad del contrato')
     calcula_indemnizacion = fields.Boolean('Calcula indemnizacion')
+    historial_salario_ids = fields.One2many('rrhh.historial_salario','contrato_id',string='Historial de salario')

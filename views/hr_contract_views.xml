@@ -11,6 +11,12 @@
                         <field name="motivo_terminacion"/>
                         <field name="temporalidad_contrato"/>
                         <field name="calcula_indemnizacion"/>
+                        <field name="historial_salario_ids">
+                          <tree string="Hitorial de salario" editable="bottom">
+                              <field name="salario"/>
+                              <field name="fecha"/>
+                          </tree>
+                        </field>
                     </field>
                     <group name="salary_and_advantages" position="inside">
                         <label for="base_extra"/>

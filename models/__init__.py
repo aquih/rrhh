@@ -2,7 +2,7 @@
 
 from . import hr
 from . import hr_contract
-from . import rrhh_prestamo
+from . import rrhh
 from . import hr_payroll
 from . import planilla
 from . import res_company
