@@ -99,7 +99,7 @@ class rrhh_prestamo(models.Model):
         else:
             self.generar_mensualidades()
         return True
-    
+
     def cancelar(self):
         for prestamo in self:
             prestamo.estado = 'proceso'
@@ -134,3 +134,9 @@ class rrhh_prestamo_linea(models.Model):
     nomina_id = fields.Many2many('hr.payslip','prestamo_nominda_id_rel',string='Nomina')
     prestamo_id = fields.Many2one('rrhh.prestamo','Prestamo')
 
+class rrhh_historial_salario(models.Model):
+    _name = "rrhh.historial_salario"
+
+    salario = fields.Float('Salario')
+    fecha = fields.Date('Fecha')
+    contrato_id = fields.Many2one('hr.contract','Contato')
