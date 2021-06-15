@@ -96,6 +96,7 @@ class HrPayslip(models.Model):
         historial_salario = []
         salario_meses = {}
         salario_total = 0
+        salario_promedio_total = 0
         extra_ordinario_total = 0
         if empleado_id.contract_ids[0].historial_salario_ids:
             for linea in empleado_id.contract_ids[0].historial_salario_ids:
@@ -150,8 +151,10 @@ class HrPayslip(models.Model):
                         fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[posicion_siguiente]['fecha']), '%Y-%m-%d')
                         diferencia_meses = (fecha_cambio_salario.year - fecha_inicio_diferencia.year) * 12 + (fecha_cambio_salario.month - fecha_inicio_diferencia.month)
 
-        salario_meses = sorted(salario_meses.items())
-        salario_promedio_total =  (salario_total + extra_ordinario_total) / len(salario_meses)
+            salario_meses = sorted(salario_meses.items())
+            salario_promedio_total =  (salario_total + extra_ordinario_total) / len(salario_meses)
+        else:
+            salario_promedio_total = empleado_id.contract_ids[0].wage
         return salario_promedio_total
 
     def get_inputs(self, contracts, date_from, date_to):
