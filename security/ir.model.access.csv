@@ -19,3 +19,6 @@ access_rrhh_historial_salario_user,rrhh.historial.salario.user,model_rrhh_histor
 access_rrhh_historial_salario_manager,rrhh.historial.salario.manager,model_rrhh_historial_salario,hr.group_hr_manager,1,1,1,1
 access_rrhh_informe_empleador_manager,rrhh.informe.empleador.manager,rrhh.model_rrhh_informe_empleador,hr.group_hr_manager,1,1,1,1
 access_rrhh_libro_salarios_manager,rrhh.libro.salarios.manager,rrhh.model_rrhh_libro_salarios,hr.group_hr_manager,1,1,1,1
+access_rrhh_igss_wizard_manager,rrhh.igss.wizard.manager,rrhh.model_rrhh_igss_wizard,hr.group_hr_manager,1,1,1,1
+access_rrhh_planilla_wizard_manager,rrhh.planilla.wizard.manager,rrhh.model_rrhh_planilla_wizard,hr.group_hr_manager,1,1,1,1
+access_rrhh_planilla_pdf_manager,rrhh.planilla_pdf.manager,rrhh.model_report_rrhh_planilla_pdf,hr.group_hr_manager,1,1,1,1
