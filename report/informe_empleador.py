@@ -13,13 +13,13 @@ class ReportInformeEmpleador(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
         data = data if data is not None else {}
-        self.model = 'hr.employee'
+        model = 'rrhh.informe_empleador'
         docs = data.get('ids', data.get('active_ids'))
         anio = data.get('form', {}).get('anio', False)
 
         return {
             'doc_ids': docids,
-            'doc_model': self.model,
+            'doc_model': model,
             'docs': docs,
             'anio': anio,
             'datos_compania': datos_compania,

@@ -96,7 +96,7 @@
 
                                 </group>
                             </group>
-                            <label for="centro" string="Centros de trabajo"/>
+                            <label for="centro_trabajo_ids" string="Centros de trabajo"/>
                             <field name="centro_trabajo_ids">
                                 <tree string="Centros" editable="bottom">
                                     <field name="codigo"/>
