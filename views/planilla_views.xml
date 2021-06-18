@@ -68,7 +68,7 @@
         </record>
 
 
-        <menuitem action="action_planilla" id="menu_planilla" parent="hr_payroll.menu_hr_payroll_configuration" sequence="2"/>
+        <menuitem action="action_planilla" id="menu_planilla" parent="hr_payroll.menu_hr_salary_configuration" sequence="2"/>
 
         <record id="view_recibo_tree" model="ir.ui.view">
             <field name="name">recibo.tree</field>

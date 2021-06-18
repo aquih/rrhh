@@ -181,7 +181,7 @@ class ReportLibroSalarios(models.AbstractModel):
                     if linea.salary_rule_id.id in nomina.company_id.boni_incentivo_decreto_ids.ids:
                         boni_incentivo_decreto += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.devolucion_isr_otro_ids.ids:
-                        dev_isr_otro += linea.total
+                        dev_isr_otro += line.total
 
                 dias_trabajados = int(dias_laborados_netos) if dias_laborados_netos > 0 else int(dias_trabajados)
                 ordinarias = dias_trabajados*8 if dias_trabajados <= 31 else 0
@@ -240,12 +240,12 @@ class ReportLibroSalarios(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
         data = data if data is not None else {}
-        self.model = 'hr.employee'
+        model = 'rrhh.libro_salarios'
         docs = data.get('ids', data.get('active_ids'))
         anio = data.get('form', {}).get('anio', False)
         return {
             'doc_ids': docids,
-            'doc_model': self.model,
+            'doc_model': model,
             'docs': docs,
             'anio': anio,
             '_get_empleado': self._get_empleado,
