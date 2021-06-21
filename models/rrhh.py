@@ -103,6 +103,11 @@ class rrhh_prestamo(models.Model):
             prestamo.estado = 'proceso'
         return True
     
+    def iniciar(self):
+        for prestamo in self:
+            prestamo.estado = 'nuevo'
+        return True
+    
     @api.multi
     def unlink(self):
         for prestamo in self:

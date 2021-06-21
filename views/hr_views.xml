@@ -126,6 +126,7 @@
                     <header>
                         <button string="Procesar" name="prestamos" type="object" class="oe_highlight"/>
                         <button string="Pasar a Proceso" name="cancelar" type="object" groups="hr.group_hr_manager"  attrs="{'invisible':[('estado','!=','pagado')]}"/>
+                        <button string="Pasar a Borrador" name="iniciar" type="object" groups="hr.group_hr_manager"  attrs="{'invisible':[('estado','!=','proceso')]}"/>
                         <field name="estado" widget="statusbar"/>
                     </header>
                     <group>
