@@ -112,7 +112,15 @@ class rrhh_prestamo(models.Model):
     def unlink(self):
         for prestamo in self:
             if not prestamo.estado == 'nuevo':
-                raise UserError(_('No puede eliminar prestamo, por que ya existen nominas asociadas'))
+                raise UserError(_('No puede eliminar el prestamo, por que no esta en borrador'))
+                
+            cantidad_nominas = 0
+            for nomina in prestamo.prestamo_ids:
+                if nomina.nomina_id:
+                    cantidad_nominas += 1
+            if cantidad_nominas > 0:
+                raise UserError(_('No puede eliminar el prestamo, por que ya existen nominas asociadas'))
+                
         return super(hr_prestamo, self).unlink()
 
 class rrhh_prestamo_linea(models.Model):
