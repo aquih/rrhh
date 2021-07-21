@@ -109,7 +109,7 @@ class rrhh_prestamo(models.Model):
         for prestamo in self:
             if not prestamo.estado == 'nuevo':
                 raise UserError(_('No puede eliminar prestamo, por que ya existen nominas asociadas'))
-        return super(hr_prestamo, self).unlink()
+        return super(rrhh_prestamo, self).unlink()
 
 class rrhh_prestamo_linea(models.Model):
     _name = 'rrhh.prestamo.linea'
