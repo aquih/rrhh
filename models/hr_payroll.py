@@ -120,8 +120,6 @@ class HrPayslip(models.Model):
             fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[0]['fecha']), '%Y-%m-%d')
             # Sumamos + 1 en diferencia_meses por que no toma la fecha final
             diferencia_meses = ((fecha_final_nomina.year - fecha_inicio_diferencia.year) * 12 + (fecha_final_nomina.month - fecha_inicio_diferencia.month)) +1
-            logging.warn('diferencnia meses')
-            logging.warn(diferencia_meses)
             if len(historial_salario_ordenado) > 1:
                 diferencia_meses = relativedelta(fecha_final_nomina, fecha_inicio_diferencia).months + 1
             for linea in historial_salario_ordenado:
