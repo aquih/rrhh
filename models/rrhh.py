@@ -102,26 +102,26 @@ class rrhh_prestamo(models.Model):
         for prestamo in self:
             prestamo.estado = 'proceso'
         return True
-    
+
     def iniciar(self):
         for prestamo in self:
             prestamo.estado = 'nuevo'
         return True
-    
+
     @api.multi
     def unlink(self):
         for prestamo in self:
             if not prestamo.estado == 'nuevo':
                 raise UserError(_('No puede eliminar el prestamo, por que no esta en borrador'))
-                
+
             cantidad_nominas = 0
             for nomina in prestamo.prestamo_ids:
                 if nomina.nomina_id:
                     cantidad_nominas += 1
             if cantidad_nominas > 0:
                 raise UserError(_('No puede eliminar el prestamo, por que ya existen nominas asociadas'))
-                
-        return super(hr_prestamo, self).unlink()
+
+        return super(rrhh_prestamo, self).unlink()
 
 class rrhh_prestamo_linea(models.Model):
     _name = 'rrhh.prestamo.linea'
@@ -152,4 +152,3 @@ class rrhh_historial_salario(models.Model):
     salario = fields.Float('Salario')
     fecha = fields.Date('Fecha')
     contrato_id = fields.Many2one('hr.contract','Contato')
-    
