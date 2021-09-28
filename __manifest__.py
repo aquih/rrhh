@@ -36,5 +36,6 @@
         'wizard/igss.xml',
         'wizard/cerrar_nominas.xml',
         'security/ir.model.access.csv',
+        'security/rrhh_security.xml',
     ],
 }
