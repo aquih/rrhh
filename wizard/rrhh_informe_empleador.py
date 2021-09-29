@@ -437,7 +437,6 @@ class rrhh_informe_empleador(models.TransientModel):
                                     if nomina_mes not in nominas:
                                         nominas[nomina_mes] = {'salario': 0,'bonificacion':0}
                                     nominas[nomina_mes]['bonificacion'] += bonificacion_decreto
-                                    numero_nominas_bono += 1
 
                     salario_anual_nominal_promedio = salario_anual_nominal / len(nominas) if salario_anual_nominal > 0 else 0
                     if empleado.gender == 'male':
