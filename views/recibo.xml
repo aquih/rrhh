@@ -47,7 +47,7 @@
                                         <td><strong>DPI: </strong><span t-field="o.employee_id.identification_id"/></td>
                                         <t t-set="dias" t-value="0.0"/>
                                         <tr t-foreach="o.worked_days_line_ids" t-as="i">
-                                            <t t-if="i.code == 'WORK100'">
+                                            <t t-if="i.code == 'TRABAJO100'">
                                                 <t t-set="dias" t-value="dias + i.number_of_days"/>
                                             </t>
                                         </tr>
