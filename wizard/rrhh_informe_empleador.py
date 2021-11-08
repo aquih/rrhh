@@ -223,11 +223,11 @@ class rrhh_informe_empleador(models.TransientModel):
             hoja_patrono.write(7,0,'NIT')
             hoja_patrono.write(7,1,datos_compania.vat)
             hoja_patrono.write(8,0,'NOMBRE DE LA EMPRESA')
-            hoja_patrono.write(8,1,datos_compania.name)
+            hoja_patrono.write(8,1,datos_compania.company_registry)
             hoja_patrono.write(9,0,'NACIONALIDAD DEL EMPLEADOR')
             hoja_patrono.write(9,1,datos_compania.country_id.name)
             hoja_patrono.write(10,0,'DENOMINACION O RAZON SOCIAL DEL PATRONO')
-            hoja_patrono.write(10,1,datos_compania.company_registry)
+            hoja_patrono.write(10,1,datos_compania.name)
             hoja_patrono.write(11,0,'NUMERO PATRONAL IGSS')
             hoja_patrono.write(11,1,datos_compania.numero_patronal)
 
