@@ -44,7 +44,12 @@
                                     <tr>
                                         <td><strong>Sueldo base mensual:</strong> <span t-field="o.contract_id.wage"/></td>
                                         <t t-set="horas" t-value="horas_extras(o)"/>
-                                        <td><strong>DPI: </strong><span t-field="o.employee_id.identification_id"/></td>
+                                        <td><strong>DPI: </strong><span t-field="o.employee_id.identification_id"/>
+                                            <t t-if="o.employee_id.nit">
+                                                <br/>
+                                                <strong>NIT: </strong><span t-esc="o.employee_id.nit"/>
+                                            </t>
+                                        </td>
                                         <t t-set="dias" t-value="0.0"/>
                                         <tr t-foreach="o.worked_days_line_ids" t-as="i">
                                             <t t-if="i.code == 'TRABAJO100'">
@@ -189,7 +194,12 @@
                                     <tr>
                                         <td><strong>Sueldo base mensual:</strong> <span t-field="o.contract_id.wage"/></td>
                                         <t t-set="horas" t-value="horas_extras(o)"/>
-                                        <td><strong>DPI: </strong><span t-field="o.employee_id.identification_id"/></td>
+                                        <td><strong>DPI: </strong><span t-field="o.employee_id.identification_id"/>
+                                            <t t-if="o.employee_id.nit">
+                                                <br/>
+                                                <strong>NIT: </strong><span t-esc="o.employee_id.nit"/>
+                                            </t>
+                                        </td>
                                         <t t-set="dias" t-value="0.0"/>
                                         <tr t-foreach="o.worked_days_line_ids" t-as="i">
                                             <t t-if="i.code == 'TRABAJO100'">
