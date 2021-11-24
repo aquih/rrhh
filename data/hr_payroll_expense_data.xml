@@ -10,4 +10,9 @@
         <field name="code">DiasTrabajados12Meses</field>
     </record>
 
+    <record id="quincena_entrada" model="hr.payslip.input.type">
+        <field name="name">Quincena</field>
+        <field name="code">quincena</field>
+    </record>
+
 </odoo>

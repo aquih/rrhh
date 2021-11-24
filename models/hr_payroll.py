@@ -71,6 +71,9 @@ class HrPayslip(models.Model):
         if contrato_id.structure_type_id and contrato_id.structure_type_id.default_struct_id:
             if contrato_id.structure_type_id.default_struct_id.input_line_type_ids:
                 entradas = [entrada for entrada in contrato_id.structure_type_id.default_struct_id.input_line_type_ids]
+                entrada_quincena_id = self.env['hr.payslip.input.type'].search([('code','=','quincena')])
+                if entrada_quincena_id:
+                    entradas.append(entrada_quincena_id)
         return entradas
 
     def calculo_rrhh(self,nomina):
@@ -235,6 +238,11 @@ class HrPayslip(models.Model):
                     for lineas in prestamo.prestamo_ids:
                         if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
                             entrada.amount = lineas.monto*(self.porcentaje_prestamo/100)
+        if self.struct_id.schedule_pay == 'bi-monthly':
+            for entrada in self.input_line_ids:
+                if entrada.input_type_id.code == 'quincena':
+                    quincena = 1 if (self.date_to.day == 15) else 2
+                    entrada.amount = quincena
         return res
 
 class HrPayslipRun(models.Model):
