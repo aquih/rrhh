@@ -147,15 +147,19 @@
             <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
-        <record id="HrSalaryRule_12" model="hr.salary.rule">
-            <field name="name">Anticipos Sueldo</field>
-            <field name="category_id">4</field>
-            <field name="code">Anticipo/sueldo</field>
+        <record id="HrSalaryRule_13" model="hr.salary.rule">
+            <field name="name">Quincena</field>
+              <field name="category_id" ref="hr_payroll.BASIC"/>
+            <field name="code">quincena</field>
             <field name="sequence">5</field>
             <field name="condition_select">none</field>
-            <field name="amount_select">fix</field>
-            <field name="quantity">1</field>
-            <field name="amount_percentage">0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+quincena = 0
+if payslip.struct_id.schedule_pay == 'bi-monthly':
+  quincena = 1 if payslip.date_to.day &lt; 16 else 2
+result = quincena
+            </field>
             <field name="struct_id" ref="EstructuraBase"/>
         </record>
 
