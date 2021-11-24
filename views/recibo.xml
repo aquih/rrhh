@@ -13,7 +13,7 @@
                               <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 45px;" alt="Logo"/>
                           </div>
                             <h2>Recibo</h2>
-                            <strong>Compañia:</strong><span t-field="o.company_id.name"/>
+                            <strong>Compañia:</strong><span t-field="o.company_id.name"/> <t t-if="o.company_id.vat"><strong>NIT:</strong> <span t-esc="o.company_id.vat"/></t>
                             <p t-field="o.name"/>
 
                             <p>
@@ -158,7 +158,7 @@
                               <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 45px;" alt="Logo"/>
                           </div>
                             <h2>Recibo</h2>
-                            <strong>Compañia:</strong><span t-field="o.company_id.name"/>
+                            <strong>Compañia:</strong><span t-field="o.company_id.name"/> <t t-if="o.company_id.vat"><strong>NIT:</strong> <span t-esc="o.company_id.vat"/></t>
                             <p t-field="o.name"/>
 
                             <p>
