@@ -138,5 +138,5 @@ class rrhh_historial_salario(models.Model):
     _name = "rrhh.historial_salario"
 
     salario = fields.Float('Salario')
-    fecha = fields.Date('Fecha')
+    fecha = fields.Date('Fecha', required=True)
     contrato_id = fields.Many2one('hr.contract','Contato')
