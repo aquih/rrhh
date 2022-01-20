@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.release import version_info
 import logging
 import datetime
@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil import relativedelta as rdelta
 from odoo.fields import Date, Datetime
 from odoo.addons.l10n_gt_extra import a_letras
+from odoo.exceptions import ValidationError
 
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
@@ -92,6 +93,9 @@ class HrPayslip(models.Model):
         salario_promedio_total = 0
         if empleado_id.contract_ids[0].historial_salario_ids:
             for linea in empleado_id.contract_ids[0].historial_salario_ids:
+                if linea.fecha == False:
+                    raise ValidationError(_('Empleado debe de tener fecha en el historial de salario: ' + str(empleado_id.name)))
+
                 historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
 
             historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
