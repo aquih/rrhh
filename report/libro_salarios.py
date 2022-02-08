@@ -129,8 +129,14 @@ class ReportLibroSalarios(models.AbstractModel):
                 dias_calculados = self.dias_trabajados(nomina.employee_id,nomina)
                 dias_laborados = nomina.employee_id._get_work_days_data(Datetime.from_string(nomina.date_from), Datetime.from_string(nomina.date_to), calendar=nomina.employee_id.contract_id.resource_calendar_id)
                 dias_laborados_netos = 0
-                if dias_laborados['days'] > 60:
-                    dias_laborados_netos = self._get_dias_laborados_netos(nomina.employee_id,nomina.date_from,nomina.date_to)
+                # Si tiene mas de 150 dias de trabajo entre la fecha de la nomina, es por que se paga bono14 o aguinaldo
+                if dias_laborados['days'] > 150:
+                    if nomina.date_from >= nomina.contract_id.date_start:
+                        dias_laborados_netos =  dias_laborados['days'] +1
+                        # Si la fecha de contrato esta entre la fecha de la planilla no se le pagan los 365 dias, entonces se calculan los días entre el contrato y fecha final de planilla
+                    if nomina.date_from <= nomina.contract_id.date_start <= nomina.date_to:
+                        dias_laborados_netos = nomina.employee_id._get_work_days_data(Datetime.from_string(nomina.contract_id.date_start), Datetime.from_string(nomina.date_to), calendar=nomina.employee_id.contract_id.resource_calendar_id)['days']+1
+
                 for linea in nomina.worked_days_line_ids:
                     if linea.number_of_days > 31:
                         contiene_bono = True
@@ -162,9 +168,9 @@ class ReportLibroSalarios(models.AbstractModel):
                         anticipos += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.bonificacion_ids.ids:
                         bonificacion += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.bono_ids.ids and contiene_bono:
+                    if linea.salary_rule_id.id in nomina.company_id.bono_ids.ids:
                         bono += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.aguinaldo_ids.ids and contiene_bono:
+                    if linea.salary_rule_id.id in nomina.company_id.aguinaldo_ids.ids:
                         aguinaldo += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.indemnizacion_ids.ids:
                         indemnizacion += linea.total
@@ -192,8 +198,6 @@ class ReportLibroSalarios(models.AbstractModel):
                 else:
                     sueldo_diario = 0
 
-                if dias_trabajados > 31:
-                    dias_trabajados = (datetime.strptime(str(nomina.date_to), "%Y-%m-%d") - datetime.strptime(str(nomina.date_from), "%Y-%m-%d")).days
                 septimos_asuetos = sueldo_diario * domingos
                 ordinario_final = ordinario - septimos_asuetos
                 ordinario = ordinario_final
