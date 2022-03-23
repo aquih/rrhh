@@ -15,12 +15,20 @@
             </field>
         </record>
 
-        <act_window id="action_cerrar_nominas_wizard"
+        <record id="action_cerrar_nominas_wizard" model="ir.actions.act_window">
+            <field name="name">Cerrar nominas</field>
+            <field name="res_model">hr.payslip</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_cerrar_nominas_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- <act_window id="action_cerrar_nominas_wizard"
             name="Cerrar nominas"
             target="new"
             binding_model="hr.payslip"
             res_model="rrhh.cerrar_nominas.wizard"
             view_mode="form"
-            />
+            /> -->
 
 </odoo>

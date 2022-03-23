@@ -47,10 +47,29 @@
             </field>
         </record>
 
-        <act_window id="action_igss_wizard"
+
+        <record id="action_igss_wizard" model="ir.actions.act_window">
+            <field name="name">Igss</field>
+            <field name="res_model">rrhh.igss.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_igss_wizard_form"/>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="model_hr_payslip_run"/>
+
+        </record>
+
+        <!-- <record id="wizard_example" model="ir.actions.act_window">
+            <field name="name">Wizard Example</field>
+            <field name="res_model">wizard.model</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="model_context_model_ref"/>
+        </record> -->
+
+        <!-- <act_window id="action_igss_wizard"
             name="Igss"
             target="new"
             binding_model="hr.payslip.run"
             res_model="rrhh.igss.wizard"
-            view_mode="form"/>
+            view_mode="form"/> -->
 </odoo>
