@@ -91,6 +91,7 @@ class HrPayslip(models.Model):
         salario_total = 0
         extra_ordinario_total = 0
         salario_promedio_total = 0
+        logging.warning('test salario')
         if empleado_id.contract_ids[0].historial_salario_ids:
             for linea in empleado_id.contract_ids[0].historial_salario_ids:
                 if linea.fecha == False:
@@ -198,57 +199,91 @@ class HrPayslip(models.Model):
             if contracts.schedule_pay == 'bi-monthly':
                 dias_laborados = 15
 
-            dias_bonificacion = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
 
-            if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_laborados = dias_laborados - (contracts.date_start - self.date_from).days
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-            elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start :
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-            elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_bonificacion = self.employee_id._get_work_days_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+
+            if version_info[0] == 15:
+                if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
+                    dias_laborados = 30
+                if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
+                    dias_laborados = 15
+
+                reference_calendar = self._get_out_of_contract_calendar()
+                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
+
+                if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
+                    dias_laborados = dias_laborados - (contracts.date_start - self.date_from).days
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+                elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start :
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+                elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
+                    dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+                else:
+                    if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
+                    if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
+                    # Cálculo de días para catorcena
+                    if contracts.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
+                        dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
+
+                self.calculo_rrhh(self)
             else:
-                if contracts.schedule_pay == 'monthly':
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
-                if contracts.schedule_pay == 'bi-monthly':
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
-                # Cálculo de días para catorcena
-                if contracts.schedule_pay == 'bi-weekly':
-                    dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
+
+                dias_bonificacion = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
+
+                if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
+                    dias_laborados = dias_laborados - (contracts.date_start - self.date_from).days
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+                elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start :
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+                elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
+                    dias_bonificacion = self.employee_id._get_work_days_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+                else:
+                    if contracts.schedule_pay == 'monthly':
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
+                    if contracts.schedule_pay == 'bi-monthly':
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
+                    # Cálculo de días para catorcena
+                    if contracts.schedule_pay == 'bi-weekly':
+                        dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
         return res
 
-    @api.onchange('employee_id','struct_id','contract_id', 'date_from', 'date_to','porcentaje_prestamo')
-    def _onchange_employee(self):
-        res = super(HrPayslip, self)._onchange_employee()
-        mes_nomina = self.date_from.month
-        anio_nomina = self.date_from.year
-        dia_nomina = self.date_to.day
-        entradas_nomina = []
-        if self.contract_id:
-            entradas = self._obtener_entrada(self.contract_id)
-            if self.contract_id.analytic_account_id:
-                self.cuenta_analitica_id = self.contract_id.analytic_account_id.id
-            if entradas:
-                for entrada in entradas:
-                    existe_entrada = False
-                    if self.input_line_ids:
-                        existe_entrada = self.existe_entrada(self.input_line_ids,entrada)
-                    if existe_entrada == False:
-                        entradas_nomina.append((0, 0, {'input_type_id':entrada.id}))
-            if entradas_nomina:
-                self.input_line_ids = entradas_nomina
-            self.calculo_rrhh(self)
 
-        for prestamo in self.employee_id.prestamo_ids:
-            anio_prestamo = int(prestamo.fecha_inicio.year)
-            for entrada in self.input_line_ids:
-                if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
-                    for lineas in prestamo.prestamo_ids:
-                        if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
-                            entrada.amount = lineas.monto*(self.porcentaje_prestamo/100)
-        return res
+    if version_info[0] != 15:
+        @api.onchange('employee_id','struct_id','contract_id', 'date_from', 'date_to','porcentaje_prestamo')
+        def _onchange_employee(self):
+            res = super(HrPayslip, self)._onchange_employee()
+            mes_nomina = self.date_from.month
+            anio_nomina = self.date_from.year
+            dia_nomina = self.date_to.day
+            entradas_nomina = []
+            if self.contract_id:
+                entradas = self._obtener_entrada(self.contract_id)
+                if self.contract_id.analytic_account_id:
+                    self.cuenta_analitica_id = self.contract_id.analytic_account_id.id
+                if entradas:
+                    for entrada in entradas:
+                        existe_entrada = False
+                        if self.input_line_ids:
+                            existe_entrada = self.existe_entrada(self.input_line_ids,entrada)
+                        if existe_entrada == False:
+                            entradas_nomina.append((0, 0, {'input_type_id':entrada.id}))
+                if entradas_nomina:
+                    self.input_line_ids = entradas_nomina
+                self.calculo_rrhh(self)
+
+            for prestamo in self.employee_id.prestamo_ids:
+                anio_prestamo = int(prestamo.fecha_inicio.year)
+                for entrada in self.input_line_ids:
+                    if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
+                        for lineas in prestamo.prestamo_ids:
+                            if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
+                                entrada.amount = lineas.monto*(self.porcentaje_prestamo/100)
+            return res
 
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
@@ -263,7 +298,7 @@ class HrPayslipRun(models.Model):
         for nomina in self.slip_ids:
             if nomina.id not in nominas_pagadas:
                 total_nomina = 0
-                if nomina.employee_id.diario_pago_id and nomina.employee_id.address_home_id and nomina.state == 'done':
+                if nomina.employee_id.diario_pago_id and nomina.employee_id.address_home_id and nomina.state in ['done','close']:
                     res = self.env['report.rrhh.recibo'].lineas(nomina)
                     total_nomina = res['totales'][0] + res['totales'][1]
                     pago = {

@@ -18,13 +18,13 @@
                           </tree>
                         </field>
                     </field>
-                    <group name="salary_and_advantages" position="inside">
+                    <field name="structure_type_id" position="after">
                         <label for="base_extra"/>
                         <div class="o_row" name="base_extra">
                             <field name="base_extra" nolabel="1"/>
                             <span>/ mes</span>
                         </div>
-                    </group>
+                    </field>
                 </data>
 	        </field>
 	    </record>

@@ -151,6 +151,5 @@
 
         <menuitem action="action_recibo" id="menu_recibo" name="Recibo" parent="hr_payroll.menu_hr_salary_configuration" groups="hr.group_hr_manager" sequence="100"/>
 
-
   </data>
 </odoo>

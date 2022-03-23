@@ -17,10 +17,8 @@ class report_planilla_pdf(models.AbstractModel):
         return partidas
 
     def reporte(self, datos):
-        logging.getLogger('datos...').warn(datos)
         planilla = self.env['rrhh.planilla'].browse(datos['planilla_id'][0])
         nomina = self.env['hr.payslip.run'].browse(datos['nomina_id'][0])
-        logging.getLogger('nomina.name').warn(nomina.name)
         reporte = {}
         reporte['encabezado'] = {}
         reporte['encabezado']['nomina'] = nomina.name
@@ -208,7 +206,6 @@ class report_planilla_pdf(models.AbstractModel):
                 reporte['no_agrupado'].append(datos_empeado)
             reporte['columnas'] = columnas
             reporte['total'] = [sum(y) for y in zip(*listas_totales)]
-        logging.getLogger('reporte').warn(reporte)
         return reporte
 
     @api.model
