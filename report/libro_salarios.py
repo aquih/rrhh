@@ -187,7 +187,7 @@ class ReportLibroSalarios(models.AbstractModel):
                     if linea.salary_rule_id.id in nomina.company_id.boni_incentivo_decreto_ids.ids:
                         boni_incentivo_decreto += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.devolucion_isr_otro_ids.ids:
-                        dev_isr_otro += line.total
+                        dev_isr_otro += linea.total
 
                 dias_trabajados = int(dias_laborados_netos) if dias_laborados_netos > 0 else int(dias_trabajados)
                 ordinarias = dias_trabajados*8 if dias_trabajados <= 31 else 0
