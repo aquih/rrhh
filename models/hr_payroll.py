@@ -252,38 +252,36 @@ class HrPayslip(models.Model):
                         res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
         return res
 
+    @api.depends('employee_id', 'contract_id', 'struct_id', 'date_from', 'date_to', 'struct_id')
+    def _compute_input_line_ids(self):
+        res = super(HrPayslip, self)._compute_input_line_ids()
+        for slip in self:
+            if slip.employee_id and slip.struct_id and slip.struct_id.input_line_type_ids:
+                input_line_vals = []
+                if slip.input_line_ids:
+                    slip.input_line_ids.unlink()
 
-    if version_info[0] != 15:
-        @api.onchange('employee_id','struct_id','contract_id', 'date_from', 'date_to','porcentaje_prestamo')
-        def _onchange_employee(self):
-            res = super(HrPayslip, self)._onchange_employee()
-            mes_nomina = self.date_from.month
-            anio_nomina = self.date_from.year
-            dia_nomina = self.date_to.day
-            entradas_nomina = []
-            if self.contract_id:
-                entradas = self._obtener_entrada(self.contract_id)
-                if self.contract_id.analytic_account_id:
-                    self.cuenta_analitica_id = self.contract_id.analytic_account_id.id
-                if entradas:
-                    for entrada in entradas:
-                        existe_entrada = False
-                        if self.input_line_ids:
-                            existe_entrada = self.existe_entrada(self.input_line_ids,entrada)
-                        if existe_entrada == False:
-                            entradas_nomina.append((0, 0, {'input_type_id':entrada.id}))
-                if entradas_nomina:
-                    self.input_line_ids = entradas_nomina
-                self.calculo_rrhh(self)
+                for line in slip.struct_id.input_line_type_ids:
+                    input_line_vals.append((0,0,{
+                        'name': line.name,
+                        'amount': 0,
+                        'input_type_id': line.id,
+                    }))
+                slip.update({'input_line_ids': input_line_vals})
 
-            for prestamo in self.employee_id.prestamo_ids:
-                anio_prestamo = int(prestamo.fecha_inicio.year)
-                for entrada in self.input_line_ids:
-                    if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
-                        for lineas in prestamo.prestamo_ids:
-                            if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
-                                entrada.amount = lineas.monto*(self.porcentaje_prestamo/100)
-            return res
+                mes_nomina = slip.date_from.month
+                anio_nomina = slip.date_from.year
+                dia_nomina = slip.date_to.day
+                entradas_nomina = []
+                if slip.employee_id.prestamo_ids:
+                    for prestamo in slip.employee_id.prestamo_ids:
+                        anio_prestamo = int(prestamo.fecha_inicio.year)
+                        for entrada in slip.input_line_ids:
+                            if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
+                                for lineas in prestamo.prestamo_ids:
+                                    if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
+                                        entrada.amount = lineas.monto*(self.porcentaje_prestamo/100)
+        return res
 
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
