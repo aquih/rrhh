@@ -281,6 +281,7 @@ class HrPayslip(models.Model):
                                 for lineas in prestamo.prestamo_ids:
                                     if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
                                         entrada.amount = lineas.monto*(self.porcentaje_prestamo/100)
+        return res
 
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
