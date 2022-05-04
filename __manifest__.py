@@ -14,7 +14,7 @@
     'category': 'Uncategorized',
     'version': '0.1',
 
-    'depends': ['base', 'hr', 'hr_contract','hr_payroll_account'],
+    'depends': ['base', 'hr', 'hr_contract','hr_payroll_account','hr_holidays'],
 
     'data': [
         'data/rrhh_data.xml',
