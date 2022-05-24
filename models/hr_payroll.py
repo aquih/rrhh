@@ -91,67 +91,68 @@ class HrPayslip(models.Model):
         salario_total = 0
         extra_ordinario_total = 0
         salario_promedio_total = 0
-        if empleado_id.contract_ids[0].historial_salario_ids:
-            for linea in empleado_id.contract_ids[0].historial_salario_ids:
-                if linea.fecha == False:
-                    raise ValidationError(_('Empleado debe de tener fecha en el historial de salario: ' + str(empleado_id.name)))
+        if empleado_id:
+            if empleado_id.contract_ids[0].historial_salario_ids:
+                for linea in empleado_id.contract_ids[0].historial_salario_ids:
+                    if linea.fecha == False:
+                        raise ValidationError(_('Empleado debe de tener fecha en el historial de salario: ' + str(empleado_id.name)))
 
-                historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
+                    historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
 
-            historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
-            meses_laborados = (fecha_final_nomina.year - empleado_id.contract_ids[0].date_start.year) * 12 + (fecha_final_nomina.month - empleado_id.contract_ids[0].date_start.month)
+                historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
+                meses_laborados = (fecha_final_nomina.year - empleado_id.contract_ids[0].date_start.year) * 12 + (fecha_final_nomina.month - empleado_id.contract_ids[0].date_start.month)
 
-            contador_mes = 0
-            if meses_laborados >= 12:
-                while contador_mes < 12:
-                    mes = relativedelta(months=contador_mes)
-                    resta_mes = fecha_final_nomina - mes
-                    mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
-                    llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'extra':0,'total':0}
-                    contador_mes += 1
-            else:
+                contador_mes = 0
+                if meses_laborados >= 12:
+                    while contador_mes < 12:
+                        mes = relativedelta(months=contador_mes)
+                        resta_mes = fecha_final_nomina - mes
+                        mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
+                        llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
+                        salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'extra':0,'total':0}
+                        contador_mes += 1
+                else:
 
-                while contador_mes <= meses_laborados:
-                    mes = relativedelta(months=contador_mes)
-                    resta_mes = fecha_final_nomina - mes
-                    mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
-                    llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'extra':0,'total':0}
-                    contador_mes += 1
+                    while contador_mes <= meses_laborados:
+                        mes = relativedelta(months=contador_mes)
+                        resta_mes = fecha_final_nomina - mes
+                        mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
+                        llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
+                        salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'extra':0,'total':0}
+                        contador_mes += 1
 
-            contador_mes = 0
-            fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[0]['fecha']), '%Y-%m-%d')
-            # Sumamos + 1 en diferencia_meses por que no toma la fecha final
-            diferencia_meses = ((fecha_final_nomina.year - fecha_inicio_diferencia.year) * 12 + (fecha_final_nomina.month - fecha_inicio_diferencia.month)) +1
-            if len(historial_salario_ordenado) > 1:
-                diferencia_meses = relativedelta(fecha_final_nomina, fecha_inicio_diferencia).months + 1
-            for linea in historial_salario_ordenado:
-                contador = 0
-                while contador < diferencia_meses:
-
-                    mes = relativedelta(months=contador_mes)
-                    resta_mes = datetime.datetime.strptime(str(fecha_final_nomina),'%Y-%m-%d') - mes
-                    mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
-                    llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    if llave in salario_meses:
-                        salario_meses[llave]['salario'] = linea['salario']
-                        salario_total += linea['salario']
-                    contador += 1
-                    contador_mes += 1
-
+                contador_mes = 0
+                fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[0]['fecha']), '%Y-%m-%d')
+                # Sumamos + 1 en diferencia_meses por que no toma la fecha final
+                diferencia_meses = ((fecha_final_nomina.year - fecha_inicio_diferencia.year) * 12 + (fecha_final_nomina.month - fecha_inicio_diferencia.month)) +1
                 if len(historial_salario_ordenado) > 1:
-                    fecha_cambio_salario = datetime.datetime.strptime(str(linea['fecha']), '%Y-%m-%d')
+                    diferencia_meses = relativedelta(fecha_final_nomina, fecha_inicio_diferencia).months + 1
+                for linea in historial_salario_ordenado:
+                    contador = 0
+                    while contador < diferencia_meses:
 
-                    posicion_siguiente = historial_salario_ordenado.index(linea) + 1
-                    if posicion_siguiente < len(historial_salario_ordenado):
-                        fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[posicion_siguiente]['fecha']), '%Y-%m-%d')
-                        diferencia_meses = (fecha_cambio_salario.year - fecha_inicio_diferencia.year) * 12 + (fecha_cambio_salario.month - fecha_inicio_diferencia.month)
+                        mes = relativedelta(months=contador_mes)
+                        resta_mes = datetime.datetime.strptime(str(fecha_final_nomina),'%Y-%m-%d') - mes
+                        mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
+                        llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
+                        if llave in salario_meses:
+                            salario_meses[llave]['salario'] = linea['salario']
+                            salario_total += linea['salario']
+                        contador += 1
+                        contador_mes += 1
 
-            salario_meses = sorted(salario_meses.items())
-            salario_promedio_total =  (salario_total + extra_ordinario_total) / len(salario_meses)
-        else:
-            salario_promedio_total = empleado_id.contract_ids[0].wage
+                    if len(historial_salario_ordenado) > 1:
+                        fecha_cambio_salario = datetime.datetime.strptime(str(linea['fecha']), '%Y-%m-%d')
+
+                        posicion_siguiente = historial_salario_ordenado.index(linea) + 1
+                        if posicion_siguiente < len(historial_salario_ordenado):
+                            fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[posicion_siguiente]['fecha']), '%Y-%m-%d')
+                            diferencia_meses = (fecha_cambio_salario.year - fecha_inicio_diferencia.year) * 12 + (fecha_cambio_salario.month - fecha_inicio_diferencia.month)
+
+                salario_meses = sorted(salario_meses.items())
+                salario_promedio_total =  (salario_total + extra_ordinario_total) / len(salario_meses)
+            else:
+                salario_promedio_total = empleado_id.contract_ids[0].wage
         return salario_promedio_total
 
 
@@ -210,9 +211,17 @@ class HrPayslip(models.Model):
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
             else:
                 if contracts.schedule_pay == 'monthly':
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
+                    if contracts.date_end and self.date_from <= contracts.date_end <= self.date_to:
+                        dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(contracts.date_end), calendar=contracts.resource_calendar_id)
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days':  dias_laborados['days'] + 1})
+                    else:
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
                 if contracts.schedule_pay == 'bi-monthly':
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
+                    if contracts.date_end and self.date_from <= contracts.date_end <= self.date_to:
+                        dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(contracts.date_end), calendar=contracts.resource_calendar_id)
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days':  dias_laborados['days'] + 1})
+                    else:
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
                 # Cálculo de días para catorcena
                 if contracts.schedule_pay == 'bi-weekly':
                     dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
