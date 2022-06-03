@@ -24,6 +24,8 @@ class rrhh_informe_isr(models.TransientModel):
         f = io.BytesIO()
         libro = xlsxwriter.Workbook(f)
         hoja = libro.add_worksheet('reporte')
+        formato_fecha = libro.add_format({'num_format': 'dd/mm/yy'})
+
         hoja.write(0, 0, 'NIT Empleado')
         hoja.write(0, 1, 'Nombre del Empleado')
         hoja.write(0, 2, 'Fecha de Alta')
@@ -70,7 +72,7 @@ class rrhh_informe_isr(models.TransientModel):
         for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
             hoja.write(fila, 0, empleado.nit if empleado.nit else '')
             hoja.write(fila, 1, empleado.name)
-            hoja.write(fila, 2, empleado.contract_id.date_start if empleado.contract_id else '')
+            hoja.write(fila, 2, empleado.contract_id.date_start if empleado.contract_id else '', formato_fecha)
             fila += 1
 
 
