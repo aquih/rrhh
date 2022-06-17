@@ -115,6 +115,16 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="ISR">
+                            <group>
+                                <field name="renta_patrono_actual_ids" widget="many2many_tags"/>
+                                <field name="otros_ingresos_gravados_ids" widget="many2many_tags"/>
+                                <field name="viaticos_ids" widget="many2many_tags"/>
+                                <field name="igss_ids" widget="many2many_tags"/>
+                                <field name="bono_ids" widget="many2many_tags"/>
+                                <field name="aguinaldo_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
                     </notebook>
                 </data>
 	        </field>
