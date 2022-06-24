@@ -8,6 +8,8 @@
                 <form string="Informe ISR">
                     <group string="Año">
                         <field name="anio"/>
+                        <field name="fecha_inicio"/>
+                        <field name="fecha_fin"/>
                         <field name="name" colspan="4" invisible="1"/>
                         <field name="archivo" filename="name" readonly="1"/>
                     </group>
