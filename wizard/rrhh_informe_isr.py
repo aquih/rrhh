@@ -45,7 +45,7 @@ class rrhh_informe_isr(models.TransientModel):
                             bono_anual += linea.total
                         if linea.salary_rule_id.id in nomina.employee_id.company_id.renta_patrono_actual_ids.ids:
                             renta_patrono_actual += linea.total
-        return {'igss': igss,'renta_patrono_actual': renta_patrono_actual,'otro_ingreso': otros_ingresos, 'viaticos': viaticos, 'igss_total': igss_total, 'bono_anual': bono_anual ,'aguinaldo_anual': aguinaldo_anual}
+        return {'renta_patrono_actual': renta_patrono_actual,'otro_ingreso': otros_ingresos, 'viaticos': viaticos, 'igss_total': igss_total, 'bono_anual': bono_anual ,'aguinaldo_anual': aguinaldo_anual}
 
     def _get_retencion_pago(self, empleados, fecha_inicio, fecha_fin):
         nomina_id = self.env['hr.payslip'].search([('employee_id','in', empleados),('date_from', '>=', fecha_inicio),('date_to','<=',fecha_fin )])
