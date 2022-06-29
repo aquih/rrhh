@@ -45,7 +45,7 @@ class rrhh_informe_isr(models.TransientModel):
                             bono_anual += linea.total
                         if linea.salary_rule_id.id in nomina.employee_id.company_id.renta_patrono_actual_ids.ids:
                             renta_patrono_actual += linea.total
-        return {'igss': igss,'renta_patrono_actual': renta_patrono_actual,'otro_ingreso': otros_ingresos, 'viaticos': viaticos, 'igss_total': igss_total, 'bono_anual': bono_anual ,'aguinaldo_anual': aguinaldo_anual}
+        return {'renta_patrono_actual': renta_patrono_actual,'otro_ingreso': otros_ingresos, 'viaticos': viaticos, 'igss_total': igss_total, 'bono_anual': bono_anual ,'aguinaldo_anual': aguinaldo_anual}
 
     def _get_retencion_pago(self, empleados, fecha_inicio, fecha_fin):
         nomina_id = self.env['hr.payslip'].search([('employee_id','in', empleados),('date_from', '>=', fecha_inicio),('date_to','<=',fecha_fin )])
@@ -127,23 +127,25 @@ class rrhh_informe_isr(models.TransientModel):
             hoja.write(fila, 4, empleado.contract_id.wage)
             hoja.write(fila, 5, empleado.contract_id.wage)
 
-            otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
-            hoja.write(fila, 36, empleado.contract_id.base_extra * 12)
-            hoja.write(fila, 37, empleado.contract_id.wage)
-            hoja.write(fila, 38, empleado.contract_id.wage)
-            cuota_igss = (empleado.contract_id.wage * 12)*0.0483
-            hoja.write(fila, 39, cuota_igss)
+            if self.anio > 0:
+                otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
+                hoja.write(fila, 36, empleado.contract_id.base_extra * 12)
+                hoja.write(fila, 37, empleado.contract_id.wage)
+                hoja.write(fila, 38, empleado.contract_id.wage)
+                cuota_igss = (empleado.contract_id.wage * 12)*0.0483
+                hoja.write(fila, 39, cuota_igss)
             fila += 1
 
         hoja_carga_ajuste.write(0, 0, 'NIT Empleado')
         hoja_carga_ajuste.write(0, 1, 'AJUSTE/SUSPENSION')
 
-        retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
-        fila = 1
-        for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-            if empleado.id in retencion_pago and retencion_pago[empleado.id][2] > 0:
-                hoja_carga_ajuste.write(fila, 0, empleado.nit if empleado.nit else '')
-                hoja_carga_ajuste.write(fila, 1, retencion_pago[empleado.id][2])
+        if self.fecha_inicio and self.fecha_fin:
+            retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
+            fila = 1
+            for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
+                if empleado.id in retencion_pago and retencion_pago[empleado.id][2] > 0:
+                    hoja_carga_ajuste.write(fila, 0, empleado.nit if empleado.nit else '')
+                    hoja_carga_ajuste.write(fila, 1, retencion_pago[empleado.id][2])
                 fila += 1
 
         hoja_fin_labores.write(0, 0, 'NIT empleado')
@@ -200,18 +202,19 @@ class rrhh_informe_isr(models.TransientModel):
                 hoja_fin_labores.write(fila, 4, empleado.contract_id.wage)
                 hoja_fin_labores.write(fila, 5, empleado.contract_id.wage)
 
-                otra_info = self._get_informacion(empleado.id, self.fecha_inicio, empleado.contract_id.date_end)
-                hoja_fin_labores.write(fila, 1, otra_info['renta_patrono_actual'])
-                hoja_fin_labores.write(fila, 2, otra_info['bono_anual'])
-                hoja_fin_labores.write(fila, 3, otra_info['aguinaldo_anual'])
-                hoja_fin_labores.write(fila, 34, otra_info['otro_ingreso'])
+                if self.fecha_inicio and self.fecha_fin:
+                    otra_info = self._get_informacion(empleado.id, self.fecha_inicio, empleado.contract_id.date_end)
+                    hoja_fin_labores.write(fila, 1, otra_info['renta_patrono_actual'])
+                    hoja_fin_labores.write(fila, 2, otra_info['bono_anual'])
+                    hoja_fin_labores.write(fila, 3, otra_info['aguinaldo_anual'])
+                    hoja_fin_labores.write(fila, 34, otra_info['otro_ingreso'])
 
 
-                hoja_fin_labores.write(fila, 38, otra_info['viaticos'])
-                hoja_fin_labores.write(fila, 39, otra_info['aguinaldo_anual'])
-                hoja_fin_labores.write(fila, 40, otra_info['bono_anual'])
-                hoja_fin_labores.write(fila, 41, otra_info['igss_total'])
-                hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end))
+                    hoja_fin_labores.write(fila, 38, otra_info['viaticos'])
+                    hoja_fin_labores.write(fila, 39, otra_info['aguinaldo_anual'])
+                    hoja_fin_labores.write(fila, 40, otra_info['bono_anual'])
+                    hoja_fin_labores.write(fila, 41, otra_info['igss_total'])
+                    hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end))
                 fila += 1
 
 
@@ -264,22 +267,23 @@ class rrhh_informe_isr(models.TransientModel):
 
         for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
             # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '31-12-'+str(self.anio-1))
-            otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
-            hoja_fin_periodo.write(fila, 0, empleado.nit if empleado.nit else '')
-            hoja_fin_periodo.write(fila, 1, (empleado.contract_id.wage*2))
-            hoja_fin_periodo.write(fila, 2, otra_info['bono_anual'])
-            hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
-
-            if empleados_dic.contract_id.date_end and (empleados_dic.contract_id.date_end > self.fecha_inicio and empleados_dic.contract_id.date_end <= self.date_end):
-                otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio), empleado.contract_id.date_end)
-            else:
+            if self.fecha_inicio and self.fecha_fin:
                 otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
+                hoja_fin_periodo.write(fila, 0, empleado.nit if empleado.nit else '')
+                hoja_fin_periodo.write(fila, 1, (empleado.contract_id.wage*2))
+                hoja_fin_periodo.write(fila, 2, otra_info['bono_anual'])
+                hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
 
-            hoja_fin_periodo.write(fila, 34, otra_info['otro_ingreso'])
-            hoja_fin_periodo.write(fila, 38, otra_info['viaticos'])
-            hoja_fin_periodo.write(fila, 39, empleado.contract_id.wage)
-            hoja_fin_periodo.write(fila, 40, empleado.contract_id.wage)
-            hoja_fin_periodo.write(fila, 41, otra_info['igss_total'])
+                if empleados_dic.contract_id.date_end and (empleados_dic.contract_id.date_end > self.fecha_inicio and empleados_dic.contract_id.date_end <= self.date_end):
+                    otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio), empleado.contract_id.date_end)
+                else:
+                    otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
+
+                hoja_fin_periodo.write(fila, 34, otra_info['otro_ingreso'])
+                hoja_fin_periodo.write(fila, 38, otra_info['viaticos'])
+                hoja_fin_periodo.write(fila, 39, empleado.contract_id.wage)
+                hoja_fin_periodo.write(fila, 40, empleado.contract_id.wage)
+                hoja_fin_periodo.write(fila, 41, otra_info['igss_total'])
             fila += 1
 
         hoja_retencion.write(0, 0, 'NIT empleado')
@@ -296,7 +300,7 @@ class rrhh_informe_isr(models.TransientModel):
                 hoja_retencion.write(fila, 2, retencion_pago[empleado.id][1])
                 hoja_retencion.write(fila, 3, str(self.fecha_fin))
 
-                fila += 1
+            fila += 1
 
         libro.close()
         datos = base64.b64encode(f.getvalue())
