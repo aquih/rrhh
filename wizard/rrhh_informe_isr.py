@@ -139,6 +139,7 @@ class rrhh_informe_isr(models.TransientModel):
         hoja_carga_ajuste.write(0, 0, 'NIT Empleado')
         hoja_carga_ajuste.write(0, 1, 'AJUSTE/SUSPENSION')
 
+        retencion_pago = False
         if self.fecha_inicio and self.fecha_fin:
             retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
             fila = 1
@@ -274,7 +275,7 @@ class rrhh_informe_isr(models.TransientModel):
                 hoja_fin_periodo.write(fila, 2, otra_info['bono_anual'])
                 hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
 
-                if empleados_dic.contract_id.date_end and (empleados_dic.contract_id.date_end > self.fecha_inicio and empleados_dic.contract_id.date_end <= self.date_end):
+                if empleado.contract_id.date_end and (empleado.contract_id.date_end > self.fecha_inicio and empleado.contract_id.date_end <= self.fecha_fin):
                     otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio), empleado.contract_id.date_end)
                 else:
                     otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
@@ -294,7 +295,7 @@ class rrhh_informe_isr(models.TransientModel):
 
         # retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
         for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-            if empleado.id in retencion_pago and retencion_pago[empleado.id][1] < 0:
+            if  retencion_pago and empleado.id in retencion_pago and retencion_pago[empleado.id][1] < 0:
                 hoja_retencion.write(fila, 0, empleado.nit if empleado.nit else '')
                 hoja_retencion.write(fila, 1, retencion_pago[empleado.id][0])
                 hoja_retencion.write(fila, 2, retencion_pago[empleado.id][1])
