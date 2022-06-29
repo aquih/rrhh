@@ -127,12 +127,13 @@ class rrhh_informe_isr(models.TransientModel):
             hoja.write(fila, 4, empleado.contract_id.wage)
             hoja.write(fila, 5, empleado.contract_id.wage)
 
-            otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
-            hoja.write(fila, 36, empleado.contract_id.base_extra * 12)
-            hoja.write(fila, 37, empleado.contract_id.wage)
-            hoja.write(fila, 38, empleado.contract_id.wage)
-            cuota_igss = (empleado.contract_id.wage * 12)*0.0483
-            hoja.write(fila, 39, cuota_igss)
+            if self.anio > 0:
+                otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
+                hoja.write(fila, 36, empleado.contract_id.base_extra * 12)
+                hoja.write(fila, 37, empleado.contract_id.wage)
+                hoja.write(fila, 38, empleado.contract_id.wage)
+                cuota_igss = (empleado.contract_id.wage * 12)*0.0483
+                hoja.write(fila, 39, cuota_igss)
             fila += 1
 
         hoja_carga_ajuste.write(0, 0, 'NIT Empleado')
@@ -145,7 +146,7 @@ class rrhh_informe_isr(models.TransientModel):
                 if empleado.id in retencion_pago and retencion_pago[empleado.id][2] > 0:
                     hoja_carga_ajuste.write(fila, 0, empleado.nit if empleado.nit else '')
                     hoja_carga_ajuste.write(fila, 1, retencion_pago[empleado.id][2])
-                    fila += 1
+                fila += 1
 
         hoja_fin_labores.write(0, 0, 'NIT empleado')
         hoja_fin_labores.write(0, 1, 'Renta Patrono Actual')
@@ -214,7 +215,7 @@ class rrhh_informe_isr(models.TransientModel):
                     hoja_fin_labores.write(fila, 40, otra_info['bono_anual'])
                     hoja_fin_labores.write(fila, 41, otra_info['igss_total'])
                     hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end))
-                    fila += 1
+                fila += 1
 
 
         hoja_fin_periodo.write(0, 0, 'NIT empleado')
@@ -283,7 +284,7 @@ class rrhh_informe_isr(models.TransientModel):
                 hoja_fin_periodo.write(fila, 39, empleado.contract_id.wage)
                 hoja_fin_periodo.write(fila, 40, empleado.contract_id.wage)
                 hoja_fin_periodo.write(fila, 41, otra_info['igss_total'])
-                fila += 1
+            fila += 1
 
         hoja_retencion.write(0, 0, 'NIT empleado')
         hoja_retencion.write(0, 1, 'Base Gra')
@@ -299,7 +300,7 @@ class rrhh_informe_isr(models.TransientModel):
                 hoja_retencion.write(fila, 2, retencion_pago[empleado.id][1])
                 hoja_retencion.write(fila, 3, str(self.fecha_fin))
 
-                fila += 1
+            fila += 1
 
         libro.close()
         datos = base64.b64encode(f.getvalue())
