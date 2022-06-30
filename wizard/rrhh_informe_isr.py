@@ -140,8 +140,6 @@ class rrhh_informe_isr(models.TransientModel):
         hoja_carga_ajuste.write(0, 1, 'AJUSTE/SUSPENSION')
 
         retencion_pago = False
-        logging.warning(self.fecha_inicio)
-        logging.warning(self.fecha_inicio)
         if self.fecha_inicio and self.fecha_fin:
             retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
             fila = 1
