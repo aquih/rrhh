@@ -123,7 +123,7 @@ class rrhh_informe_isr(models.TransientModel):
             hoja.write(fila, 0, empleado.nit if empleado.nit else '')
             hoja.write(fila, 1, empleado.name)
             hoja.write(fila, 2, empleado.contract_id.date_start if empleado.contract_id else '', formato_fecha)
-            hoja.write(fila, 3, (empleado.contract_id.wage*250) * 12)
+            hoja.write(fila, 3, (empleado.contract_id.wage+250) * 12)
             hoja.write(fila, 4, empleado.contract_id.wage)
             hoja.write(fila, 5, empleado.contract_id.wage)
 
@@ -140,11 +140,13 @@ class rrhh_informe_isr(models.TransientModel):
         hoja_carga_ajuste.write(0, 1, 'AJUSTE/SUSPENSION')
 
         retencion_pago = False
+        logging.warning(self.fecha_inicio)
+        logging.warning(self.fecha_inicio)
         if self.fecha_inicio and self.fecha_fin:
             retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
             fila = 1
             for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-                if empleado.id in retencion_pago and retencion_pago[empleado.id][2] > 0:
+                if empleado.id in retencion_pago and retencion_pago[empleado.id][2] < 0:
                     hoja_carga_ajuste.write(fila, 0, empleado.nit if empleado.nit else '')
                     hoja_carga_ajuste.write(fila, 1, retencion_pago[empleado.id][2])
                 fila += 1
