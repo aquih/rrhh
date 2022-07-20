@@ -7,9 +7,10 @@
               <field name="arch" type="xml">
                 <form string="Informe ISR">
                     <group string="Año">
-                        <field name="anio"/>
-                        <field name="fecha_inicio"/>
-                        <field name="fecha_fin"/>
+                        <field name="tipo"/>
+                        <field name="anio" attrs="{'invisible':[('tipo','in',['actualizacion','ajuste_suspesion','liquidacion_labor','liquidacion_periodo','retencion_pago'])]}"/>
+                        <field name="fecha_inicio" attrs="{'invisible':[('tipo','=','proyeccion')]}"/>
+                        <field name="fecha_fin" attrs="{'invisible':[('tipo','=','proyeccion')]}"/>
                         <field name="name" colspan="4" invisible="1"/>
                         <field name="archivo" filename="name" readonly="1"/>
                     </group>

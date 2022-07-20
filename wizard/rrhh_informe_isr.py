@@ -7,10 +7,17 @@ import base64
 import xlsxwriter
 import logging
 import io
+import datetime
 
 class rrhh_informe_isr(models.TransientModel):
     _name = 'rrhh.informe_isr'
 
+    tipo = fields.Selection([('proyeccion', 'Proyección'),
+        ('actualizacion', 'Actualización'),
+        ('ajuste_suspesion','Ajuste/Suspensión'),
+        ('liquidacion_labor','Liquidacion fin labores'),
+        ('liquidacion_periodo','Liquidación fin periodo'),
+        ('retencion_pago','Retención por pago')],'Tipo', default="proyeccion")
     anio = fields.Integer('Año')
     fecha_inicio = fields.Date('Fecha inicio')
     fecha_fin = fields.Date('Fecha fin')
@@ -67,241 +74,422 @@ class rrhh_informe_isr(models.TransientModel):
         datos = ''
         f = io.BytesIO()
         libro = xlsxwriter.Workbook(f)
-        hoja = libro.add_worksheet('Cargaproyeccionesyactualización')
-        hoja_carga_ajuste = libro.add_worksheet('CargasAjustesysuspensiones')
-        hoja_fin_labores = libro.add_worksheet('CargaLiquidación Fin de labores')
-        hoja_fin_periodo = libro.add_worksheet('CargaLiquidación Fin Período')
-        hoja_retencion = libro.add_worksheet('Retención por pago')
-
-
+        hoja = False
+        hoja_carga_ajuste = False
+        hoja_fin_labores = False
+        hoja_fin_periodo = False
+        hoja_retencion = False
         formato_fecha = libro.add_format({'num_format': 'dd/mm/yy'})
-
-        hoja.write(0, 0, 'NIT Empleado')
-        hoja.write(0, 1, 'Nombre del Empleado')
-        hoja.write(0, 2, 'Fecha de Alta')
-        hoja.write(0, 3, 'Renta Patrono Actual')
-        hoja.write(0, 4, 'Bono Anual de Trabajadores')
-        hoja.write(0, 5, 'Aguinaldo')
-        hoja.write(0, 6, 'NIT Otro Patrono 1')
-        hoja.write(0, 7, 'Renta Otro Patrono 1')
-        hoja.write(0, 8, 'Retencion Otro Patrono 1')
-        hoja.write(0, 9, 'NIT Otro Patrono 2')
-        hoja.write(0, 10, 'Renta Otro Patrono 2')
-        hoja.write(0, 11, 'Retencion Otro Patrono 2')
-        hoja.write(0, 12, 'NIT Otro Patrono 3')
-        hoja.write(0, 13, 'Renta Otro Patrono 3')
-        hoja.write(0, 14, 'Retencion Otro Patrono 3')
-        hoja.write(0, 15, 'NIT Otro Patrono 4')
-        hoja.write(0, 16, 'Renta Otro Patrono 4')
-        hoja.write(0, 17, 'Retencion Otro Patrono 4')
-        hoja.write(0, 18, 'NIT Otro Patrono 5')
-        hoja.write(0, 19, 'Renta Otro Patrono 5')
-        hoja.write(0, 20, 'Retencion Otro Patrono 5')
-        hoja.write(0, 21, 'NIT ex patrono 1')
-        hoja.write(0, 22, 'Renta Ex Patrono 1')
-        hoja.write(0, 23, 'Retencion Ex Patrono 1')
-        hoja.write(0, 24, 'NIT ex patrono 2')
-        hoja.write(0, 25, 'Renta Ex Patrono 2')
-        hoja.write(0, 26, 'Retencion Ex Patrono 2')
-        hoja.write(0, 27, 'NIT ex patrono 3')
-        hoja.write(0, 28, 'Renta Ex Patrono 3')
-        hoja.write(0, 29, 'Retencion Ex Patrono 3')
-        hoja.write(0, 30, 'NIT ex patrono 4')
-        hoja.write(0, 31, 'Renta Ex Patrono 4')
-        hoja.write(0, 32, 'Retencion Ex Patrono 4')
-        hoja.write(0, 33, 'NIT ex patrono 5')
-        hoja.write(0, 34, 'Renta Ex Patrono 5')
-        hoja.write(0, 35, 'Retencion Ex Patrono 5')
-        hoja.write(0, 36, 'Otros Ingresos Gravados')
-        hoja.write(0, 37, 'Aguinaldo')
-        hoja.write(0, 38, 'Bono Anual de Trabajadores')
-        hoja.write(0, 39, 'Cuotas IGSS  y Otros Planes de Seguridad Social ')
-        hoja.write(0, 40, 'Fecha de actualización de Renta')
-        fila = 1
-
-        for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-            hoja.write(fila, 0, empleado.nit if empleado.nit else '')
-            hoja.write(fila, 1, empleado.name)
-            hoja.write(fila, 2, empleado.contract_id.date_start if empleado.contract_id else '', formato_fecha)
-            hoja.write(fila, 3, (empleado.contract_id.wage+250) * 12)
-            hoja.write(fila, 4, empleado.contract_id.wage)
-            hoja.write(fila, 5, empleado.contract_id.wage)
-
-            if self.anio > 0:
-                otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
-                hoja.write(fila, 36, empleado.contract_id.base_extra * 12)
-                hoja.write(fila, 37, empleado.contract_id.wage)
-                hoja.write(fila, 38, empleado.contract_id.wage)
-                cuota_igss = (empleado.contract_id.wage * 12)*0.0483
-                hoja.write(fila, 39, cuota_igss)
-            fila += 1
-
-        hoja_carga_ajuste.write(0, 0, 'NIT Empleado')
-        hoja_carga_ajuste.write(0, 1, 'AJUSTE/SUSPENSION')
-
-        retencion_pago = False
-        if self.fecha_inicio and self.fecha_fin:
-            retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
+        if self.tipo == "proyeccion":
+            hoja = libro.add_worksheet('Cargaproyecciones')
+            hoja.write(0, 0, 'NIT Empleado')
+            hoja.write(0, 1, 'Nombre del Empleado')
+            hoja.write(0, 2, 'Fecha de Alta')
+            hoja.write(0, 3, 'Renta Patrono Actual')
+            hoja.write(0, 4, 'Bono Anual de Trabajadores')
+            hoja.write(0, 5, 'Aguinaldo')
+            hoja.write(0, 6, 'NIT Otro Patrono 1')
+            hoja.write(0, 7, 'Renta Otro Patrono 1')
+            hoja.write(0, 8, 'Retencion Otro Patrono 1')
+            hoja.write(0, 9, 'NIT Otro Patrono 2')
+            hoja.write(0, 10, 'Renta Otro Patrono 2')
+            hoja.write(0, 11, 'Retencion Otro Patrono 2')
+            hoja.write(0, 12, 'NIT Otro Patrono 3')
+            hoja.write(0, 13, 'Renta Otro Patrono 3')
+            hoja.write(0, 14, 'Retencion Otro Patrono 3')
+            hoja.write(0, 15, 'NIT Otro Patrono 4')
+            hoja.write(0, 16, 'Renta Otro Patrono 4')
+            hoja.write(0, 17, 'Retencion Otro Patrono 4')
+            hoja.write(0, 18, 'NIT Otro Patrono 5')
+            hoja.write(0, 19, 'Renta Otro Patrono 5')
+            hoja.write(0, 20, 'Retencion Otro Patrono 5')
+            hoja.write(0, 21, 'NIT ex patrono 1')
+            hoja.write(0, 22, 'Renta Ex Patrono 1')
+            hoja.write(0, 23, 'Retencion Ex Patrono 1')
+            hoja.write(0, 24, 'NIT ex patrono 2')
+            hoja.write(0, 25, 'Renta Ex Patrono 2')
+            hoja.write(0, 26, 'Retencion Ex Patrono 2')
+            hoja.write(0, 27, 'NIT ex patrono 3')
+            hoja.write(0, 28, 'Renta Ex Patrono 3')
+            hoja.write(0, 29, 'Retencion Ex Patrono 3')
+            hoja.write(0, 30, 'NIT ex patrono 4')
+            hoja.write(0, 31, 'Renta Ex Patrono 4')
+            hoja.write(0, 32, 'Retencion Ex Patrono 4')
+            hoja.write(0, 33, 'NIT ex patrono 5')
+            hoja.write(0, 34, 'Renta Ex Patrono 5')
+            hoja.write(0, 35, 'Retencion Ex Patrono 5')
+            hoja.write(0, 36, 'Otros Ingresos Gravados')
+            hoja.write(0, 37, 'Aguinaldo')
+            hoja.write(0, 38, 'Bono Anual de Trabajadores')
+            hoja.write(0, 39, 'Cuotas IGSS  y Otros Planes de Seguridad Social ')
+            hoja.write(0, 40, 'Fecha de actualización de Renta')
             fila = 1
+
             for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-                if empleado.id in retencion_pago and retencion_pago[empleado.id][2] < 0:
-                    hoja_carga_ajuste.write(fila, 0, empleado.nit if empleado.nit else '')
-                    hoja_carga_ajuste.write(fila, 1, retencion_pago[empleado.id][2])
+                hoja.write(fila, 0, empleado.nit if empleado.nit else '')
+                hoja.write(fila, 1, empleado.name)
+
+                if empleado.contract_id:
+                    renta_patrono_actual = 0
+                    bono_anual = 0
+                    aguinaldo = 0
+                    otros_ingresos_gravados = 0
+                    cuota_igss = 0
+                    fecha_alta = ""
+                    anio_ingreso = empleado.contract_id.date_start.year
+                    if anio_ingreso< self.anio:
+                        renta_patrono_actual = ((empleado.contract_id.wage+250) * 12)
+                    else:
+                        dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-12-01', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
+                        valor_diario = (((empleado.contract_id.wage+250) * 12)/365)
+                        renta_patrono_actual = valor_diario * dias_trabajados
+
+                    fecha_bono_anterior = datetime.datetime.strptime(str(self.anio-1)+'-07-01', '%Y-%m-%d').date()
+                    if empleado.contract_id.date_start < fecha_bono_anterior:
+                        bono_anual = (empleado.contract_id.wage * 12)
+                    else:
+                        dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-06-30', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
+                        valor_diario = ((empleado.contract_id.wage * 12)/365)
+                        bono_anual = valor_diario * dias_trabajados
+
+                    fecha_inicio_calculo = datetime.datetime.strptime(str(self.anio-1)+'-12-01', '%Y-%m-%d').date()
+                    if empleado.contract_id.date_start < fecha_inicio_calculo:
+                        aguinaldo = (empleado.contract_id.wage * 12)
+                    else:
+                        dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-11-30', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
+                        valor_diario = ((empleado.contract_id.wage * 12)/365)
+                        aguinaldo = valor_diario * dias_trabajados
+
+                    if anio_ingreso< self.anio:
+                        otros_ingresos_gravados = ((empleado.contract_id.wage+empleado.contract_id.base_extra+250) * 12)
+                    else:
+                        dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-12-01', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
+                        valor_diario = (((empleado.contract_id.wage+empleado.contract_id.base_extra+250) * 12)/365)
+                        otros_ingresos_gravados = valor_diario * dias_trabajados
+
+                    if anio_ingreso< self.anio:
+                        cuota_igss = ((empleado.contract_id.wage) * 12)
+                        fecha_alta = "01/01/"+str(self.anio)
+                    else:
+                        dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-12-01', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
+                        valor_diario = ((empleado.contract_id.wage * 12)/365)
+                        cuota_igss = valor_diario * dias_trabajados
+                        fecha_alta = empleado.contract_id.date_start
+
+                    # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
+                    hoja.write(fila, 2, empleado.contract_id.date_start, formato_fecha)
+                    hoja.write(fila, 3, renta_patrono_actual)
+                    hoja.write(fila, 4, bono_anual)
+                    hoja.write(fila, 5, aguinaldo)
+                    hoja.write(fila, 36, otros_ingresos_gravados)
+                    hoja.write(fila, 37, aguinaldo)
+                    hoja.write(fila, 38, bono_anual)
+                    hoja.write(fila, 39, cuota_igss)
+                    hoja.write(fila, 40, fecha_alta, formato_fecha)
                 fila += 1
 
-        hoja_fin_labores.write(0, 0, 'NIT empleado')
-        hoja_fin_labores.write(0, 1, 'Renta Patrono Actual')
-        hoja_fin_labores.write(0, 2, 'Bono Anual de trabajadores (14)')
-        hoja_fin_labores.write(0, 3, 'Aguinaldo')
-        hoja_fin_labores.write(0, 4, 'NIT Otro Patrono 1')
-        hoja_fin_labores.write(0, 5, 'Renta Otro Patrono 1')
-        hoja_fin_labores.write(0, 6, 'Retencion Otro Patrono 1')
-        hoja_fin_labores.write(0, 7, 'NIT Otro Patrono 2')
-        hoja_fin_labores.write(0, 8, 'Renta Otro Patrono 2')
-        hoja_fin_labores.write(0, 9, 'Retencion Otro Patrono 2')
-        hoja_fin_labores.write(0, 10, 'NIT Otro Patrono 3')
-        hoja_fin_labores.write(0, 11, 'Renta Otro Patrono 3')
-        hoja_fin_labores.write(0, 12, 'Retencion Otro Patrono 3')
-        hoja_fin_labores.write(0, 13, 'NIT Otro Patrono 4')
-        hoja_fin_labores.write(0, 14, 'Renta Otro Patrono 4')
-        hoja_fin_labores.write(0, 15, 'Retencion Otro Patrono 4')
-        hoja_fin_labores.write(0, 16, 'NIT Otro Patrono 5')
-        hoja_fin_labores.write(0, 17, 'Renta Otro Patrono 5')
-        hoja_fin_labores.write(0, 18, 'Retencion Otro Patrono 5')
-        hoja_fin_labores.write(0, 19, 'NIT ex patrono 1')
-        hoja_fin_labores.write(0, 20, 'Renta Ex Patrono 1')
-        hoja_fin_labores.write(0, 21, 'Retencion Ex Patrono 1')
-        hoja_fin_labores.write(0, 22, 'NIT ex patrono 2')
-        hoja_fin_labores.write(0, 23, 'Renta Ex Patrono 2')
-        hoja_fin_labores.write(0, 24, 'Retencion Ex Patrono 2')
-        hoja_fin_labores.write(0, 25, 'NIT ex patrono 3')
-        hoja_fin_labores.write(0, 26, 'Renta Ex Patrono 3')
-        hoja_fin_labores.write(0, 27, 'Retencion Ex Patrono 3')
-        hoja_fin_labores.write(0, 28, 'NIT ex patrono 4')
-        hoja_fin_labores.write(0, 29, 'Renta Ex Patrono 4')
-        hoja_fin_labores.write(0, 30, 'Retencion Ex Patrono 4')
-        hoja_fin_labores.write(0, 31, 'NIT ex patrono 5')
-        hoja_fin_labores.write(0, 32, 'Renta Ex Patrono 5')
-        hoja_fin_labores.write(0, 33, 'Retencion Ex Patrono 5')
-        hoja_fin_labores.write(0, 34, 'Otros ingresos Gravados y Exentos obtenidos en el período')
-        hoja_fin_labores.write(0, 35, 'Indemnizaciones o pensiones por causa de muerte')
-        hoja_fin_labores.write(0, 36, 'Indemnizaciones por tiempo servido')
-        hoja_fin_labores.write(0, 37, 'Remuneraciones de los diplomáticos')
-        hoja_fin_labores.write(0, 38, 'Gastos de representación y viáticos comprobables')
-        hoja_fin_labores.write(0, 39, 'Aguinaldo')
-        hoja_fin_labores.write(0, 40, 'Bono Anual de trabajadores (14)')
-        hoja_fin_labores.write(0, 41, 'Cuotas IGSS  y Otros planes de seguridad social')
-        hoja_fin_labores.write(0, 42, 'Fecha de Fin de Labores')
-        hoja_fin_labores.write(0, 43, 'Ultima Retención')
+        if self.tipo == "actualizacion":
+            hoja = libro.add_worksheet('Cargaactualizaciones')
+            hoja.write(0, 0, 'NIT Empleado')
+            hoja.write(0, 1, 'Nombre del Empleado')
+            hoja.write(0, 2, 'Fecha de Alta')
+            hoja.write(0, 3, 'Renta Patrono Actual')
+            hoja.write(0, 4, 'Bono Anual de Trabajadores')
+            hoja.write(0, 5, 'Aguinaldo')
+            hoja.write(0, 6, 'NIT Otro Patrono 1')
+            hoja.write(0, 7, 'Renta Otro Patrono 1')
+            hoja.write(0, 8, 'Retencion Otro Patrono 1')
+            hoja.write(0, 9, 'NIT Otro Patrono 2')
+            hoja.write(0, 10, 'Renta Otro Patrono 2')
+            hoja.write(0, 11, 'Retencion Otro Patrono 2')
+            hoja.write(0, 12, 'NIT Otro Patrono 3')
+            hoja.write(0, 13, 'Renta Otro Patrono 3')
+            hoja.write(0, 14, 'Retencion Otro Patrono 3')
+            hoja.write(0, 15, 'NIT Otro Patrono 4')
+            hoja.write(0, 16, 'Renta Otro Patrono 4')
+            hoja.write(0, 17, 'Retencion Otro Patrono 4')
+            hoja.write(0, 18, 'NIT Otro Patrono 5')
+            hoja.write(0, 19, 'Renta Otro Patrono 5')
+            hoja.write(0, 20, 'Retencion Otro Patrono 5')
+            hoja.write(0, 21, 'NIT ex patrono 1')
+            hoja.write(0, 22, 'Renta Ex Patrono 1')
+            hoja.write(0, 23, 'Retencion Ex Patrono 1')
+            hoja.write(0, 24, 'NIT ex patrono 2')
+            hoja.write(0, 25, 'Renta Ex Patrono 2')
+            hoja.write(0, 26, 'Retencion Ex Patrono 2')
+            hoja.write(0, 27, 'NIT ex patrono 3')
+            hoja.write(0, 28, 'Renta Ex Patrono 3')
+            hoja.write(0, 29, 'Retencion Ex Patrono 3')
+            hoja.write(0, 30, 'NIT ex patrono 4')
+            hoja.write(0, 31, 'Renta Ex Patrono 4')
+            hoja.write(0, 32, 'Retencion Ex Patrono 4')
+            hoja.write(0, 33, 'NIT ex patrono 5')
+            hoja.write(0, 34, 'Renta Ex Patrono 5')
+            hoja.write(0, 35, 'Retencion Ex Patrono 5')
+            hoja.write(0, 36, 'Otros Ingresos Gravados')
+            hoja.write(0, 37, 'Aguinaldo')
+            hoja.write(0, 38, 'Bono Anual de Trabajadores')
+            hoja.write(0, 39, 'Cuotas IGSS  y Otros Planes de Seguridad Social ')
+            hoja.write(0, 40, 'Fecha de actualización de Renta')
+            fila = 1
 
-        fila = 1
+            for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
+                if empleado.contract_id:
+                    if len(empleado.contract_id.historial_salario_ids) > 0:
+                        salario = 0
+                        fecha_actualizacion = ""
+                        for linea_historial in empleado.contract_id.historial_salario_ids:
+                            if linea_historial.fecha and ( linea_historial.fecha >= self.fecha_inicio and linea_historial.fecha <= self.fecha_fin):
+                                salario = linea_historial.salario
+                                fecha_actualizacion = linea_historial.fecha
 
-        for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-            if empleado.contract_id.date_end:
-                hoja_fin_labores.write(fila, 0, empleado.nit if empleado.nit else '')
-                # hoja_fin_labores.write(fila, 3, (empleado.contract_id.wage))
-                hoja_fin_labores.write(fila, 4, empleado.contract_id.wage)
-                hoja_fin_labores.write(fila, 5, empleado.contract_id.wage)
+                        if salario > 0:
+                            hoja.write(fila, 0, empleado.nit if empleado.nit else '')
+                            hoja.write(fila, 1, empleado.name)
+                            renta_patrono_actual = 0
+                            bono_anual = 0
+                            aguinaldo = 0
+                            otros_ingresos_gravados = 0
+                            cuota_igss = 0
+                            fecha_actualizacion = ""
+                            anio_ingreso = empleado.contract_id.date_start.year
+                            empleado_planillas = self._get_informacion(empleado.id, '01/01/'+str(self.anio), self.fecha_inicio)
 
-                if self.fecha_inicio and self.fecha_fin:
-                    otra_info = self._get_informacion(empleado.id, self.fecha_inicio, empleado.contract_id.date_end)
-                    hoja_fin_labores.write(fila, 1, otra_info['renta_patrono_actual'])
-                    hoja_fin_labores.write(fila, 2, otra_info['bono_anual'])
-                    hoja_fin_labores.write(fila, 3, otra_info['aguinaldo_anual'])
-                    hoja_fin_labores.write(fila, 34, otra_info['otro_ingreso'])
+                            fecha_final_date = datetime.datetime.strptime(str(self.anio)+'-12-31', '%Y-%m-%d').date()
+                            diferencia_meses = (fecha_final_date.year - self.fecha_inicio.year) * 12 + (fecha_final_date.month - self.fecha_inicio.month)
+                            renta_patrono_actual = empleado_planillas["renta_patrono_actual"] +(salario * diferencia_meses)
+
+                            # ---------------------------- INICIO CALCULO BONO
+                            fecha_final_nuevo_salario_bono = datetime.datetime.strptime(str(self.anio)+'-06-30', '%Y-%m-%d').date()
+                            dias_nuevo_salario_bono = (fecha_final_nuevo_salario_bono - self.fecha_inicio).days + 1
+                            bono_nuevo_salario = ((salario * 12)/ 365)*dias_nuevo_salario_bono
+
+                            fecha_inicio_antiguo_salario_bono = datetime.datetime.strptime(str(self.anio-1)+'-07-01', '%Y-%m-%d').date()
+                            dias_antiguo_salario_bono = (self.fecha_inicio - fecha_inicio_antiguo_salario_bono).days + 1
+
+                            bono_antiguo_salario = ((salario * 12)/ 365)*dias_antiguo_salario_bono
+                            bono_anual = bono_nuevo_salario + bono_antiguo_salario
+                            # ---------------------------- FIN CALCULO BONO
+
+                            # ---------------------------- INICIO CALCULO AGUINALDO
+                            fecha_final_nuevo_salario_aguinaldo = datetime.datetime.strptime(str(self.anio)+'-11-30', '%Y-%m-%d').date()
+                            dias_nuevo_salario_aguinaldo = (fecha_final_nuevo_salario_aguinaldo - self.fecha_inicio).days + 1
+                            aguinaldo_nuevo_salario = ((salario * 12)/ 365)*dias_nuevo_salario_aguinaldo
+
+                            fecha_inicio_antiguo_salario_aguinaldo = datetime.datetime.strptime(str(self.anio-1)+'-12-01', '%Y-%m-%d').date()
+                            dias_antiguo_salario_aguinaldo = (self.fecha_inicio - fecha_inicio_antiguo_salario_aguinaldo).days + 1
+                            aguinaldo_antiguo_salario = ((salario * 12)/ 365)*dias_antiguo_salario_aguinaldo
+                            aguinaldo_anual = aguinaldo_nuevo_salario + aguinaldo_antiguo_salario
+
+                            # ---------------------------- FIN CALCULO AGUINALDO
 
 
-                    hoja_fin_labores.write(fila, 38, otra_info['viaticos'])
-                    hoja_fin_labores.write(fila, 39, otra_info['aguinaldo_anual'])
-                    hoja_fin_labores.write(fila, 40, otra_info['bono_anual'])
-                    hoja_fin_labores.write(fila, 41, otra_info['igss_total'])
-                    hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end))
-                fila += 1
+                            fecha_final_calculo = datetime.datetime.strptime(str(self.anio)+'-12-31', '%Y-%m-%d').date()
+                            dias_trabajados = (fecha_final_calculo - self.fecha_inicio).days + 1
+                            proyeccion_base_extra = ((empleado.contract_id.base_extra * 12) / 365)*dias_trabajados
+                            otros_ingresos_gravados = empleado_planillas["otro_ingreso"] + proyeccion_base_extra
+
+                            valor_salario_nuevo = ((salario * 12)/365)*dias_trabajados
+                            cuota_igss = (empleado_planillas["igss_total"] * -1) + (valor_salario_nuevo)
 
 
-        hoja_fin_periodo.write(0, 0, 'NIT empleado')
-        hoja_fin_periodo.write(0, 1, 'Renta Patrono Actual')
-        hoja_fin_periodo.write(0, 2, 'Bono Anual de trabajadores (14)')
-        hoja_fin_periodo.write(0, 3, 'Aguinaldo')
-        hoja_fin_periodo.write(0, 4, 'NIT Otro Patrono 1')
-        hoja_fin_periodo.write(0, 5, 'Renta Otro Patrono 1')
-        hoja_fin_periodo.write(0, 6, 'Retencion Otro Patrono 1')
-        hoja_fin_periodo.write(0, 7, 'NIT Otro Patrono 2')
-        hoja_fin_periodo.write(0, 8, 'Renta Otro Patrono 2')
-        hoja_fin_periodo.write(0, 9, 'Retencion Otro Patrono 2')
-        hoja_fin_periodo.write(0, 10, 'NIT Otro Patrono 3')
-        hoja_fin_periodo.write(0, 11, 'Renta Otro Patrono 3')
-        hoja_fin_periodo.write(0, 12, 'Retencion Otro Patrono 3')
-        hoja_fin_periodo.write(0, 13, 'NIT Otro Patrono 4')
-        hoja_fin_periodo.write(0, 14, 'Renta Otro Patrono 4')
-        hoja_fin_periodo.write(0, 15, 'Retencion Otro Patrono 4')
-        hoja_fin_periodo.write(0, 16, 'NIT Otro Patrono 5')
-        hoja_fin_periodo.write(0, 17, 'Renta Otro Patrono 5')
-        hoja_fin_periodo.write(0, 18, 'Retencion Otro Patrono 5')
-        hoja_fin_periodo.write(0, 19, 'NIT ex patrono 1')
-        hoja_fin_periodo.write(0, 20, 'Renta Ex Patrono 1')
-        hoja_fin_periodo.write(0, 21, 'Retencion Ex Patrono 1')
-        hoja_fin_periodo.write(0, 22, 'NIT ex patrono 2')
-        hoja_fin_periodo.write(0, 23, 'Renta Ex Patrono 2')
-        hoja_fin_periodo.write(0, 24, 'Retencion Ex Patrono 2')
-        hoja_fin_periodo.write(0, 25, 'NIT ex patrono 3')
-        hoja_fin_periodo.write(0, 26, 'Renta Ex Patrono 3')
-        hoja_fin_periodo.write(0, 27, 'Retencion Ex Patrono 3')
-        hoja_fin_periodo.write(0, 28, 'NIT ex patrono 4')
-        hoja_fin_periodo.write(0, 29, 'Renta Ex Patrono 4')
-        hoja_fin_periodo.write(0, 30, 'Retencion Ex Patrono 4')
-        hoja_fin_periodo.write(0, 31, 'NIT ex patrono 5')
-        hoja_fin_periodo.write(0, 32, 'Renta Ex Patrono 5')
-        hoja_fin_periodo.write(0, 33, 'Retencion Ex Patrono 5')
-        hoja_fin_periodo.write(0, 34, 'Otros ingresos Gravados y Exentos obtenidos en el período')
-        hoja_fin_periodo.write(0, 35, 'Indemnizaciones o pensiones por causa de muerte')
-        hoja_fin_periodo.write(0, 36, 'Indemnizaciones por tiempo servido')
-        hoja_fin_periodo.write(0, 37, 'Remuneraciones de los diplomáticos')
-        hoja_fin_periodo.write(0, 38, 'Gastos de representación y viáticos comprobables')
-        hoja_fin_periodo.write(0, 39, 'Aguinaldo')
-        hoja_fin_periodo.write(0, 40, 'Bono Anual de trabajadores (14)')
-        hoja_fin_periodo.write(0, 41, 'Cuotas IGSS  y Otros planes de seguridad social')
-        hoja_fin_periodo.write(0, 42, 'Seguros')
-        hoja_fin_periodo.write(0, 43, 'Planilla')
-        hoja_fin_periodo.write(0, 43, 'Otras Donaciones')
-        fila = 1
+                            fecha_inicio_calculo = datetime.datetime.strptime(str(self.anio-1)+'-12-01', '%Y-%m-%d').date()
+                            if empleado.contract_id.date_start < fecha_inicio_calculo:
+                                aguinaldo = (empleado.contract_id.wage * 12)
+                            else:
+                                dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-11-30', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
+                                valor_diario = ((empleado.contract_id.wage * 12)/365)
+                                aguinaldo = valor_diario * dias_trabajados
 
-        for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-            # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '31-12-'+str(self.anio-1))
+
+                            # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
+                            hoja.write(fila, 2, empleado.contract_id.date_start, formato_fecha)
+                            hoja.write(fila, 3, renta_patrono_actual)
+                            hoja.write(fila, 4, bono_anual)
+                            hoja.write(fila, 5, aguinaldo)
+                            hoja.write(fila, 36, otros_ingresos_gravados)
+                            hoja.write(fila, 37, aguinaldo)
+                            hoja.write(fila, 38, bono_anual)
+                            hoja.write(fila, 39, cuota_igss)
+                            hoja.write(fila, 40, fecha_actualizacion, formato_fecha)
+                        fila += 1
+
+        if self.tipo == "ajuste_suspesion":
+            hoja_carga_ajuste = libro.add_worksheet('CargasAjustesysuspensiones')
+            hoja_carga_ajuste.write(0, 0, 'NIT Empleado')
+            hoja_carga_ajuste.write(0, 1, 'AJUSTE/SUSPENSION')
+
+            retencion_pago = False
             if self.fecha_inicio and self.fecha_fin:
-                otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
-                hoja_fin_periodo.write(fila, 0, empleado.nit if empleado.nit else '')
-                hoja_fin_periodo.write(fila, 1, (empleado.contract_id.wage*2))
-                hoja_fin_periodo.write(fila, 2, otra_info['bono_anual'])
-                hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
+                retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
+                fila = 1
+                for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
+                    if empleado.id in retencion_pago and retencion_pago[empleado.id][2] < 0:
+                        hoja_carga_ajuste.write(fila, 0, empleado.nit if empleado.nit else '')
+                        hoja_carga_ajuste.write(fila, 1, retencion_pago[empleado.id][2])
+                    fila += 1
 
-                if empleado.contract_id.date_end and (empleado.contract_id.date_end > self.fecha_inicio and empleado.contract_id.date_end <= self.fecha_fin):
-                    otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio), empleado.contract_id.date_end)
-                else:
+        if self.tipo == "liquidacion_labor":
+            hoja_fin_labores = libro.add_worksheet('CargaLiquidación Fin de labores')
+            hoja_fin_labores.write(0, 0, 'NIT empleado')
+            hoja_fin_labores.write(0, 1, 'Renta Patrono Actual')
+            hoja_fin_labores.write(0, 2, 'Bono Anual de trabajadores (14)')
+            hoja_fin_labores.write(0, 3, 'Aguinaldo')
+            hoja_fin_labores.write(0, 4, 'NIT Otro Patrono 1')
+            hoja_fin_labores.write(0, 5, 'Renta Otro Patrono 1')
+            hoja_fin_labores.write(0, 6, 'Retencion Otro Patrono 1')
+            hoja_fin_labores.write(0, 7, 'NIT Otro Patrono 2')
+            hoja_fin_labores.write(0, 8, 'Renta Otro Patrono 2')
+            hoja_fin_labores.write(0, 9, 'Retencion Otro Patrono 2')
+            hoja_fin_labores.write(0, 10, 'NIT Otro Patrono 3')
+            hoja_fin_labores.write(0, 11, 'Renta Otro Patrono 3')
+            hoja_fin_labores.write(0, 12, 'Retencion Otro Patrono 3')
+            hoja_fin_labores.write(0, 13, 'NIT Otro Patrono 4')
+            hoja_fin_labores.write(0, 14, 'Renta Otro Patrono 4')
+            hoja_fin_labores.write(0, 15, 'Retencion Otro Patrono 4')
+            hoja_fin_labores.write(0, 16, 'NIT Otro Patrono 5')
+            hoja_fin_labores.write(0, 17, 'Renta Otro Patrono 5')
+            hoja_fin_labores.write(0, 18, 'Retencion Otro Patrono 5')
+            hoja_fin_labores.write(0, 19, 'NIT ex patrono 1')
+            hoja_fin_labores.write(0, 20, 'Renta Ex Patrono 1')
+            hoja_fin_labores.write(0, 21, 'Retencion Ex Patrono 1')
+            hoja_fin_labores.write(0, 22, 'NIT ex patrono 2')
+            hoja_fin_labores.write(0, 23, 'Renta Ex Patrono 2')
+            hoja_fin_labores.write(0, 24, 'Retencion Ex Patrono 2')
+            hoja_fin_labores.write(0, 25, 'NIT ex patrono 3')
+            hoja_fin_labores.write(0, 26, 'Renta Ex Patrono 3')
+            hoja_fin_labores.write(0, 27, 'Retencion Ex Patrono 3')
+            hoja_fin_labores.write(0, 28, 'NIT ex patrono 4')
+            hoja_fin_labores.write(0, 29, 'Renta Ex Patrono 4')
+            hoja_fin_labores.write(0, 30, 'Retencion Ex Patrono 4')
+            hoja_fin_labores.write(0, 31, 'NIT ex patrono 5')
+            hoja_fin_labores.write(0, 32, 'Renta Ex Patrono 5')
+            hoja_fin_labores.write(0, 33, 'Retencion Ex Patrono 5')
+            hoja_fin_labores.write(0, 34, 'Otros ingresos Gravados y Exentos obtenidos en el período')
+            hoja_fin_labores.write(0, 35, 'Indemnizaciones o pensiones por causa de muerte')
+            hoja_fin_labores.write(0, 36, 'Indemnizaciones por tiempo servido')
+            hoja_fin_labores.write(0, 37, 'Remuneraciones de los diplomáticos')
+            hoja_fin_labores.write(0, 38, 'Gastos de representación y viáticos comprobables')
+            hoja_fin_labores.write(0, 39, 'Aguinaldo')
+            hoja_fin_labores.write(0, 40, 'Bono Anual de trabajadores (14)')
+            hoja_fin_labores.write(0, 41, 'Cuotas IGSS  y Otros planes de seguridad social')
+            hoja_fin_labores.write(0, 42, 'Fecha de Fin de Labores')
+            hoja_fin_labores.write(0, 43, 'Ultima Retención')
+
+            fila = 1
+
+            for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
+                if empleado.contract_id.date_end:
+                    hoja_fin_labores.write(fila, 0, empleado.nit if empleado.nit else '')
+                    # hoja_fin_labores.write(fila, 3, (empleado.contract_id.wage))
+                    hoja_fin_labores.write(fila, 4, empleado.contract_id.wage)
+                    hoja_fin_labores.write(fila, 5, empleado.contract_id.wage)
+
+                    if self.fecha_inicio and self.fecha_fin:
+                        otra_info = self._get_informacion(empleado.id, self.fecha_inicio, empleado.contract_id.date_end)
+                        hoja_fin_labores.write(fila, 1, otra_info['renta_patrono_actual'])
+                        hoja_fin_labores.write(fila, 2, otra_info['bono_anual'])
+                        hoja_fin_labores.write(fila, 3, otra_info['aguinaldo_anual'])
+                        hoja_fin_labores.write(fila, 34, otra_info['otro_ingreso'])
+
+
+                        hoja_fin_labores.write(fila, 38, otra_info['viaticos'])
+                        hoja_fin_labores.write(fila, 39, otra_info['aguinaldo_anual'])
+                        hoja_fin_labores.write(fila, 40, otra_info['bono_anual'])
+                        hoja_fin_labores.write(fila, 41, otra_info['igss_total'])
+                        hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end))
+                    fila += 1
+
+
+
+
+        if self.tipo == "liquidacion_periodo":
+            hoja_fin_periodo = libro.add_worksheet('CargaLiquidación Fin Período')
+            hoja_fin_periodo.write(0, 0, 'NIT empleado')
+            hoja_fin_periodo.write(0, 1, 'Renta Patrono Actual')
+            hoja_fin_periodo.write(0, 2, 'Bono Anual de trabajadores (14)')
+            hoja_fin_periodo.write(0, 3, 'Aguinaldo')
+            hoja_fin_periodo.write(0, 4, 'NIT Otro Patrono 1')
+            hoja_fin_periodo.write(0, 5, 'Renta Otro Patrono 1')
+            hoja_fin_periodo.write(0, 6, 'Retencion Otro Patrono 1')
+            hoja_fin_periodo.write(0, 7, 'NIT Otro Patrono 2')
+            hoja_fin_periodo.write(0, 8, 'Renta Otro Patrono 2')
+            hoja_fin_periodo.write(0, 9, 'Retencion Otro Patrono 2')
+            hoja_fin_periodo.write(0, 10, 'NIT Otro Patrono 3')
+            hoja_fin_periodo.write(0, 11, 'Renta Otro Patrono 3')
+            hoja_fin_periodo.write(0, 12, 'Retencion Otro Patrono 3')
+            hoja_fin_periodo.write(0, 13, 'NIT Otro Patrono 4')
+            hoja_fin_periodo.write(0, 14, 'Renta Otro Patrono 4')
+            hoja_fin_periodo.write(0, 15, 'Retencion Otro Patrono 4')
+            hoja_fin_periodo.write(0, 16, 'NIT Otro Patrono 5')
+            hoja_fin_periodo.write(0, 17, 'Renta Otro Patrono 5')
+            hoja_fin_periodo.write(0, 18, 'Retencion Otro Patrono 5')
+            hoja_fin_periodo.write(0, 19, 'NIT ex patrono 1')
+            hoja_fin_periodo.write(0, 20, 'Renta Ex Patrono 1')
+            hoja_fin_periodo.write(0, 21, 'Retencion Ex Patrono 1')
+            hoja_fin_periodo.write(0, 22, 'NIT ex patrono 2')
+            hoja_fin_periodo.write(0, 23, 'Renta Ex Patrono 2')
+            hoja_fin_periodo.write(0, 24, 'Retencion Ex Patrono 2')
+            hoja_fin_periodo.write(0, 25, 'NIT ex patrono 3')
+            hoja_fin_periodo.write(0, 26, 'Renta Ex Patrono 3')
+            hoja_fin_periodo.write(0, 27, 'Retencion Ex Patrono 3')
+            hoja_fin_periodo.write(0, 28, 'NIT ex patrono 4')
+            hoja_fin_periodo.write(0, 29, 'Renta Ex Patrono 4')
+            hoja_fin_periodo.write(0, 30, 'Retencion Ex Patrono 4')
+            hoja_fin_periodo.write(0, 31, 'NIT ex patrono 5')
+            hoja_fin_periodo.write(0, 32, 'Renta Ex Patrono 5')
+            hoja_fin_periodo.write(0, 33, 'Retencion Ex Patrono 5')
+            hoja_fin_periodo.write(0, 34, 'Otros ingresos Gravados y Exentos obtenidos en el período')
+            hoja_fin_periodo.write(0, 35, 'Indemnizaciones o pensiones por causa de muerte')
+            hoja_fin_periodo.write(0, 36, 'Indemnizaciones por tiempo servido')
+            hoja_fin_periodo.write(0, 37, 'Remuneraciones de los diplomáticos')
+            hoja_fin_periodo.write(0, 38, 'Gastos de representación y viáticos comprobables')
+            hoja_fin_periodo.write(0, 39, 'Aguinaldo')
+            hoja_fin_periodo.write(0, 40, 'Bono Anual de trabajadores (14)')
+            hoja_fin_periodo.write(0, 41, 'Cuotas IGSS  y Otros planes de seguridad social')
+            hoja_fin_periodo.write(0, 42, 'Seguros')
+            hoja_fin_periodo.write(0, 43, 'Planilla')
+            hoja_fin_periodo.write(0, 43, 'Otras Donaciones')
+            fila = 1
+
+            for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
+                # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '31-12-'+str(self.anio-1))
+                if self.fecha_inicio and self.fecha_fin:
                     otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
+                    hoja_fin_periodo.write(fila, 0, empleado.nit if empleado.nit else '')
+                    hoja_fin_periodo.write(fila, 1, (empleado.contract_id.wage*2))
+                    hoja_fin_periodo.write(fila, 2, otra_info['bono_anual'])
+                    hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
 
-                hoja_fin_periodo.write(fila, 34, otra_info['otro_ingreso'])
-                hoja_fin_periodo.write(fila, 38, otra_info['viaticos'])
-                hoja_fin_periodo.write(fila, 39, empleado.contract_id.wage)
-                hoja_fin_periodo.write(fila, 40, empleado.contract_id.wage)
-                hoja_fin_periodo.write(fila, 41, otra_info['igss_total'])
-            fila += 1
+                    if empleado.contract_id.date_end and (empleado.contract_id.date_end > self.fecha_inicio and empleado.contract_id.date_end <= self.fecha_fin):
+                        otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio), empleado.contract_id.date_end)
+                    else:
+                        otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
 
-        hoja_retencion.write(0, 0, 'NIT empleado')
-        hoja_retencion.write(0, 1, 'Base Gra')
-        hoja_retencion.write(0, 2, 'Retencion por pago')
-        hoja_retencion.write(0, 3, 'Fecha de retencion')
-        fila = 1
+                    hoja_fin_periodo.write(fila, 34, otra_info['otro_ingreso'])
+                    hoja_fin_periodo.write(fila, 38, otra_info['viaticos'])
+                    hoja_fin_periodo.write(fila, 39, empleado.contract_id.wage)
+                    hoja_fin_periodo.write(fila, 40, empleado.contract_id.wage)
+                    hoja_fin_periodo.write(fila, 41, otra_info['igss_total'])
+                fila += 1
 
-        # retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
-        for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-            if  retencion_pago and empleado.id in retencion_pago and retencion_pago[empleado.id][1] < 0:
-                hoja_retencion.write(fila, 0, empleado.nit if empleado.nit else '')
-                hoja_retencion.write(fila, 1, retencion_pago[empleado.id][0])
-                hoja_retencion.write(fila, 2, retencion_pago[empleado.id][1])
-                hoja_retencion.write(fila, 3, str(self.fecha_fin))
+        if self.tipo == "retencion_pago":
+            hoja_retencion = libro.add_worksheet('Retención por pago')
+            hoja_retencion.write(0, 0, 'NIT empleado')
+            hoja_retencion.write(0, 1, 'Base Gra')
+            hoja_retencion.write(0, 2, 'Retencion por pago')
+            hoja_retencion.write(0, 3, 'Fecha de retencion')
+            fila = 1
 
-            fila += 1
+            retencion_pago = self._get_retencion_pago(self.env.context.get('active_ids', []), self.fecha_inicio, self.fecha_fin)
+            for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
+                if  retencion_pago and empleado.id in retencion_pago and retencion_pago[empleado.id][1] < 0:
+                    hoja_retencion.write(fila, 0, empleado.nit if empleado.nit else '')
+                    hoja_retencion.write(fila, 1, retencion_pago[empleado.id][0])
+                    hoja_retencion.write(fila, 2, retencion_pago[empleado.id][1])
+                    hoja_retencion.write(fila, 3, str(self.fecha_fin))
+
+                fila += 1
 
         libro.close()
         datos = base64.b64encode(f.getvalue())
