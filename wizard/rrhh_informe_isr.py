@@ -243,6 +243,7 @@ class rrhh_informe_isr(models.TransientModel):
                                 salario = linea_historial.salario
                                 fecha_actualizacion = linea_historial.fecha
 
+                        logging.warning(fecha_actualizacion)
                         if salario > 0:
                             hoja.write(fila, 0, empleado.nit if empleado.nit else '')
                             hoja.write(fila, 1, empleado.name)
@@ -251,20 +252,20 @@ class rrhh_informe_isr(models.TransientModel):
                             aguinaldo = 0
                             otros_ingresos_gravados = 0
                             cuota_igss = 0
-                            fecha_actualizacion = ""
+                            anio_actual = self.fecha_fin.year
                             anio_ingreso = empleado.contract_id.date_start.year
-                            empleado_planillas = self._get_informacion(empleado.id, '01/01/'+str(self.anio), self.fecha_inicio)
+                            empleado_planillas = self._get_informacion(empleado.id, '01/01/'+str(anio_actual), self.fecha_inicio)
 
-                            fecha_final_date = datetime.datetime.strptime(str(self.anio)+'-12-31', '%Y-%m-%d').date()
+                            fecha_final_date = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
                             diferencia_meses = (fecha_final_date.year - self.fecha_inicio.year) * 12 + (fecha_final_date.month - self.fecha_inicio.month)
                             renta_patrono_actual = empleado_planillas["renta_patrono_actual"] +(salario * diferencia_meses)
 
                             # ---------------------------- INICIO CALCULO BONO
-                            fecha_final_nuevo_salario_bono = datetime.datetime.strptime(str(self.anio)+'-06-30', '%Y-%m-%d').date()
+                            fecha_final_nuevo_salario_bono = datetime.datetime.strptime(str(anio_actual)+'-06-30', '%Y-%m-%d').date()
                             dias_nuevo_salario_bono = (fecha_final_nuevo_salario_bono - self.fecha_inicio).days + 1
                             bono_nuevo_salario = ((salario * 12)/ 365)*dias_nuevo_salario_bono
 
-                            fecha_inicio_antiguo_salario_bono = datetime.datetime.strptime(str(self.anio-1)+'-07-01', '%Y-%m-%d').date()
+                            fecha_inicio_antiguo_salario_bono = datetime.datetime.strptime(str(anio_actual-1)+'-07-01', '%Y-%m-%d').date()
                             dias_antiguo_salario_bono = (self.fecha_inicio - fecha_inicio_antiguo_salario_bono).days + 1
 
                             bono_antiguo_salario = ((salario * 12)/ 365)*dias_antiguo_salario_bono
@@ -272,11 +273,11 @@ class rrhh_informe_isr(models.TransientModel):
                             # ---------------------------- FIN CALCULO BONO
 
                             # ---------------------------- INICIO CALCULO AGUINALDO
-                            fecha_final_nuevo_salario_aguinaldo = datetime.datetime.strptime(str(self.anio)+'-11-30', '%Y-%m-%d').date()
+                            fecha_final_nuevo_salario_aguinaldo = datetime.datetime.strptime(str(anio_actual)+'-11-30', '%Y-%m-%d').date()
                             dias_nuevo_salario_aguinaldo = (fecha_final_nuevo_salario_aguinaldo - self.fecha_inicio).days + 1
                             aguinaldo_nuevo_salario = ((salario * 12)/ 365)*dias_nuevo_salario_aguinaldo
 
-                            fecha_inicio_antiguo_salario_aguinaldo = datetime.datetime.strptime(str(self.anio-1)+'-12-01', '%Y-%m-%d').date()
+                            fecha_inicio_antiguo_salario_aguinaldo = datetime.datetime.strptime(str(anio_actual-1)+'-12-01', '%Y-%m-%d').date()
                             dias_antiguo_salario_aguinaldo = (self.fecha_inicio - fecha_inicio_antiguo_salario_aguinaldo).days + 1
                             aguinaldo_antiguo_salario = ((salario * 12)/ 365)*dias_antiguo_salario_aguinaldo
                             aguinaldo_anual = aguinaldo_nuevo_salario + aguinaldo_antiguo_salario
@@ -284,7 +285,7 @@ class rrhh_informe_isr(models.TransientModel):
                             # ---------------------------- FIN CALCULO AGUINALDO
 
 
-                            fecha_final_calculo = datetime.datetime.strptime(str(self.anio)+'-12-31', '%Y-%m-%d').date()
+                            fecha_final_calculo = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
                             dias_trabajados = (fecha_final_calculo - self.fecha_inicio).days + 1
                             proyeccion_base_extra = ((empleado.contract_id.base_extra * 12) / 365)*dias_trabajados
                             otros_ingresos_gravados = empleado_planillas["otro_ingreso"] + proyeccion_base_extra
@@ -293,11 +294,11 @@ class rrhh_informe_isr(models.TransientModel):
                             cuota_igss = (empleado_planillas["igss_total"] * -1) + (valor_salario_nuevo)
 
 
-                            fecha_inicio_calculo = datetime.datetime.strptime(str(self.anio-1)+'-12-01', '%Y-%m-%d').date()
+                            fecha_inicio_calculo = datetime.datetime.strptime(str(anio_actual-1)+'-12-01', '%Y-%m-%d').date()
                             if empleado.contract_id.date_start < fecha_inicio_calculo:
                                 aguinaldo = (empleado.contract_id.wage * 12)
                             else:
-                                dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-11-30', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
+                                dias_trabajados = (datetime.datetime.strptime(str(anio_actual)+'-11-30', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
                                 valor_diario = ((empleado.contract_id.wage * 12)/365)
                                 aguinaldo = valor_diario * dias_trabajados
 
@@ -379,25 +380,25 @@ class rrhh_informe_isr(models.TransientModel):
             fila = 1
 
             for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
-                if empleado.contract_id.date_end:
+                if empleado.contract_id.date_end and (empleado.contract_id.date_end >= self.fecha_inicio and empleado.contract_id.date_end <= self.fecha_fin):
                     hoja_fin_labores.write(fila, 0, empleado.nit if empleado.nit else '')
                     # hoja_fin_labores.write(fila, 3, (empleado.contract_id.wage))
                     hoja_fin_labores.write(fila, 4, empleado.contract_id.wage)
                     hoja_fin_labores.write(fila, 5, empleado.contract_id.wage)
 
-                    if self.fecha_inicio and self.fecha_fin:
-                        otra_info = self._get_informacion(empleado.id, self.fecha_inicio, empleado.contract_id.date_end)
-                        hoja_fin_labores.write(fila, 1, otra_info['renta_patrono_actual'])
-                        hoja_fin_labores.write(fila, 2, otra_info['bono_anual'])
-                        hoja_fin_labores.write(fila, 3, otra_info['aguinaldo_anual'])
-                        hoja_fin_labores.write(fila, 34, otra_info['otro_ingreso'])
+
+                    otra_info = self._get_informacion(empleado.id, self.fecha_inicio, empleado.contract_id.date_end)
+                    hoja_fin_labores.write(fila, 1, otra_info['renta_patrono_actual'])
+                    hoja_fin_labores.write(fila, 2, otra_info['bono_anual'])
+                    hoja_fin_labores.write(fila, 3, otra_info['aguinaldo_anual'])
+                    hoja_fin_labores.write(fila, 34, otra_info['otro_ingreso'])
 
 
-                        hoja_fin_labores.write(fila, 38, otra_info['viaticos'])
-                        hoja_fin_labores.write(fila, 39, otra_info['aguinaldo_anual'])
-                        hoja_fin_labores.write(fila, 40, otra_info['bono_anual'])
-                        hoja_fin_labores.write(fila, 41, otra_info['igss_total'])
-                        hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end))
+                    hoja_fin_labores.write(fila, 38, otra_info['viaticos'])
+                    hoja_fin_labores.write(fila, 39, otra_info['aguinaldo_anual'])
+                    hoja_fin_labores.write(fila, 40, otra_info['bono_anual'])
+                    hoja_fin_labores.write(fila, 41, otra_info['igss_total'])
+                    hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end))
                     fila += 1
 
 
@@ -455,6 +456,7 @@ class rrhh_informe_isr(models.TransientModel):
             for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
                 # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '31-12-'+str(self.anio-1))
                 if self.fecha_inicio and self.fecha_fin:
+                    anio_actual = self.fecha_fin.year
                     otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
                     hoja_fin_periodo.write(fila, 0, empleado.nit if empleado.nit else '')
                     hoja_fin_periodo.write(fila, 1, (empleado.contract_id.wage*2))
@@ -462,7 +464,7 @@ class rrhh_informe_isr(models.TransientModel):
                     hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
 
                     if empleado.contract_id.date_end and (empleado.contract_id.date_end > self.fecha_inicio and empleado.contract_id.date_end <= self.fecha_fin):
-                        otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio), empleado.contract_id.date_end)
+                        otra_info = self._get_informacion(empleado.id, '01-07-'+str(anio_actual), empleado.contract_id.date_end)
                     else:
                         otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
 
@@ -476,7 +478,7 @@ class rrhh_informe_isr(models.TransientModel):
         if self.tipo == "retencion_pago":
             hoja_retencion = libro.add_worksheet('Retención por pago')
             hoja_retencion.write(0, 0, 'NIT empleado')
-            hoja_retencion.write(0, 1, 'Base Gra')
+            hoja_retencion.write(0, 1, 'Base Gravado')
             hoja_retencion.write(0, 2, 'Retencion por pago')
             hoja_retencion.write(0, 3, 'Fecha de retencion')
             fila = 1
