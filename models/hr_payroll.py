@@ -88,6 +88,7 @@ class HrPayslip(models.Model):
                             prestamo.estado = "proceso"
                         if cantidad_pagados == cantidad_pagos and cantidad_pagos > 0:
                             prestamo.estado = "pagado"
+                    prestamo._compute_prestamo()
 
         return res
 

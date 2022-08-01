@@ -88,6 +88,8 @@ class res_company(models.Model):
     renta_patrono_actual_ids = fields.Many2many('hr.salary.rule','rrhh_renta_pactual_rel',string='Rentra patrono actual')
     base_gravada_ids = fields.Many2many('hr.salary.rule','rrhh_base_gravada_re', string="Base gravada")
     ajuste_suspension_ids = fields.Many2many('hr.salary.rule','rrhh_ajuste_suspension_rel', string="Ajuste/suspension")
+    retenciones_sobre_ventas_ids = fields.Many2many('hr.salary.rule','rrhh_retenciones_ventas_rel', string="Retenciones sobre ventas")
+    impuesto_devuelto_compensado_ids = fields.Many2many('hr.salary.rule','rrhh_impuesto_devuelto_rel', string="Impuesto devuelto compensado")
 
 class res_company_centro_trabajo(models.Model):
     _name = 'res.company.centro_trabajo'

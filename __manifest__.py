@@ -36,6 +36,7 @@
         'wizard/rrhh_libro_salarios_view.xml',
         'wizard/rrhh_informe_empleador_view.xml',
         'wizard/rrhh_informe_isr_view.xml',
+        'wizard/rrhh_formato_carga_isr_view.xml',
         'wizard/igss.xml',
         'wizard/cerrar_nominas.xml',
         'security/ir.model.access.csv',

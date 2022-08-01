@@ -25,7 +25,7 @@ class rrhh_prestamo(models.Model):
         ('proceso','Proceso'),
         ('pagado', 'Pagado')
     ], string='Status', help='Estado del prestamo',readonly=True, default='nuevo')
-    pendiente_pagar_prestamo = fields.Float(compute='_compute_prestamo', string='Pendiente a pagar del prestamos', )
+    pendiente_pagar_prestamo = fields.Float(compute='_compute_prestamo', string='Pendiente a pagar del prestamos', store=True)
 
     def _compute_prestamo (self):
         for prestamo in self:
@@ -81,6 +81,7 @@ class rrhh_prestamo(models.Model):
                             logging.warn(ultimos_pagos_mensuales)
                             self.env['rrhh.prestamo.linea'].create({'prestamo_id': self.id,'mes': mes,'anio': anio,'monto': ultimos_pagos_mensuales})
                         contador += 1
+            self._compute_prestamo()
         return True
 
     def prestamos(self):

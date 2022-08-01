@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_rrhh_formato_carga_isr" model="ir.ui.view">
+              <field name="name">Formato Carga ISR</field>
+              <field name="model">rrhh.formato_carga_isr</field>
+              <field name="arch" type="xml">
+                <form string="Informe ISR">
+                    <group string="Generación de formulario">
+                        <field name="formulario"/>
+                        <field name="fecha_inicio"/>
+                        <field name="fecha_fin"/>
+                        <field name="name" colspan="4" invisible="1"/>
+                        <field name="archivo" filename="name" readonly="1"/>
+                    </group>
+                    <footer>
+                        <button name="generar" string="Generar" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+              </field>
+        </record>
+
+        <act_window id="action_rrhh_formato_carga_isr"
+            key2="client_print_multi"
+            name="Formato Carga ISR"
+            res_model="rrhh.formato_carga_isr"
+            src_model="hr.employee"
+            view_mode="form" target="new" view_type="form" />
+</odoo>

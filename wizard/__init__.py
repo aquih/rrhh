@@ -8,3 +8,4 @@ from . import igss
 from . import cerrar_nominas
 from . import vacaciones
 from . import rrhh_informe_isr
+from . import rrhh_formato_carga_isr
