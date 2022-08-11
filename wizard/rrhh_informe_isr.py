@@ -177,7 +177,7 @@ class rrhh_informe_isr(models.TransientModel):
                         fecha_alta = empleado.contract_id.date_start
 
                     # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
-                    hoja.write(fila, 2, empleado.contract_id.date_start, formato_fecha)
+                    hoja.write(fila, 2, fecha_alta, formato_fecha)
                     hoja.write(fila, 3, renta_patrono_actual)
                     hoja.write(fila, 4, bono_anual)
                     hoja.write(fila, 5, aguinaldo)
@@ -301,7 +301,7 @@ class rrhh_informe_isr(models.TransientModel):
 
 
                             # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
-                            hoja.write(fila, 2, empleado.contract_id.date_start, formato_fecha)
+                            hoja.write(fila, 2, fecha_actualizacion, formato_fecha)
                             hoja.write(fila, 3, renta_patrono_actual)
                             hoja.write(fila, 4, bono_anual)
                             hoja.write(fila, 5, aguinaldo_anual)
@@ -395,7 +395,7 @@ class rrhh_informe_isr(models.TransientModel):
                     hoja_fin_labores.write(fila, 39, otra_info['aguinaldo_anual'])
                     hoja_fin_labores.write(fila, 40, otra_info['bono_anual'])
                     hoja_fin_labores.write(fila, 41, otra_info['igss_total'])
-                    hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end))
+                    hoja_fin_labores.write(fila, 42,  str(empleado.contract_id.date_end), formato_fecha)
                     fila += 1
 
 
@@ -485,8 +485,8 @@ class rrhh_informe_isr(models.TransientModel):
                 if  retencion_pago and empleado.id in retencion_pago and retencion_pago[empleado.id][1] < 0:
                     hoja_retencion.write(fila, 0, empleado.nit if empleado.nit else '')
                     hoja_retencion.write(fila, 1, retencion_pago[empleado.id][0])
-                    hoja_retencion.write(fila, 2, retencion_pago[empleado.id][1])
-                    hoja_retencion.write(fila, 3, str(self.fecha_fin))
+                    hoja_retencion.write(fila, 2, retencion_pago[empleado.id][1]*-1 if retencion_pago[empleado.id][1]<0 else retencion_pago[empleado.id][1] )
+                    hoja_retencion.write(fila, 3, str(self.fecha_fin), formato_fecha)
 
                 fila += 1
 
