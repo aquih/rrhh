@@ -248,7 +248,8 @@ class HrPayslipRun(models.Model):
 
     porcentaje_prestamo = fields.Float('Prestamo (%)')
     estructura_id = fields.Many2one('hr.payroll.structure','Estructura')
-
+    formulario = fields.Char('Número de formulario')
+    total_devolucion_isr = fields.Float('Total devolución ISR')
 
     def generar_pagos(self):
         pagos = self.env['account.payment'].search([('nomina_id', '!=', False)])

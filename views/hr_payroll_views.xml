@@ -14,6 +14,8 @@
                     <field name="journal_id" position="after">
                         <field name="porcentaje_prestamo"/>
                         <field name="estructura_id"/>
+                        <field name="formulario"/>
+                        <field name="total_devolucion_isr"/>
                     </field>
                 </data>
             </field>
