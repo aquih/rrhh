@@ -40,8 +40,8 @@ class report_planilla_pdf(models.AbstractModel):
                 else:
                     llave = 'Indefinido'
             else:
-                if slip.contract_id.analytic_account_id.name:
-                    llave = l.contract_id.analytic_account_id.name
+                if slip.contract_id.analytic_account_id:
+                    llave = slip.contract_id.analytic_account_id.name
                 else:
                     llave = 'Indefinido'
 
