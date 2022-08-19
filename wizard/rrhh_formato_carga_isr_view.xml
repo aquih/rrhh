@@ -7,7 +7,6 @@
               <field name="arch" type="xml">
                 <form string="Informe ISR">
                     <group string="Generación de formulario">
-                        <field name="formulario"/>
                         <field name="fecha_inicio"/>
                         <field name="fecha_fin"/>
                         <field name="name" colspan="4" invisible="1"/>
