@@ -26,17 +26,18 @@ class rrhh_formato_carga_isr(models.TransientModel):
         impuesto_devuelto_compensado = 0
         impuesto_retenido_pagar = 0
         informacion_mes = {}
-        nomina_id = self.env['hr.payslip'].search([('employee_id','in', empleados_ids),('date_from', '>=', fecha_inicio),('date_to','<=', fecha_fin)] , order='date_to asc')
+        nomina_id = self.env['hr.payslip'].search([('employee_id','in', empleados_ids),('date_from', '>=', fecha_inicio),('date_to','<=', fecha_fin),('payslip_run_id','!=', False)] , order='date_to asc')
         if nomina_id:
             for nomina in nomina_id:
-                mes = (nomina.date_to.month - 1)
-                if mes not in informacion_mes:
-                    informacion_mes[mes] = {'periodo': self._get_mes_letras(mes),'numero_formulario': nomina.payslip_run_id.formulario,'retenciones_sobre_rentas': 0 ,'impuesto_devuelto_compensado': nomina.payslip_run_id.total_devolucion_isr}
+                if nomina.payslip_run_id.formulario:
+                    mes = (nomina.date_to.month - 1)
+                    if mes not in informacion_mes:
+                        informacion_mes[mes] = {'periodo': self._get_mes_letras(mes),'numero_formulario': nomina.payslip_run_id.formulario,'retenciones_sobre_rentas': 0 ,'impuesto_devuelto_compensado': nomina.payslip_run_id.total_devolucion_isr}
 
-                if nomina.line_ids:
-                    for linea in nomina.line_ids:
-                        if linea.salary_rule_id.id in nomina.employee_id.company_id.retenciones_sobre_rentas_ids.ids:
-                            informacion_mes[mes]['retenciones_sobre_rentas'] += abs(linea.total)
+                    if nomina.line_ids:
+                        for linea in nomina.line_ids:
+                            if linea.salary_rule_id.id in nomina.employee_id.company_id.retenciones_sobre_rentas_ids.ids:
+                                informacion_mes[mes]['retenciones_sobre_rentas'] += abs(linea.total)
         return informacion_mes
 
     def _get_mes_letras(self, mes):
