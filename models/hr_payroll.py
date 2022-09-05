@@ -282,6 +282,12 @@ class HrPayslip(models.Model):
                                     if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
                                         entrada.amount = lineas.monto*(slip.porcentaje_prestamo/100)
         return res
+    
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        res = super(models.Model, self).fields_view_get(view_id, view_type, toolbar, submenu)
+        
+        return res
 
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
