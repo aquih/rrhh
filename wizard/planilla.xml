@@ -28,13 +28,14 @@
         </record>
 
         <record id="action_planilla_pdf" model="ir.actions.report">
-           <field name="name">Planilla PDF</field>
+           <field name="name"></field>
            <field name="model">rhh.planilla.wizard</field>
            <field name="report_type">qweb-pdf</field>
            <field name="report_name">rrhh.planilla_pdf</field>
            <field name="report_file">rrhh.planilla_pdf</field>
            <field name="binding_model_id" ref="model_hr_payslip_run"/>
-           <field name="binding_type">report</field>
+           <field name="binding_type">action</field>
+           <field name="paperformat_id" ref="paperformat_libro_salarios"/>
         </record>
 
 
