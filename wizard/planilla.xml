@@ -19,7 +19,7 @@
                     <footer>
                         <button name="generar" string="Generar" type="object" class="oe_highlight"/>
                         or
-                        <button name="generar_pdf" string="Generar PDF" type="object" class="oe_highlight"/>
+                        <button name="print_report" string="Generar PDF" type="object" class="oe_highlight"/>
                         or
                         <button string="Cancel" class="oe_link" special="cancel"/>
                     </footer>
@@ -33,10 +33,7 @@
            <field name="report_type">qweb-pdf</field>
            <field name="report_name">rrhh.planilla_pdf</field>
            <field name="report_file">rrhh.planilla_pdf</field>
-           <field name="binding_model_id" ref="model_hr_payslip_run"/>
-           <field name="binding_type">report</field>
         </record>
-
 
         <record id="action_planilla_wizard" model="ir.actions.act_window">
             <field name="name">Planilla</field>
