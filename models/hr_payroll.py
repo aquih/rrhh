@@ -9,7 +9,7 @@ import dateutil.parser
 from dateutil.relativedelta import relativedelta
 from dateutil import relativedelta as rdelta
 from odoo.fields import Date, Datetime
-from odoo.addons.l10n_gt_extra import a_letras
+from odoo.addons.l10n_sv_extra import a_letras
 from odoo.exceptions import ValidationError
 
 class HrPayslip(models.Model):

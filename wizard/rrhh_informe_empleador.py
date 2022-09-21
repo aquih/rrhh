@@ -14,7 +14,7 @@ from datetime import datetime, date, time
 from odoo.fields import Date, Datetime
 import itertools
 from dateutil.relativedelta import relativedelta
-from odoo.addons.l10n_gt_extra import a_letras
+from odoo.addons.l10n_sv_extra import a_letras
 
 class rrhh_informe_empleador(models.TransientModel):
     _name = 'rrhh.informe_empleador'
