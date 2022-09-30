@@ -43,7 +43,6 @@
         <field name="view_id" ref="view_planilla_wizard_form"/>
         <field name="target">new</field>
         <field name="binding_model_id" ref="model_hr_payslip_run"/>
-        <field name="paperformat_id" ref="paperformat_libro_salarios"/>
     </record>
 
 </odoo>
