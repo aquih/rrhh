@@ -231,7 +231,7 @@ class HrPayslip(models.Model):
                 self.calculo_rrhh(self)
             else:
 
-                dias_bonificacion = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
+                dias_bonificacion = self.employee_id._get_work_days_data_batch(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
 
                 if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
                     dias_laborados = dias_laborados - (contracts.date_start - self.date_from).days
@@ -239,7 +239,7 @@ class HrPayslip(models.Model):
                 elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start :
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
                 elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
-                    dias_bonificacion = self.employee_id._get_work_days_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
+                    dias_bonificacion = self.employee_id._get_work_days_data_batch(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
                 else:
                     if contracts.schedule_pay == 'monthly':
@@ -248,7 +248,7 @@ class HrPayslip(models.Model):
                         res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
                     # Cálculo de días para catorcena
                     if contracts.schedule_pay == 'bi-weekly':
-                        dias_laborados = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
+                        dias_laborados = self.employee_id._get_work_days_data_batch(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
                         res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
         return res
 
@@ -257,6 +257,10 @@ class HrPayslip(models.Model):
         res = super(HrPayslip, self)._compute_input_line_ids()
         for slip in self:
             if slip.employee_id and slip.struct_id and slip.struct_id.input_line_type_ids:
+
+                if slip.contract_id and slip.contract_id.analytic_account_id:
+                    slip.cuenta_analitica_id = slip.contract_id.analytic_account_id.id
+
                 input_line_vals = []
                 if slip.input_line_ids:
                     slip.input_line_ids.unlink()

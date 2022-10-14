@@ -183,18 +183,18 @@ class rrhh_informe_empleador(models.TransientModel):
         if empleado_id.contract_id.date_start and empleado_id.contract_id.date_end:
             anio_fin_contrato = int(empleado_id.contract_id.date_end.year)
             if anio_inicio_contrato == anio and anio_fin_contrato == anio:
-                dias = empleado._get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado._get_work_days_data_batch(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
             if anio_inicio_contrato != anio and anio_fin_contrato == anio:
-                dias = empleado._get_work_days_data(Datetime.from_string(anio_inicio), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado._get_work_days_data_batch(Datetime.from_string(anio_inicio), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
         if empleado_id.contract_id.date_start and empleado_id.contract_id.date_end == False:
             if anio_inicio_contrato == anio:
-                dias = empleado._get_work_days_data(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado._get_work_days_data_batch(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
                 dias_laborados = dias['days']
             else:
                 # dias = empleado.get_work_days_data(Datetime.from_string(anio_inicio), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
-                dias = empleado_id._get_work_days_data(Datetime.from_string(anio_inicio), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
+                dias = empleado_id._get_work_days_data_batch(Datetime.from_string(anio_inicio), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
 
                 dias_laborados = dias['days']
         return dias_laborados
