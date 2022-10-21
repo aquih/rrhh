@@ -22,7 +22,7 @@ class rrhh_planilla_wizard(models.TransientModel):
         res = self.read([])
         res = res and res[0] or {}
         datas['form'] = res
-        return self.env.ref('rrhh.action_planilla_pdf').report_action([], data=datas)
+        return self.env.ref('rrhh.action_planilla_pdf').with_context(landscape=True).report_action([], data=datas)
 
     def buscar_partida_nominas(self, slip_ids):
         cantidad_nominas_partida = 0
