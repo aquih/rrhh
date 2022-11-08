@@ -121,13 +121,13 @@
                                                         <tr>
                                                             <t t-if="l[2]">
                                                                 <td><span t-esc="l[2]['nombre']"></span></td>
-                                                                <td><span t-esc="l[2]['total']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                                                <td><span t-esc="l[2]['total']"/></td>
                                                             </t>
                                                         </tr>
                                                     </t>
                                                     <tr>
                                                         <td>Subtotal</td>
-                                                        <td><span t-esc="lineas(o)['totales'][2]" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                                        <td><span t-esc="lineas(o)['totales'][2]"/></td>
                                                     </tr>
                                                 </table>
                                             </td>
@@ -271,13 +271,13 @@
                                                         <tr>
                                                             <t t-if="l[2]">
                                                                 <td><span t-esc="l[2]['nombre']"></span></td>
-                                                                <td><span t-esc="l[2]['total']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                                                <td><span t-esc="l[2]['total']"/></td>
                                                             </t>
                                                         </tr>
                                                     </t>
                                                     <tr>
                                                         <td>Subtotal</td>
-                                                        <td><span t-esc="lineas(o)['totales'][2]" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                                        <td><span t-esc="lineas(o)['totales'][2]"/></td>
                                                     </tr>
                                                 </table>
                                             </td>
