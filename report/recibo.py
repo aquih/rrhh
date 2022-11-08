@@ -56,6 +56,7 @@ class ReportRecibo(models.AbstractModel):
             for entrada in recibo.entrada_id:
                 datos = {'nombre': entrada.input_id.name, 'total': 0}
                 datos['total'] = entradas.get(entrada.input_id.code, 0)
+                result['totales'][2] += entradas.get(entrada.input_id.code, 0)
                 lineas_entradas.append(datos)
 
             largo = max(len(lineas_ingresos), len(lineas_deducciones), len(lineas_entradas))
