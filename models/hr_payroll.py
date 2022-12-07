@@ -67,12 +67,16 @@ class HrPayslip(models.Model):
         res =  super(HrPayslip, self).compute_sheet()
         return res
 
-    def _obtener_entrada(self,contrato_id):
-        entradas = False
+    def _obtener_entrada(self,contrato_id, estructura_id):
+        entradas = []
+        entradas_estructura_planilla = []
         if contrato_id.structure_type_id and contrato_id.structure_type_id.default_struct_id:
             if contrato_id.structure_type_id.default_struct_id.input_line_type_ids:
                 entradas = [entrada for entrada in contrato_id.structure_type_id.default_struct_id.input_line_type_ids]
-        return entradas
+        if estructura_id:
+            if estructura_id.id != contrato_id.structure_type_id.default_struct_id.id:
+                entradas_estructura_planilla = [entrada for entrada in estructura_id.input_line_type_ids]
+        return entradas + entradas_estructura_planilla
 
     def calculo_rrhh(self,nomina):
         salario = self.salario_promedio(self.employee_id,self.date_to)
@@ -236,7 +240,7 @@ class HrPayslip(models.Model):
         dia_nomina = self.date_to.day
         entradas_nomina = []
         if self.contract_id:
-            entradas = self._obtener_entrada(self.contract_id)
+            entradas = self._obtener_entrada(self.contract_id, self.struct_id)
             if self.contract_id.analytic_account_id:
                 self.cuenta_analitica_id = self.contract_id.analytic_account_id.id
             if entradas:
