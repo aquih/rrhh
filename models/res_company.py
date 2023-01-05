@@ -59,7 +59,7 @@ class res_company(models.Model):
                                     ('no', 'No')], 'Rango ingresos anual')
     jefe_recursos_humanos_id = fields.Many2one('hr.employee','Jefe de recursos humanos')
     horas_extras_ids = fields.Many2many('hr.salary.rule','rrhh_horas_extras_rel',string='Horas extras')
-    retribucion_comisiones_ids = fields.Many2many('hr.salary.rule','rrhh_retribucion_comisiones_rel',string='Redistribucion de comisiones')
+    retribucion_comisiones_ids = fields.Many2many('hr.salary.rule','rrhh_retribucion_comisiones_rel',string='Retribucion de comisiones')
     viaticos_ids= fields.Many2many('hr.salary.rule',string='Viaticos')
     retribucion_vacaciones_ids = fields.Many2many('hr.salary.rule','rrhh_redistribucion_vacaiones_rel',string='Retribucion por vacaciones')
     bonificaciones_adicionales_ids = fields.Many2many('hr.salary.rule','rrhh_bonificaciones_adicionales_rel', string='Bonificaciones adicionales')
