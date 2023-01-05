@@ -122,7 +122,7 @@ class rrhh_informe_empleador(models.TransientModel):
 
     def _get_dias_laborados(self,id):
         empleado_id = self._get_empleado(id)
-        dias = datetime.strptime( empleado_id.contract_ids[0].date_end,"%Y-%m-%d") - datetime.strptime(empleado_id.contract_ids[0].date_start,"%Y-%m-%d")
+        dias = datetime.strptime( str(empleado_id.contract_ids[0].date_end),"%Y-%m-%d") - datetime.strptime(str(empleado_id.contract_ids[0].date_start),"%Y-%m-%d")
         return dias.days+1
 
     def _get_indemnizacion(self,id):
