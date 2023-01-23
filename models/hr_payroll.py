@@ -40,9 +40,8 @@ class HrPayslip(models.Model):
             mes_nomina = int(nomina.date_from.month)
             dia_nomina = int(nomina.date_to.day)
             anio_nomina = int(nomina.date_from.year)
-            valor_pago = 0
-            porcentaje_pagar = 0
             for entrada in nomina.input_line_ids:
+                porcentaje_pagar = 0
                 for prestamo in nomina.employee_id.prestamo_ids:
                     anio_prestamo = int(prestamo.fecha_inicio.year)
                     if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
@@ -53,7 +52,7 @@ class HrPayslip(models.Model):
                                 lista.append(nomina.id)
                                 lineas.nomina_id = [(6, 0, lista)]
                                 valor_pago = lineas.monto
-                                porcentaje_pagar =(valor_pago * (nomina.porcentaje_prestamo/100))
+                                porcentaje_pagar +=(valor_pago * (nomina.porcentaje_prestamo/100))
                                 entrada.amount = porcentaje_pagar
                         cantidad_pagos = prestamo.numero_descuentos
                         cantidad_pagados = 0
@@ -91,7 +90,6 @@ class HrPayslip(models.Model):
         salario_total = 0
         extra_ordinario_total = 0
         salario_promedio_total = 0
-        logging.warning('test salario')
         if empleado_id.contract_ids[0].historial_salario_ids:
             for linea in empleado_id.contract_ids[0].historial_salario_ids:
                 if linea.fecha == False:
@@ -284,9 +282,11 @@ class HrPayslip(models.Model):
                             if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
                                 for lineas in prestamo.prestamo_ids:
                                     if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
-                                        entrada.amount = lineas.monto*(slip.porcentaje_prestamo/100)
+                                        valor_entrada = entrada.amount
+                                        valor_entrada += lineas.monto*(slip.porcentaje_prestamo/100)
+                                        entrada.amount = valor_entrada
         return res
-    
+
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(models.Model, self).fields_view_get(view_id, view_type, toolbar, submenu)
