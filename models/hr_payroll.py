@@ -280,11 +280,11 @@ class HrPayslip(models.Model):
                         anio_prestamo = int(prestamo.fecha_inicio.year)
                         for entrada in slip.input_line_ids:
                             if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
+                                valor_entrada = entrada.amount
                                 for lineas in prestamo.prestamo_ids:
                                     if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
-                                        valor_entrada = entrada.amount
                                         valor_entrada += lineas.monto*(slip.porcentaje_prestamo/100)
-                                        entrada.amount = valor_entrada
+                                entrada.amount = valor_entrada
         return res
 
     @api.model
