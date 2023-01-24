@@ -183,7 +183,7 @@
                                         <td><strong>Puesto:</strong> <span t-field="o.employee_id.job_id.name"/></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>No. afiliacion del IGSS:</strong><span t-field="o.employee_id.igss"/></td>
+                                        <td><strong>No. afiliacion del ISSS:</strong><span t-field="o.employee_id.igss"/></td>
                                         <td><strong>Cuenta analítica: </strong><span t-field="o.employee_id.contract_id.analytic_account_id.name"/></td>
                                     </tr>
                                     <tr>
