@@ -66,13 +66,6 @@ class HrPayslip(models.Model):
         res =  super(HrPayslip, self).compute_sheet()
         return res
 
-    def _obtener_entrada(self,contrato_id):
-        entradas = False
-        if contrato_id.structure_type_id and contrato_id.structure_type_id.default_struct_id:
-            if contrato_id.structure_type_id.default_struct_id.input_line_type_ids:
-                entradas = [entrada for entrada in contrato_id.structure_type_id.default_struct_id.input_line_type_ids]
-        return entradas
-
     def calculo_rrhh(self,nomina):
         salario = self.salario_promedio(self.employee_id,self.date_to)
         dias = self.dias_trabajados_ultimos_meses(self.contract_id.employee_id,self.date_from,self.date_to)
@@ -218,9 +211,11 @@ class HrPayslip(models.Model):
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
                 else:
                     if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
+                        total_dias =  30 - dias_ausentados_restar
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
                     if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
+                        total_dias =  15 - dias_ausentados_restar
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
                     # Cálculo de días para catorcena
                     if contracts.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
                         dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
