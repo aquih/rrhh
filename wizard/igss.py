@@ -74,7 +74,7 @@ class rrhh_igss_wizard(models.TransientModel):
                         fecha_alta = str(datetime.strptime(str(slip.contract_id.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if mes_inicio_contrato == mes_planilla else ''
                         fecha_baja = str(datetime.strptime(str(slip.contract_id.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if mes_final_contrato == mes_planilla else ''
 
-                        centro_trabajo = str(slip.employee_id.centro_trabajo_id.codigo) if slip.employee_id.centro_trabajo_id else ''
+                        centro_trabajo = str(slip.employee_id.codigo_centro_trabajo) if slip.employee_id.codigo_centro_trabajo else ''
                         nit = str(slip.employee_id.nit) if slip.employee_id.nit else ''
                         codigo_ocupacion = str(slip.employee_id.codigo_ocupacion) if slip.employee_id.codigo_ocupacion else ''
                         condicion_laboral = str(slip.employee_id.condicion_laboral) if slip.employee_id.condicion_laboral else ''
