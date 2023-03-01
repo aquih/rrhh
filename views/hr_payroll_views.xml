@@ -9,7 +9,7 @@
                 <button name="action_validate" position="after">
                     <button string="Generar pagos" name="generar_pagos" type="object"/>
                 </button>
-                <field name="credit_note" position="after">
+                <field name="company_id" position="before">
                     <field name="porcentaje_prestamo"/>
                 </field>
             </data>
