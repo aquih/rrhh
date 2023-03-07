@@ -192,7 +192,7 @@ class HrPayslip(models.Model):
 
 
 
-            if version_info[0] == 15:
+            if version_info[0] == 15 or version_info[0] == 16:
                 if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
                     dias_laborados = 30
                 if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
