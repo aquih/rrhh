@@ -286,6 +286,11 @@ class HrPayslip(models.Model):
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(models.Model, self).fields_view_get(view_id, view_type, toolbar, submenu)
         return res
+        
+    @api.model
+    def get_views(self, views, options=None):
+        res = super(models.Model, self).get_views(views, options)
+        return res
 
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
