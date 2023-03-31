@@ -85,7 +85,7 @@ class res_company(models.Model):
     devolucion_isr_otro_ids = fields.Many2many('hr.salary.rule','rrhh_dev_isr_otro_rel',string='Devolución ISR')
     otros_ingresos_gravados_ids = fields.Many2many('hr.salary.rule','rrhh_otro_ing_grav_rel',string='Otros ingresos gravados')
     viaticos_ids = fields.Many2many('hr.salary.rule','rrhh_viaticos_rel',string='Viaticos')
-    renta_patrono_actual_ids = fields.Many2many('hr.salary.rule','rrhh_renta_pactual_rel',string='Rentra patrono actual')
+    renta_patrono_actual_ids = fields.Many2many('hr.salary.rule','rrhh_renta_pactual_rel',string='Renta patrono actual')
     base_gravada_ids = fields.Many2many('hr.salary.rule','rrhh_base_gravada_re', string="Base gravada")
     ajuste_suspension_ids = fields.Many2many('hr.salary.rule','rrhh_ajuste_suspension_rel', string="Ajuste/suspension")
     retenciones_sobre_rentas_ids = fields.Many2many('hr.salary.rule','rrhh_retenciones_rentas_rel', string="Retenciones sobre rentas")

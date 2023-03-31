@@ -8,24 +8,31 @@
             <t t-foreach="docs" t-as="o">
                 <t t-set="empleado" t-value="_get_empleado(o)"/>
                 <div class="article">
-                    <div class="header">
-                        <div class="encabezado" align="center">
-                                <p style="tex-align:center">
-                                    <span t-field="empleado.company_id.name"/>
-                                </p>
-                                <p style="tex-align:center">
-                                    <span t-field="empleado.company_id.vat"/>
-                                </p>
-                                <p style="tex-align:center">
-                                     LIBRO DE SALARIOS PARA TRABAJADORES PERMANENTES
-                                </p>
-                                <p style="tex-align:center">
-                                    AUTORIZADO POR EL MINISTERIO DE TRABAJO Y PREVISION SOCIAL, SEGÚN ARTÍCULO 102 DEL CODIGO DE TRABAJO
-                                </p>
+                    <div class="header" >
+                      <div class="folio" align="right">
+                         <br>
+                         </br>
+                         <p style="text-align: right">
+                                 <strong> Folio No. ___ </strong>
+                          </p>
+                      </div>
+                      <div class="encabezado" align="center">
+                          <p style="text-align:center" >
+                              <strong> <span t-field="empleado.company_id.name"/> </strong>
+                          </p>
+                          <p style="text-align:center">
+                                 <strong> <span t-field="empleado.company_id.vat"/> </strong>
+                          </p>
+                          <p style="text-align:center">
+                               LIBRO COMPUTARIZADO PARA LA OPERACIÓN DE SALARIOS PARA TRABAJADORES PERMANENTES, AUTORIZADO POR EL MINISTERIO DE TRABAJO Y
+                          </p>
+                          <p style="text-align:center">
+                              PREVISION SOCIAL, FUNDAMENTO LEGAL: ARTÍCULOS 102 DEL DECRETO No. 1441 y 2 DEL ACUERDO MINISTERIAL No. 124-2019
+                          </p>
                         </div>
                     </div>
                     <div class="page">
-                        <div style="height:1.7cm"/>
+                        <div style="height:1.8cm"/>
                         <table style="margin: 0px auto;">
                             <tr>
                                 <td style="text-align:center">

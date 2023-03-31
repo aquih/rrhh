@@ -419,7 +419,7 @@ class rrhh_informe_empleador(models.TransientModel):
                 nombre_empleado = empleado.name.split( )
                 if empleado.primer_nombre:
                     nominas_lista = []
-                    contrato = self.env['hr.contract'].search([('employee_id', '=', empleado.id),('state','=','open')])
+                    contrato = self.env['hr.contract'].search([('employee_id', '=', empleado.id),('state','=',['open','pending','close']  )])
                     nomina_id = self.env['hr.payslip'].search([['employee_id', '=', empleado.id]])
                     dias_trabajados = 0
                     salario_anual_nominal = 0
