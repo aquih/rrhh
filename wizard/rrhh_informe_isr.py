@@ -456,7 +456,7 @@ class rrhh_informe_isr(models.TransientModel):
                     anio_actual = self.fecha_fin.year
                     otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin)
                     hoja_fin_periodo.write(fila, 0, empleado.nit if empleado.nit else '')
-                    hoja_fin_periodo.write(fila, 1, (empleado.contract_id.wage*2))
+                    hoja_fin_periodo.write(fila, 1, otra_info['renta_patrono_actual'])
                     hoja_fin_periodo.write(fila, 2, otra_info['bono_anual'])
                     hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
 
