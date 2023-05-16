@@ -15,7 +15,7 @@
                           </t>
                           <t t-foreach="reporte['puestos'][cuenta]" t-as="puesto">
                               <center><span t-esc="puesto"/></center><br/>
-                              <table style="width:100%; border-spacing: 8px; border-collapse: separate;">
+                              <table style="width: 100%; border-spacing: 8px; border-collapse: separate;">
                                   <thead>
                                       <tr>
                                           <th>No.</th>
@@ -95,7 +95,7 @@
                           <br> </br>
                           <br> </br>
                           <br> </br>
-                          <table style="margin:0px auto 0px auto;width:22cm">
+                          <table style="width: 22cm; border-spacing: 8px; border-collapse: separate;">
                               <tr>
                                   <th></th>
                                   <t t-foreach="reporte['columnas']" t-as="columna">
@@ -121,7 +121,7 @@
                       </t>
                       <br></br>
                       <br></br>
-                      <table style="margin:0px auto 0px auto;width:22cm">
+                      <table style="width: 22cm; border-spacing: 8px; border-collapse: separate;">
                           <tr>
                               <th>Cuenta</th>
                               <t t-foreach="reporte['columnas']" t-as="columna">
