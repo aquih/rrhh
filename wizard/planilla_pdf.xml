@@ -9,7 +9,7 @@
                       <p style="page-break-after:always;">   </p>
                       <div class="page">
                           <br/>
-                          <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="user.company_id.name"/></center></h2>
+                          <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="nomina_id.company_id.name"/></center></h2>
                           <t t-if="cuenta">
                               <h3><center><span t-esc="cuenta"/></center></h3><br/>
                           </t>
@@ -43,14 +43,14 @@
                                               <span t-esc="linea['estatico']['nombre_empleado']"/>
                                           </td>
                                           <td>
-                                              <span t-esc="linea['estatico']['fecha_ingreso']"/>
+                                              <span t-esc="linea['estatico']['fecha_ingreso']" t-options="{'widget': 'date'}"/>
                                           </td>
                                           <td class="text-right">
                                               <span t-esc="linea['estatico']['dias']"/>
                                           </td>
                                           <t t-foreach="linea['dinamico']" t-as="l">
                                               <td class="text-right">
-                                                  <span t-esc="l" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                                  <span t-esc="l" t-options='{"widget": "monetary", "display_currency": nomina_id.company_id.currency_id}'/>
                                               </td>
                                           </t>
                                           <td>
@@ -77,7 +77,7 @@
                                           </td>
                                           <t t-foreach="reporte['lineas'][cuenta][puesto]['totales']" t-as="t">
                                               <td class="text-right">
-                                                  <span t-esc="t" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                                  <span t-esc="t" t-options='{"widget": "monetary", "display_currency": nomina_id.company_id.currency_id}'/>
                                               </td>
                                           </t>
                                           <td>
@@ -106,7 +106,7 @@
                                   <th>TOTALES</th>
                                   <t t-foreach="reporte['suma'][cuenta]" t-as="t">
                                       <td>
-                                          <span t-esc="t" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                          <span t-esc="t" t-options='{"widget": "monetary", "display_currency": nomina_id.company_id.currency_id}'/>
                                       </td>
                                   </t>
                               </tr>
@@ -115,7 +115,7 @@
                   </t>
                   <p style="page-break-before:always;"> </p>
                   <div class="page">
-                      <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="user.company_id.name"/></center></h2>
+                      <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="nomina_id.company_id.name"/></center></h2>
                       <t t-if="cuenta">
                           <h3><center><span t-esc="cuenta"/></center></h3><br/>
                       </t>
@@ -133,16 +133,16 @@
                                   <td><span t-esc="cuenta"/></td>
                                   <t t-foreach="reporte['suma'][cuenta]" t-as="t">
                                       <td>
-                                          <span t-esc="t" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                          <span t-esc="t" t-options='{"widget": "monetary", "display_currency": nomina_id.company_id.currency_id}'/>
                                       </td>
                                   </t>
                               </tr>
                           </t>
                           <tr>
-                              <th>GRAN TOTAL</th>
+                              <td>GRAN TOTAL</td>
                               <t t-foreach="reporte['total']" t-as="t">
                                   <td>
-                                      <span t-esc="t" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                      <span t-esc="t" t-options='{"widget": "monetary", "display_currency": nomina_id.company_id.currency_id}'/>
                                   </td>
                               </t>
                           </tr>
@@ -152,38 +152,37 @@
                 <t t-else="">
                     <div class="page">
                       <br/>
-                      <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="user.company_id.name"/></center></h2>
+                      <h2><center><span t-esc="reporte['encabezado']['nomina']"/><br/><span t-esc="nomina_id.company_id.name"/></center></h2>
                       <t t-if="cuenta">
                           <h3><center><span t-esc="cuenta"/></center></h3><br/>
                       </t>
 
                       <table style="width:100%">
-                              <tr>
-                                  <th>No.</th>
-                                  <th>Cod. de empleado</th>
-                                  <th>Nombre de empleado</th>
-                                  <th>Fecha de ingreso</th>
-                                  <th>Puesto</th>
-                                  <th>Días</th>
-                                  <t t-foreach="reporte['columnas']" t-as="columna">
-                                      <th class="text-center"><span t-esc="columna"/></th>
-                                  </t>
-                                  <th class="text-center">Banco a depositar</th>
-                                  <th class="text-center">Cuenta a depositar</th>
-                                  <th class="text-center">Observaciones</th>
-                              </tr>
-
+                          <tr>
+                              <th>No.</th>
+                              <th>Cod. de empleado</th>
+                              <th>Nombre de empleado</th>
+                              <th>Fecha de ingreso</th>
+                              <th>Puesto</th>
+                              <th>Días</th>
+                              <t t-foreach="reporte['columnas']" t-as="columna">
+                                  <th class="text-center"><span t-esc="columna"/></th>
+                              </t>
+                              <th class="text-center">Banco a depositar</th>
+                              <th class="text-center">Cuenta a depositar</th>
+                              <th class="text-center">Observaciones</th>
+                          </tr>
                           <t t-foreach="reporte['no_agrupado']" t-as="empleado">
                               <tr>
                                   <td><span t-esc="empleado['numero']"/></td>
                                   <td><span t-esc="empleado['codigo_empleado']"/></td>
                                   <td><span t-esc="empleado['nombre_empleado']"/></td>
-                                  <td><span t-esc="empleado['fecha_ingreso']"/></td>
+                                  <td><span t-esc="empleado['fecha_ingreso']" t-options="{'widget': 'date'}"/></td>
                                   <td><span t-esc="empleado['puesto']"/></td>
                                   <td><span t-esc="empleado['dias']"/></td>
                                   <t t-foreach="empleado['columnas']" t-as="l">
                                       <td class="text-right">
-                                          <span t-esc="l" t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                          <span t-esc="l" t-options='{"widget": "monetary", "display_currency": nomina_id.company_id.currency_id}'/>
                                       </td>
                                   </t>
                                   <td><span t-esc="empleado['banco_depositar']"/></td>
@@ -193,10 +192,9 @@
                           </t>
                           <tr>
                               <tr>
-                                  <td colspan="6"></td>
+                                  <td colspan="6">GRAN TOTAL</td>
                                   <t t-foreach="reporte['total']" t-as="valor">
-                                      <td class="text-right"><strong><span t-esc="valor"/></strong></td>
-
+                                      <td class="text-right"><strong><span t-esc="valor" t-options='{"widget": "monetary", "display_currency": nomina_id.company_id.currency_id}'/></strong></td>
                                   </t>
                               </tr>
                           </tr>
