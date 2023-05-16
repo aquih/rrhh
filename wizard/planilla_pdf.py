@@ -221,6 +221,7 @@ class report_planilla_pdf(models.AbstractModel):
             'doc_ids': self.ids,
             'doc_model': model,
             'data': data['form'],
+            'nomina_id': self.env['hr.payslip.run'].browse(data['form']['nomina_id'][0]),
             'docs': docs,
             'reporte': self.reporte,
         }
