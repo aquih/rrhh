@@ -17,7 +17,7 @@
                             <p t-field="o.name"/>
 
                             <p>
-                                Boleta de pago correspondiente al periodo del:
+                                Boleta de pago correspondiente al período del:
                                 <span t-field="o.date_from"/> al <span t-field="o.date_to"/>
                             </p>
 
@@ -25,7 +25,7 @@
                                 <tbody>
                                     <tr>
                                         <t t-if="o.employee_id.codigo_empleado">
-                                            <td><strong>Codigo:</strong> <span t-field="o.employee_id.codigo_empleado"/></td>
+                                            <td><strong>Código:</strong> <span t-field="o.employee_id.codigo_empleado"/></td>
                                             <td><strong>Empleado:</strong> <span t-field="o.employee_id.name"/></td>
                                         </t>
                                         <t t-else="">
@@ -38,7 +38,7 @@
                                         <td><strong>Puesto:</strong> <span t-field="o.employee_id.job_id.name"/></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>No. afiliacion del IGSS:</strong><span t-field="o.employee_id.igss"/></td>
+                                        <td><strong>No. afiliación del IGSS:</strong><span t-field="o.employee_id.igss"/></td>
                                         <td><strong>Cuenta analítica: </strong><span t-field="o.employee_id.contract_id.analytic_account_id.name"/></td>
                                     </tr>
                                     <tr>
@@ -56,7 +56,7 @@
                                                 <t t-set="dias" t-value="dias + i.number_of_days"/>
                                             </t>
                                         </tr>
-                                        <td><strong>Dias laborados:</strong> <span t-esc="dias"/></td>
+                                        <td><strong>Días laborados:</strong> <span t-esc="dias"/></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -137,7 +137,7 @@
                             </div>
 
                             <div class="row mt32">
-                                <p>Liquido a recibir: <span t-esc="lineas(o)['totales'][0] + lineas(o)['totales'][1]" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></p>
+                                <p>Líquido a recibir: <span t-esc="lineas(o)['totales'][0] + lineas(o)['totales'][1]" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></p>
                             </div>
 
                             <div class="derecha" style="float:right">
@@ -167,7 +167,7 @@
                             <p t-field="o.name"/>
 
                             <p>
-                                Boleta de pago correspondiente al periodo del:
+                                Boleta de pago correspondiente al período del:
                                 <span t-field="o.date_from"/> al <span t-field="o.date_to"/>
                             </p>
 
@@ -175,7 +175,7 @@
                                 <tbody>
                                     <tr>
                                         <t t-if="o.employee_id.codigo_empleado">
-                                            <td><strong>Codigo:</strong> <span t-field="o.employee_id.codigo_empleado"/></td>
+                                            <td><strong>Código:</strong> <span t-field="o.employee_id.codigo_empleado"/></td>
                                             <td><strong>Empleado:</strong> <span t-field="o.employee_id.name"/></td>
                                         </t>
                                         <t t-else="">
@@ -188,7 +188,7 @@
                                         <td><strong>Puesto:</strong> <span t-field="o.employee_id.job_id.name"/></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>No. afiliacion del IGSS:</strong><span t-field="o.employee_id.igss"/></td>
+                                        <td><strong>No. afiliación del IGSS:</strong><span t-field="o.employee_id.igss"/></td>
                                         <td><strong>Cuenta analítica: </strong><span t-field="o.employee_id.contract_id.analytic_account_id.name"/></td>
                                     </tr>
                                     <tr>
@@ -206,7 +206,7 @@
                                                 <t t-set="dias" t-value="dias + i.number_of_days"/>
                                             </t>
                                         </tr>
-                                        <td><strong>Dias laborados:</strong> <span t-esc="dias"/></td>
+                                        <td><strong>Días laborados:</strong> <span t-esc="dias"/></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -287,7 +287,7 @@
                             </div>
 
                             <div class="row mt32">
-                                <p>Liquido a recibir: <span t-esc="lineas(o)['totales'][0] + lineas(o)['totales'][1]" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></p>
+                                <p>Líquido a recibir: <span t-esc="lineas(o)['totales'][0] + lineas(o)['totales'][1]" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></p>
                             </div>
 
                             <div class="derecha" style="float:right">
