@@ -224,9 +224,14 @@ class HrPayslip(models.Model):
             dia_inicio_contrato = int(datetime.datetime.strptime(str(contracts.date_start), '%Y-%m-%d').date().strftime('%d'))
 
             if version_info[0] == 12:
-                res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) <= 30 else 30, 'contract_id': contracts.id})
+                if contracts.schedule_pay == 'monthly':
+                    dias_laborados = 30
+                if contracts.schedule_pay == 'bi-monthly':
+                    dias_laborados = 15
+                dias_laborados = dias_laborados - (contracts.date_start - self.date_from).days
+                res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados - dias_ausentados_restar), 'contract_id': contracts.id})
                 res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
-            else:
+           else:
                 res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados['days'] - dias_ausentados_restar) if (dias_laborados['days'] - dias_ausentados_restar) <= 30 else 30, 'contract_id': contracts.id})
                 res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
         elif contracts.date_end and date_from <= contracts.date_end <= date_to:
