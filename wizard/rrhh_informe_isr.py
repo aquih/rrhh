@@ -467,6 +467,8 @@ class rrhh_informe_isr(models.TransientModel):
                     hoja_fin_periodo.write(fila, 1, (empleado.contract_id.wage*2))
                     hoja_fin_periodo.write(fila, 2, otra_info['bono_anual'])
                     hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
+                    hoja_fin_periodo.write(fila, 39, otra_info['aguinaldo_anual'])
+                    hoja_fin_periodo.write(fila, 40, otra_info['bono_anual'])
 
                     if empleado.contract_id.date_end and (empleado.contract_id.date_end > self.fecha_inicio and empleado.contract_id.date_end <= self.fecha_fin):
                         otra_info = self._get_informacion(empleado.id, '01-07-'+str(anio_actual), empleado.contract_id.date_end,'liquidacion_periodo')
@@ -475,8 +477,8 @@ class rrhh_informe_isr(models.TransientModel):
 
                     hoja_fin_periodo.write(fila, 34, otra_info['otro_ingreso'])
                     hoja_fin_periodo.write(fila, 38, otra_info['viaticos'])
-                    hoja_fin_periodo.write(fila, 39, empleado.contract_id.wage)
-                    hoja_fin_periodo.write(fila, 40, empleado.contract_id.wage)
+                    #hoja_fin_periodo.write(fila, 39, empleado.contract_id.wage)
+                    #hoja_fin_periodo.write(fila, 40, empleado.contract_id.wage)
                     hoja_fin_periodo.write(fila, 41, otra_info['igss_total'])
                 fila += 1
 
