@@ -138,9 +138,7 @@ class ReportLibroSalarios(models.AbstractModel):
                     if linea.salary_rule_id.id in nomina.company_id.salario_ids.ids:
                         salario += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.ordinarias_ids.ids:
-                        for entrada in nomina.input_line_ids:
-                            if linea.code == entrada.code:
-                                ordinarias += entrada.amount
+                        ordinarias += linea.total
                     if linea.salary_rule_id.id in nomina.company_id.extras_ordinarias_ids.ids:
                         for entrada in nomina.input_line_ids:
                             if linea.code == entrada.code:

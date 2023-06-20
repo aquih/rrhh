@@ -39,8 +39,8 @@ class rrhh_informe_empleador(models.TransientModel):
                 historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
 
             historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
-            fecha_inicio_contrato = datetime.strptime(empleado_id.contract_ids[0].date_start,"%Y-%m-%d")
-            fecha_final_contrato = datetime.strptime(empleado_id.contract_id.date_end,"%Y-%m-%d") + relativedelta(months=-1)
+            fecha_inicio_contrato = datetime.strptime(str(empleado_id.contract_ids[0].date_start),"%Y-%m-%d")
+            fecha_final_contrato = datetime.strptime(str(empleado_id.contract_id.date_end),"%Y-%m-%d") + relativedelta(months=-1)
             meses_laborados = (fecha_final_contrato.year - fecha_inicio_contrato.year) * 12 + (fecha_final_contrato.month - fecha_inicio_contrato.month)
             contador_mes = 0
             if meses_laborados >= 6:
@@ -114,7 +114,8 @@ class rrhh_informe_empleador(models.TransientModel):
         salarios['totales'] = salario_total
         salarios['extra_ordinario_total'] = extra_ordinario_total
         salarios['total_total'] =  (salario_total + extra_ordinario_total)
-
+        if len(salario_meses) == 0:
+            salario_meses = [1]
         salarios['total_promedio'] = salario_total / len(salario_meses)
         salarios['extra_ordinario_promedio'] = extra_ordinario_total / len(salario_meses)
         salarios['total_salario_promedio'] = salarios['total_total'] / len(salario_meses)
