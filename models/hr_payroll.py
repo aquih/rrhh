@@ -9,6 +9,7 @@ import dateutil.parser
 from dateutil.relativedelta import relativedelta
 from dateutil import relativedelta as rdelta
 from odoo.fields import Date, Datetime
+from calendar import monthrange
 from odoo.addons.l10n_gt_extra import a_letras
 from odoo.exceptions import ValidationError
 
@@ -74,6 +75,9 @@ class HrPayslip(models.Model):
                 entrada.amount = salario
             if entrada.input_type_id.code == 'DiasTrabajados12Meses':
                 entrada.amount = dias
+            dias_calendario = monthrange(self.date_to.year, self.date_to.month)[1]
+            if entrada.input_type_id.code == 'DiasCalendario':
+                entrada.amount = dias_calendario
         return True
 
     # SALARIO PROMEDIO POR 12 MESES LABORADOS O MENOS
