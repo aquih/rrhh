@@ -9,6 +9,7 @@ import dateutil.parser
 from dateutil.relativedelta import relativedelta
 from dateutil import relativedelta as rdelta
 from odoo.fields import Date, Datetime
+from calendar import monthrange
 import odoo.addons.l10n_gt_extra.a_letras as a_letras
 
 class HrPayslip(models.Model):
@@ -182,6 +183,9 @@ class HrPayslip(models.Model):
             res.append({'name': 'Salario promedio', 'code': 'SalarioPromedio','amount': salario,'contract_id': contract.id})
             dias = self.dias_trabajados_ultimos_meses(contract.employee_id,date_from,date_to)
             res.append({'name': 'Dias Trabajados 12 Meses','code':'DiasTrabajados12Meses','amount': dias,'contract_id': contract.id})
+            dias_calendario = monthrange(date_to.year, date_to.month)[1]
+            res.append({'name': 'Días calendario','code':'DiasCalendario','amount': dias_calendario,'contract_id': contract.id})
+
         return res
 
     @api.onchange('employee_id', 'date_from', 'date_to','porcentaje_prestamo')
@@ -231,7 +235,7 @@ class HrPayslip(models.Model):
                 dias_laborados = dias_laborados - (contracts.date_start - self.date_from).days
                 res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados - dias_ausentados_restar), 'contract_id': contracts.id})
                 res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
-           else:
+            else:
                 res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados['days'] - dias_ausentados_restar) if (dias_laborados['days'] - dias_ausentados_restar) <= 30 else 30, 'contract_id': contracts.id})
                 res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
         elif contracts.date_end and date_from <= contracts.date_end <= date_to:
