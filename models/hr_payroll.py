@@ -9,6 +9,7 @@ import dateutil.parser
 from dateutil.relativedelta import relativedelta
 from dateutil import relativedelta as rdelta
 from odoo.fields import Date, Datetime
+from calendar import monthrange
 from odoo.addons.l10n_gt_extra import a_letras
 from odoo.exceptions import ValidationError
 
@@ -86,6 +87,9 @@ class HrPayslip(models.Model):
                 entrada.amount = salario
             if entrada.input_type_id.code == 'DiasTrabajados12Meses':
                 entrada.amount = dias
+            dias_calendario = monthrange(self.date_to.year, self.date_to.month)[1]
+            if entrada.input_type_id.code == 'DiasCalendario':
+                entrada.amount = dias_calendario
         return True
 
     # SALARIO PROMEDIO POR 12 MESES LABORADOS O MENOS
@@ -206,7 +210,7 @@ class HrPayslip(models.Model):
             dias_bonificacion = self.employee_id._get_work_days_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
 
             if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_laborados = dias_laborados - ((contracts.date_start - self.date_from  ).days) 
+                dias_laborados = dias_laborados - ((contracts.date_start - self.date_from  ).days)
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
             elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start :
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})

@@ -10,4 +10,8 @@
         <field name="code">DiasTrabajados12Meses</field>
     </record>
 
+    <record id="dias_calendario_entrada" model="hr.payslip.input.type">
+        <field name="name">Dias calendario</field>
+        <field name="code">DiasCalendario</field>
+    </record>
 </odoo>
