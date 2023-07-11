@@ -208,7 +208,10 @@ class HrPayslip(models.Model):
                 if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
                     dias_laborados = dias_laborados - ((contracts.date_start - self.date_from ).days)
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-                elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start :
+                if contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
+                    dias_laborados = dias_laborados - ((contracts.date_end - self.date_from ).days) + 1
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+                elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
                 elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
                     dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
