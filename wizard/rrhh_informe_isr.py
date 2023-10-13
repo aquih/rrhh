@@ -35,9 +35,8 @@ class rrhh_informe_isr(models.TransientModel):
         aguinaldo_anual = 0
         bono_anual = 0
         renta_patrono_actual = 0
-        if tipo == "liquidacion_labor":
-            nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
-        elif tipo == "liquidacion_periodo":
+        incentivo = 0
+        if tipo in ["liquidacion_labor","liquidacion_periodo","actualizacion"]:
             nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
         else:
             nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_to', '<', fecha_inicio)])
@@ -57,7 +56,10 @@ class rrhh_informe_isr(models.TransientModel):
                             bono_anual += linea.total
                         if linea.salary_rule_id.id in nomina.employee_id.company_id.renta_patrono_actual_ids.ids:
                             renta_patrono_actual += linea.total
-        return {'renta_patrono_actual': renta_patrono_actual,'otro_ingreso': otros_ingresos, 'viaticos': viaticos, 'igss_total': igss_total, 'bono_anual': bono_anual ,'aguinaldo_anual': aguinaldo_anual}
+                        if linea.salary_rule_id.id in nomina.employee_id.company_id.incentivo_ids.ids:
+                            renta_patrono_actual += linea.total
+
+        return {'incentivo': incentivo,'renta_patrono_actual': renta_patrono_actual,'otro_ingreso': otros_ingresos, 'viaticos': viaticos, 'igss_total': igss_total, 'bono_anual': bono_anual ,'aguinaldo_anual': aguinaldo_anual}
 
     def _get_retencion_pago(self, empleados, fecha_inicio, fecha_fin):
         nomina_id = self.env['hr.payslip'].search([('employee_id','in', empleados),('date_from', '>=', fecha_inicio),('date_to','<=',fecha_fin )])
@@ -166,7 +168,7 @@ class rrhh_informe_isr(models.TransientModel):
                         aguinaldo = valor_diario * dias_trabajados
 
                     if anio_ingreso< self.anio:
-                        otros_ingresos_gravados = (empleado.contract_id.base_extra)
+                        otros_ingresos_gravados = (empleado.contract_id.wage + empleado.contract_id.bono_incentivo_fjo)* 12
                     else:
                         dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-12-31', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
                         valor_diario = ((empleado.contract_id.base_extra * 12)/365)
@@ -179,9 +181,8 @@ class rrhh_informe_isr(models.TransientModel):
                     else:
                         fecha_alta = empleado.contract_id.date_start
                     dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-12-31', '%Y-%m-%d').date() - fecha_alta).days+1
-                    valor_diario = ((empleado.contract_id.wage * 12)/365)
+                    valor_diario = (empleado.contract_id.wage / 30)
                     cuota_igss = (valor_diario * dias_trabajados) * 0.0483
-                    #logging.war
                     #fecha_alta = empleado.contract_id.date_start
 
                     # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
@@ -200,7 +201,7 @@ class rrhh_informe_isr(models.TransientModel):
             hoja = libro.add_worksheet('Cargaactualizaciones')
             hoja.write(0, 0, 'NIT Empleado')
             hoja.write(0, 1, 'Nombre del Empleado')
-            #hoja.write(0, 2, 'Fecha de Alta')
+            #hoja.write(0, 2, 'Fecha de Alta') abajo es
             hoja.write(0, 2, 'Renta Patrono Actual')
             hoja.write(0, 3, 'Bono Anual de Trabajadores')
             hoja.write(0, 4, 'Aguinaldo')
@@ -243,19 +244,20 @@ class rrhh_informe_isr(models.TransientModel):
 
             for empleado in self._get_empleados(self.env.context.get('active_ids', [])):
                 if empleado.contract_id:
-                    if len(empleado.contract_id.historial_salario_ids) > 1:
-                        salario = 0
+                    if len(empleado.contract_id.historial_salario_ids) > 0:
+                        salario_total = 0
                         fecha_actualizacion = ""
                         posicion_salario = 0
                         salario_anterior = 0
                         for linea_historial in empleado.contract_id.historial_salario_ids:
                             if linea_historial.fecha and ( linea_historial.fecha >= self.fecha_inicio and linea_historial.fecha <= self.fecha_fin):
                                 posicion_salario = empleado.contract_id.historial_salario_ids.ids.index(linea_historial.id)
-                                salario = linea_historial.salario
+                                salario_total = linea_historial.salario
                                 fecha_actualizacion = linea_historial.fecha
 
                         salario_anterior = empleado.contract_id.historial_salario_ids[posicion_salario-1].salario
-                        if salario > 0:
+
+                        if salario_total > 0:
                             hoja.write(fila, 0, empleado.nit if empleado.nit else '')
                             hoja.write(fila, 1, empleado.name)
                             renta_patrono_actual = 0
@@ -265,45 +267,52 @@ class rrhh_informe_isr(models.TransientModel):
                             cuota_igss = 0
                             anio_actual = self.fecha_fin.year
                             anio_ingreso = empleado.contract_id.date_start.year
-                            empleado_planillas = self._get_informacion(empleado.id, self.fecha_inicio , '01/01/'+str(anio_actual), 'actualizacion')
+                            empleado_planillas = self._get_informacion(empleado.id, self.fecha_inicio , self.fecha_fin, 'actualizacion')
 
                             fecha_final_date = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
                             # diferencia_meses = (fecha_final_date.year - self.fecha_inicio.year) * 12 + (fecha_final_date.month - self.fecha_inicio.month)
-                            dias_trabajados_proyectados = (fecha_final_date - self.fecha_inicio).days + 1
-                            renta_patrono_actual = empleado_planillas["renta_patrono_actual"] +  ((((salario+250)*12)/365) * dias_trabajados_proyectados)
+                            dias_trabajados_proyectados = (fecha_final_date - self.fecha_fin).days + 1
+
+                            renta_patrono_actual = empleado_planillas["renta_patrono_actual"] +  ((((salario_total+250)/30)*365) * dias_trabajados_proyectados)
 
                             # ---------------------------- INICIO CALCULO BONO
                             fecha_final_nuevo_salario_bono = datetime.datetime.strptime(str(anio_actual)+'-06-30', '%Y-%m-%d').date()
                             dias_nuevo_salario_bono = (fecha_final_nuevo_salario_bono - self.fecha_inicio).days + 1
-                            bono_nuevo_salario = ((salario * 12)/ 365)*dias_nuevo_salario_bono
+                            bono_nuevo_salario = ((salario_total * 12)/ 365)*dias_nuevo_salario_bono
 
                             fecha_inicio_antiguo_salario_bono = datetime.datetime.strptime(str(anio_actual-1)+'-07-01', '%Y-%m-%d').date()
                             dias_antiguo_salario_bono = (self.fecha_inicio - fecha_inicio_antiguo_salario_bono).days + 1
 
                             # cambiar salario por salario_anterior
                             bono_antiguo_salario = ((salario_anterior * 12)/ 365)*dias_antiguo_salario_bono
-                            bono_anual = bono_nuevo_salario + bono_antiguo_salario
+                            bono_anual = (bono_nuevo_salario + bono_antiguo_salario)/12
                             # ---------------------------- FIN CALCULO BONO
 
                             # ---------------------------- INICIO CALCULO AGUINALDO
                             fecha_final_nuevo_salario_aguinaldo = datetime.datetime.strptime(str(anio_actual)+'-11-30', '%Y-%m-%d').date()
                             dias_nuevo_salario_aguinaldo = (fecha_final_nuevo_salario_aguinaldo - self.fecha_inicio).days + 1
-                            aguinaldo_nuevo_salario = ((salario * 12)/ 365)*dias_nuevo_salario_aguinaldo
+                            aguinaldo_nuevo_salario = ((salario_total * 12)/ 365)*dias_nuevo_salario_aguinaldo
 
                             fecha_inicio_antiguo_salario_aguinaldo = datetime.datetime.strptime(str(anio_actual-1)+'-12-01', '%Y-%m-%d').date()
                             dias_antiguo_salario_aguinaldo = (self.fecha_inicio - fecha_inicio_antiguo_salario_aguinaldo).days + 1
                             aguinaldo_antiguo_salario = ((salario_anterior * 12)/ 365)*dias_antiguo_salario_aguinaldo
-                            aguinaldo_anual = aguinaldo_nuevo_salario + aguinaldo_antiguo_salario
+                            aguinaldo_anual = (aguinaldo_nuevo_salario + aguinaldo_antiguo_salario) / 12
 
                             # ---------------------------- FIN CALCULO AGUINALDO
 
-
                             fecha_final_calculo = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
                             dias_trabajados = (fecha_final_calculo - self.fecha_inicio).days + 1
-                            proyeccion_base_extra = ((empleado.contract_id.base_extra * 12) / 365)*dias_trabajados
-                            otros_ingresos_gravados = empleado_planillas["otro_ingreso"] + proyeccion_base_extra
-
-                            valor_salario_nuevo = ((salario * 12)/365)*dias_trabajados
+                            # otros ingresos gravados
+                            fecha_inicio_incentivo = datetime.datetime.strptime(str(self.fecha_fin.year)+'-'+str(self.fecha_fin.month)+"-01" , '%Y-%m-%d').date()
+                            # fecha_inicio_incentivo = str(self.fecha_fin.year)+str(self.fecha_fin.month)+"01"
+                            incentivo_ultima_nomina = self._get_informacion(empleado.id, fecha_inicio_incentivo, self.fecha_fin, "actualizacion")['incentivo']
+                            valor_mes_proyectar =  incentivo_ultima_nomina + empleado.contract_id.base_extra
+                            dias_trabajados = (datetime.datetime.strptime(str(self.fecha_fin.year)+'-12-31', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
+                            fecha_fin_proyectar = datetime.datetime.strptime(str(self.fecha_fin.year)+'-12-31', '%Y-%m-%d').date()
+                            meses_proyectar = (fecha_fin_proyectar -self.fecha_fin).days/30
+                            proyeccion = valor_mes_proyectar * meses_proyectar
+                            otros_ingresos_gravados = empleado_planillas["otro_ingreso"] + (valor_mes_proyectar * meses_proyectar)
+                            valor_salario_nuevo = ((salario_total * 12)/365)*dias_trabajados
                             # cuota_igss = (empleado_planillas["igss_total"] * -1) + (valor_salario_nuevo)
                             cuota_igss = (empleado_planillas["igss_total"] * -1) + (valor_salario_nuevo*0.0483)
 
@@ -464,7 +473,7 @@ class rrhh_informe_isr(models.TransientModel):
                     anio_actual = self.fecha_fin.year
                     otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin,'liquidacion_periodo')
                     hoja_fin_periodo.write(fila, 0, empleado.nit if empleado.nit else '')
-                    hoja_fin_periodo.write(fila, 1, (empleado.contract_id.wage*2))
+                    hoja_fin_periodo.write(fila, 1, otra_info['renta_patrono_actual'])
                     hoja_fin_periodo.write(fila, 2, otra_info['bono_anual'])
                     hoja_fin_periodo.write(fila, 3, otra_info['aguinaldo_anual'])
                     hoja_fin_periodo.write(fila, 39, otra_info['aguinaldo_anual'])

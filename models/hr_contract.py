@@ -16,6 +16,7 @@ class Contract(models.Model):
         ('despido_justificado', 'Despido Justificado'),
         ], 'Motivo de terminacion')
     base_extra = fields.Monetary('Base Extra', digits=(16,2), track_visibility='onchange')
+    bono_incentivo_fjo = fields.Monetary('Bono incentivo fijo', digits=(16,2), track_visibility='onchange')
     # salario_extra_ordinario_id = fields.Many2many('hr.salary.rule', 'salario_extra_regla_rel', 'contrato_id', 'regla_id', string='Salario extra ordinario')
     # igss_id = fields.Many2many('hr.salary.rule', 'igss_regla_rel', 'contrato_id', 'regla_id', string='IGSS')
     # otras_deducciones_legales_id = fields.Many2many('hr.salary.rule', 'otras_deducciones_legales_regla_rel', 'contrato_id', 'regla_id', string='Otras deducciones legales')

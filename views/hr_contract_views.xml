@@ -50,6 +50,11 @@
                             <field name="base_extra" nolabel="1"/>
                             <span>/ mes</span>
                         </div>
+                        <label for="bono_incentivo_fjo"/>
+                        <div class="o_row" name="bono_incentivo_fjo">
+                            <field name="bono_incentivo_fjo" nolabel="1"/>
+                            <span>/ mes</span>
+                        </div>
                     </group>
                 </data>
 	        </field>
