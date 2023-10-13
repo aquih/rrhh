@@ -232,7 +232,7 @@ class HrPayslip(models.Model):
                     dias_laborados = 30
                 if contracts.schedule_pay == 'bi-monthly':
                     dias_laborados = 15
-                dias_laborados = dias_laborados - (contracts.date_start - self.date_from).days
+                dias_laborados = dias_laborados - (contracts.date_start - date_from).days
                 res.append({'name': 'Dias trabajados', 'sequence': 10,'code': 'TRABAJO100', 'number_of_days': (dias_laborados - dias_ausentados_restar), 'contract_id': contracts.id})
                 res.append({'name': 'Dias trabajados mes', 'sequence': 10,'code': 'TRABAJOMES', 'number_of_days': (30- dia_inicio_contrato - dias_ausentados_restar), 'contract_id': contracts.id})
             else:

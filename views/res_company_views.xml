@@ -122,6 +122,7 @@
                                 <field name="viaticos_ids" widget="many2many_tags"/>
                                 <field name="ajuste_suspension_ids" widget="many2many_tags"/>
                                 <field name="igss_ids" widget="many2many_tags"/>
+                                <field name="incentivo_ids" widget="many2many_tags"/>
                                 <field name="bono_ids" widget="many2many_tags"/>
                                 <field name="aguinaldo_ids" widget="many2many_tags"/>
                                 <field name="base_gravada_ids" widget="many2many_tags"/>
