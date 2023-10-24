@@ -99,6 +99,11 @@
                                 <td style="text-align:center">
                                     <span t-esc="fecha['fecha_finalizacion']" t-options="{'widget': 'date'}"/>
                                 </td>
+                                <td>
+                                </td>
+                                <td style="text-align:center">
+                                    <span t-field="empleado.job_id.name"/>
+                                </td>
                             </tr>
                             <tr>
                                 <td style="text-align:center;border-top: 1px solid black;width:100px">
@@ -118,6 +123,11 @@
                                 </td>
                                 <td style="text-align:center;border-top: 1px solid black;width:100px">
                                     Fecha finalizac. de relación laboral
+                                </td>
+                                <td style="width:100px">
+                                </td>
+                                <td style="text-align:center;border-top: 1px solid black;width:100px">
+                                    Puesto:
                                 </td>
                             </tr>
                             <!-- <tr>
