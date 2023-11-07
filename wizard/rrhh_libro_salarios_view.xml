@@ -9,8 +9,13 @@
                 <group string="Año">
                     <field name="anio"/>
                 </group>
+                <group>
+                    <field name="name" invisible="1"/>
+                    <field name="archivo" readonly="1" filename="name"/>
+                </group>
                 <footer>
                     <button name="print_report" string="Print"  type="object" class="btn-primary"/>
+                    <button name="print_report_excel" string="Print Excel"  type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-default" special="cancel" />
                 </footer>
             </form>
