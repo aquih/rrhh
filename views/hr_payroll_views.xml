@@ -26,6 +26,9 @@
                 <field name="porcentaje_prestamo"/>
                 <field name="cuenta_analitica_id"/>
             </field>
+            <button name="action_payslip_cancel" position="attributes">
+                <attribute name="states">draft,done,verify,paid</attribute>
+            </button>
         </field>
     </record>
 

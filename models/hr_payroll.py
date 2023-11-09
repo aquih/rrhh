@@ -294,6 +294,12 @@ class HrPayslip(models.Model):
         res = super(models.Model, self).fields_view_get(view_id, view_type, toolbar, submenu)
         return res
 
+    def action_payslip_cancel(self):
+        pago_id = self.env['account.payment'].search([('nomina_id','=',self.id),('state','=', 'posted')])
+        if len(pago_id) > 0:
+            raise ValidationError(_("No puede cambiar a borrador por que tiene un pago asociado"))
+        return super(HrPayslip, self).action_payslip_cancel()
+
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 
@@ -321,3 +327,20 @@ class HrPayslipRun(models.Model):
                     }
                     pago_id = self.env['account.payment'].create(pago)
         return True
+
+    def action_draft(self):
+        for lote in self:
+            if lote.state == 'paid':
+                if len(lote.slip_ids) > 0:
+                    for nomina in lote.slip_ids:
+                        pago_id = self.env['account.payment'].search([('nomina_id','=',nomina.id)])
+                        if len(pago_id) == 00:
+                            nomina.action_payslip_cancel()
+                            nomina.write({'state': 'verify'})
+                            if nomina.move_id:
+                                nomina.move_id.unlink()
+                lote.write({'state': 'verify'})
+        return super(HrPayslipRun, self).action_draft()
+
+    def accion_confirmar(self):
+        self.write({'state': 'verify'})
