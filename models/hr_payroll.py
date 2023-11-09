@@ -297,7 +297,7 @@ class HrPayslip(models.Model):
     def action_payslip_cancel(self):
         pago_id = self.env['account.payment'].search([('nomina_id','=',self.id),('state','=', 'posted')])
         if len(pago_id) > 0:
-            raise ValidationError(_("No puede cambiar a borrador por que tiene un pago asociado"))
+            raise ValidationError(_("No puede cancelar por que tiene un pago asociado"))
         return super(HrPayslip, self).action_payslip_cancel()
 
 class HrPayslipRun(models.Model):
