@@ -36,8 +36,12 @@ class rrhh_informe_isr(models.TransientModel):
         bono_anual = 0
         renta_patrono_actual = 0
         incentivo = 0
+        nomina_id = False
         if tipo in ["liquidacion_labor","liquidacion_periodo","actualizacion"]:
-            nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+            if fecha_inicio:
+                nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+            else:
+                nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_to', '>=', fecha_fin),('date_to', '<=', fecha_fin)])
         else:
             nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_to', '<', fecha_inicio)])
         if nomina_id:
@@ -168,7 +172,7 @@ class rrhh_informe_isr(models.TransientModel):
                         aguinaldo = valor_diario * dias_trabajados
 
                     if anio_ingreso< self.anio:
-                        otros_ingresos_gravados = (empleado.contract_id.wage + empleado.contract_id.bono_incentivo_fjo)* 12
+                        otros_ingresos_gravados = (empleado.contract_id.base_extra + empleado.contract_id.bono_incentivo_fjo)* 12
                     else:
                         dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-12-31', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
                         valor_diario = ((empleado.contract_id.base_extra * 12)/365)
@@ -182,7 +186,7 @@ class rrhh_informe_isr(models.TransientModel):
                         fecha_alta = empleado.contract_id.date_start
                     dias_trabajados = (datetime.datetime.strptime(str(self.anio)+'-12-31', '%Y-%m-%d').date() - fecha_alta).days+1
                     valor_diario = (empleado.contract_id.wage / 30)
-                    cuota_igss = (valor_diario * dias_trabajados) * 0.0483
+                    cuota_igss = (empleado.contract_id.wage * 12) * 0.0483
                     #fecha_alta = empleado.contract_id.date_start
 
                     # otra_info = self._get_informacion(empleado.id, '01-07-'+str(self.anio-1), '01-06-'+str(self.anio))
@@ -397,14 +401,13 @@ class rrhh_informe_isr(models.TransientModel):
                 if empleado.contract_id.date_end and (empleado.contract_id.date_end >= self.fecha_inicio and empleado.contract_id.date_end <= self.fecha_fin):
                     hoja_fin_labores.write(fila, 0, empleado.nit if empleado.nit else '')
                     # hoja_fin_labores.write(fila, 3, (empleado.contract_id.wage))
-                    hoja_fin_labores.write(fila, 4, empleado.contract_id.wage)
-                    hoja_fin_labores.write(fila, 5, empleado.contract_id.wage)
-
 
                     otra_info = self._get_informacion(empleado.id, self.fecha_inicio, empleado.contract_id.date_end, 'liquidacion_labor')
+                    otra_info_extra = self._get_informacion(empleado.id, False, self.fecha_fin, 'liquidacion_labor')
+
                     hoja_fin_labores.write(fila, 1, otra_info['renta_patrono_actual'])
-                    hoja_fin_labores.write(fila, 2, otra_info['bono_anual'])
-                    hoja_fin_labores.write(fila, 3, otra_info['aguinaldo_anual'])
+                    hoja_fin_labores.write(fila, 2, otra_info_extra['bono_anual'])
+                    hoja_fin_labores.write(fila, 3, otra_info_extra['aguinaldo_anual'])
                     hoja_fin_labores.write(fila, 34, otra_info['otro_ingreso'])
 
 
