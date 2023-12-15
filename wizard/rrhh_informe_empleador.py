@@ -443,7 +443,14 @@ class rrhh_informe_empleador(models.TransientModel):
                     nominas = {}
                     for nomina in nomina_id:
                         nomina_anio = datetime.strptime(str(nomina.date_from), "%Y-%m-%d").year
+                        nomina_anio_date_to = datetime.strptime(str(nomina.date_to), "%Y-%m-%d").year
                         nomina_mes = datetime.strptime(str(nomina.date_from), "%Y-%m-%d").month
+                        if w['anio'] == nomina_anio_date_to:
+                            for linea in nomina.line_ids:
+                                if linea.salary_rule_id.id in nomina.company_id.aguinaldo_ids.ids:
+                                    aguinaldo += linea.total
+                                if linea.salary_rule_id.id in nomina.company_id.bono_ids.ids:
+                                    bono += linea.total
                         if w['anio'] == nomina_anio:
                             if nomina.input_line_ids:
                                 for entrada in nomina.input_line_ids:
@@ -461,10 +468,6 @@ class rrhh_informe_empleador(models.TransientModel):
                                     numero_nominas_salario += 1
                                 if linea.salary_rule_id.id in nomina.company_id.bonificacion_ids.ids:
                                     bonificacion += linea.total
-                                if linea.salary_rule_id.id in nomina.company_id.aguinaldo_ids.ids:
-                                    aguinaldo += linea.total
-                                if linea.salary_rule_id.id in nomina.company_id.bono_ids.ids:
-                                    bono += linea.total
                                 if linea.salary_rule_id.id in nomina.company_id.horas_extras_ids.ids:
                                     horas_extras += linea.total
                                 if linea.salary_rule_id.id in nomina.company_id.retribucion_comisiones_ids.ids:
