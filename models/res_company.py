@@ -90,7 +90,7 @@ class res_company(models.Model):
     ajuste_suspension_ids = fields.Many2many('hr.salary.rule','rrhh_ajuste_suspension_rel', string="Ajuste/suspension")
     retenciones_sobre_rentas_ids = fields.Many2many('hr.salary.rule','rrhh_retenciones_rentas_rel', string="Retenciones sobre rentas")
     incentivo_ids = fields.Many2many('hr.salary.rule','rrhh_incentivo_rel', string="Incentivos")
-    
+
 class res_company_centro_trabajo(models.Model):
     _name = 'res.company.centro_trabajo'
     _rec_name = 'nombre'
