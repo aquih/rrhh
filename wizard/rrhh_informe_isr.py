@@ -8,6 +8,8 @@ import xlsxwriter
 import logging
 import io
 import datetime
+from dateutil.relativedelta import relativedelta
+
 
 class rrhh_informe_isr(models.TransientModel):
     _name = 'rrhh.informe_isr'
@@ -51,9 +53,6 @@ class rrhh_informe_isr(models.TransientModel):
                         nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_to', '>=', fecha_fin),('date_to', '<=', fecha_fin)])
         else:
             nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_to', '<', fecha_inicio)])
-        logging.warning('NOMINA ID')
-        logging.warning(fecha_fin)
-        logging.warning(nomina_id)
         if nomina_id:
             for nomina in nomina_id:
                 if nomina.line_ids:
@@ -316,7 +315,7 @@ class rrhh_informe_isr(models.TransientModel):
                             # ---------------------------- FIN CALCULO BONO
 
                             # ---------------------------- INICIO CALCULO AGUINALDO
-                            fecha_final_nuevo_salario_aguinaldo = datetime.datetime.strptime(str(anio_actual)+'-11-30', '%Y-%m-%d').date()
+                            fecha_final_nuevo_salario_aguinaldo = datetime.datetime.strptime(str(anio_actual)+'-12-12', '%Y-%m-%d').date()
                             # dias_nuevo_salario_aguinaldo = (fecha_final_nuevo_salario_aguinaldo - self.fecha_inicio).days + 1
                             # aguinaldo_nuevo_salario = ((salario_total * 12)/ 365)*dias_nuevo_salario_aguinaldo
 
@@ -329,27 +328,27 @@ class rrhh_informe_isr(models.TransientModel):
                             empleado_planillas_salario_devengado = self._get_informacion(empleado.id, fecha_inicial_nuevo_salario_aguinaldo , self.fecha_fin, 'actualizacion')
                             salario_devengado = empleado_planillas_salario_devengado['salario']
                             salario_proyectar_aguinaldo = salario_total
-                            meses_proyectar_aguinaldo = (((fecha_final_nuevo_salario_aguinaldo-fecha_inicial_nuevo_salario_aguinaldo).days + 1)/30)
+                            meses_proyectar_aguinaldo = (((fecha_final_nuevo_salario_aguinaldo-self.fecha_fin).days + 1)/30)
                             salario_proyectar_total_aguinaldo = salario_proyectar_aguinaldo * int(meses_proyectar_aguinaldo)
                             aguinaldo_anual = (salario_devengado + salario_proyectar_total_aguinaldo)/12
 
                             # ---------------------------- FIN CALCULO AGUINALDO
 
-                            fecha_final_calculo = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
-                            dias_trabajados = (fecha_final_calculo - self.fecha_inicio).days + 1
+                            # fecha_final_calculo = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
+                            # dias_trabajados = (fecha_final_calculo - self.fecha_inicio).days + 1
                             # otros ingresos gravados
                             fecha_inicio_incentivo = datetime.datetime.strptime(str(self.fecha_fin.year)+'-'+str(self.fecha_fin.month)+"-01" , '%Y-%m-%d').date()
                             # fecha_inicio_incentivo = str(self.fecha_fin.year)+str(self.fecha_fin.month)+"01"
                             incentivo_ultima_nomina = self._get_informacion(empleado.id, fecha_inicio_incentivo, self.fecha_fin, "actualizacion")['incentivo']
-                            valor_mes_proyectar =  incentivo_ultima_nomina + empleado.contract_id.base_extra
+                            # valor_mes_proyectar =  incentivo_ultima_nomina + empleado.contract_id.base_extra
                             dias_trabajados = (datetime.datetime.strptime(str(self.fecha_fin.year)+'-12-31', '%Y-%m-%d').date() - empleado.contract_id.date_start).days+1
                             fecha_fin_proyectar = datetime.datetime.strptime(str(self.fecha_fin.year)+'-12-31', '%Y-%m-%d').date()
-                            meses_proyectar = ((fecha_fin_proyectar -self.fecha_fin).days + 1 /30)
+                            meses_proyectar = (((fecha_fin_proyectar -self.fecha_fin).days + 1)/30)
                             # proyeccion = valor_mes_proyectar * meses_proyectar
                             empleado_planillas = self._get_informacion(empleado.id, self.fecha_inicio , self.fecha_fin, 'actualizacion')
 
                             otros_ingresos_devengados = empleado_planillas['otro_ingreso']
-                            mes_anterior_planilla = self.fecha_fin - datetime.timedelta(days=30)
+                            mes_anterior_planilla = self.fecha_fin - relativedelta(months=1)
                             empleado_planilla_anterior_fecha_fin = self._get_informacion(empleado.id, mes_anterior_planilla , False, 'actualizacion')
                             valor_otros_ingresos_proyectados = empleado_planilla_anterior_fecha_fin['otro_ingreso']
 
