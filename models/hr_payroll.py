@@ -100,11 +100,29 @@ class HrPayslip(models.Model):
         salario_total = 0
         salario_promedio_total = 0
         extra_ordinario_total = 0
+        salario_completo = {}
+        salario_sumatoria = 0
         if empleado_id.contract_ids[0].historial_salario_ids:
+            posicion_historial = 0
             for linea in empleado_id.contract_ids[0].historial_salario_ids:
-                historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
+                if (posicion_historial+1) < len(empleado_id.contract_ids[0].historial_salario_ids):
+                    historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
+                    contador_mes_historial = 0
 
-            historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
+                    llave_salario = '01-'+str(linea.fecha.month)+'-'+str(linea.fecha.year)
+                    llave_salario_fecha = datetime.datetime.strptime(str(llave_salario),'%d-%m-%Y').date()
+                    llave_salario_fecha_str = '01-'+str(llave_salario_fecha.month)+'-'+str(llave_salario_fecha.year)
+                    # index = empleado_id.contract_ids[0].historial_salario_ids.index(linea)
+                    while llave_salario_fecha < empleado_id.contract_ids[0].historial_salario_ids[posicion_historial+1].fecha:
+                        salario_completo[str(llave_salario_fecha_str)] = linea.salario
+                        mes = relativedelta(months=1)
+                        llave_salario_fecha = llave_salario_fecha + mes
+                        llave_salario_fecha_str = '01-'+str(llave_salario_fecha.month)+'-'+str(llave_salario_fecha.year)
+                        contador_mes_historial += 1
+
+                    posicion_historial += 1
+
+            # historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
             fecha_inicio_contrato = datetime.datetime.strptime(str(empleado_id.contract_ids[0].date_start),"%Y-%m-%d")
             fecha_final_contrato = datetime.datetime.strptime(str(fecha_final_nomina),"%Y-%m-%d")
             meses_laborados = (fecha_final_contrato.year - fecha_inicio_contrato.year) * 12 + (fecha_final_contrato.month - fecha_inicio_contrato.month)
@@ -116,45 +134,28 @@ class HrPayslip(models.Model):
                     resta_mes = fecha_final_contrato - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'extra':0,'total':0}
+                    # llave_fecha = datetime.datetime.strptime(str(llave),'%Y-%m-%d')
+                    salario = 0
+                    if llave in salario_completo:
+                        salario = salario_completo[llave]
+                    salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': salario,'anio':resta_mes.year,'extra':0,'total':0}
                     contador_mes += 1
+                    salario_sumatoria += salario
             else:
-
                 while contador_mes <= meses_laborados:
                     mes = relativedelta(months=contador_mes)
                     resta_mes = fecha_final_contrato - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'extra':0,'total':0}
+                    salario = 0
+                    if llave in salario_completo:
+                        salario = salario_completo[llave]
+                    salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': salario,'anio':resta_mes.year,'extra':0,'total':0}
                     contador_mes += 1
+                    salario_sumatoria += salario
 
-            contador_mes = 0
-            fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[0]['fecha']), '%Y-%m-%d')
-            diferencia_meses = relativedelta(fecha_final_contrato, fecha_inicio_diferencia).months + 1
-            for linea in historial_salario_ordenado:
-                contador = 0
-                while contador < diferencia_meses:
+            salario_promedio_total =  salario_sumatoria / len(salario_meses)
 
-                    mes = relativedelta(months=contador_mes)
-                    resta_mes = datetime.datetime.strptime(str(fecha_final_nomina),'%Y-%m-%d') - mes
-                    mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
-                    llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    if llave in salario_meses:
-                        salario_meses[llave]['salario'] = linea['salario']
-                        salario_total += linea['salario']
-                    contador += 1
-                    contador_mes += 1
-
-                if len(historial_salario_ordenado) > 1:
-                    fecha_cambio_salario = datetime.datetime.strptime(str(linea['fecha']), '%Y-%m-%d')
-
-                    posicion_siguiente = historial_salario_ordenado.index(linea) + 1
-                    if posicion_siguiente < len(historial_salario_ordenado):
-                        fecha_inicio_diferencia = datetime.datetime.strptime(str(historial_salario_ordenado[posicion_siguiente]['fecha']), '%Y-%m-%d')
-                        diferencia_meses = (fecha_cambio_salario.year - fecha_inicio_diferencia.year) * 12 + (fecha_cambio_salario.month - fecha_inicio_diferencia.month)
-
-            salario_meses = sorted(salario_meses.items())
-            salario_promedio_total =  (salario_total + extra_ordinario_total) / len(salario_meses)
         else:
             salario_promedio_total = empleado_id.contract_ids[0].wage
         return salario_promedio_total
