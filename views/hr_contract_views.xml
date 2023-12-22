@@ -16,7 +16,7 @@
                     </field>
                     <field name="schedule_pay" position="after">
                         <field name="historial_salario_ids">
-                          <tree string="Hitorial de salario" editable="bottom">
+                          <tree string="Hitorial de salario" default_order='fecha asc' editable="bottom">
                               <field name="salario"/>
                               <field name="fecha"/>
                           </tree>
