@@ -136,6 +136,7 @@ class rrhh_prestamo_linea(models.Model):
 
 class rrhh_historial_salario(models.Model):
     _name = "rrhh.historial_salario"
+    _order = "fecha asc"
 
     salario = fields.Float('Salario', required=True)
     fecha = fields.Date('Fecha', required=True)
