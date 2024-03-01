@@ -103,29 +103,29 @@
         <field name="arch" type="xml">
             <form string="Prestamo">
                 <header>
-                    <button string="Procesar" name="prestamos" type="object" class="oe_highlight"  attrs="{'invisible':[('estado','!=','nuevo')]}"/>
-                    <button string="Pasar a Proceso" name="cancelar" type="object" groups="hr.group_hr_manager"  attrs="{'invisible':[('estado','!=','pagado')]}"/>
+                    <button string="Procesar" name="prestamos" type="object" class="oe_highlight"  invisible="estado != 'nuevo'"/>
+                    <button string="Pasar a Proceso" name="cancelar" type="object" groups="hr.group_hr_manager" invisible="estado != 'pagado'"/>
                     <field name="estado" widget="statusbar"/>
                 </header>
                 <group>
                     <group>
-                        <field name="fecha_inicio" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
-                        <field name="numero_descuentos" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
-                        <field name="employee_id" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
-                        <field name="pendiente_pagar_prestamo" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
+                        <field name="fecha_inicio" readonly="estado != 'nuevo'"/>
+                        <field name="numero_descuentos" readonly="estado != 'nuevo'"/>
+                        <field name="employee_id" readonly="estado != 'nuevo'"/>
+                        <field name="pendiente_pagar_prestamo" readonly="estado != 'nuevo'"/>
                     </group>
                     <group>
-                        <field name="total" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
-                        <field name="mensualidad" attrs="{'readonly':[('estado','!=','nuevo')]}"/>
+                        <field name="total" readonly="estado != 'nuevo'"/>
+                        <field name="mensualidad" readonly="estado != 'nuevo'"/>
                         <field name="descripcion"/>
                         <field name="codigo"/>
                     </group>
                 </group>
                 <field name="prestamo_ids">
                     <tree editable="bottom">
-                        <field name="mes" attrs="{'readonly':[('nomina_id','!=',False)]}"/>
-                        <field name="anio" attrs="{'readonly':[('nomina_id','!=',False)]}"/>
-                        <field name="monto" attrs="{'readonly':[('nomina_id','!=',False)]}"/>
+                        <field name="mes" readonly="nomina_id != False"/>
+                        <field name="anio" readonly="nomina_id != False"/>
+                        <field name="monto" readonly="nomina_id != False"/>
                         <field name="nomina_id" widget="many2many_tags"/>
                     </tree>
                 </field>
@@ -209,4 +209,3 @@
         groups="hr.group_hr_manager"/>
 
 </odoo>
-

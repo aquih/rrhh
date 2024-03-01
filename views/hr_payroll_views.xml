@@ -27,7 +27,7 @@
                 <field name="cuenta_analitica_id"/>
             </field>
             <button name="action_payslip_cancel" position="attributes">
-                <attribute name="states">draft,done,verify,paid</attribute>
+                <attribute name="invisible">state not in ('draft','done','verify','paid')</attribute>
             </button>
         </field>
     </record>
