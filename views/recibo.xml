@@ -21,7 +21,7 @@
                                 <span t-field="o.date_from"/> al <span t-field="o.date_to"/>
                             </p>
 
-                            <table style="margin: 0px auto;width:100%">
+                            <table style="margin: 0px auto;width:100%" class="table table-sm table-borderless">
                                 <tbody>
                                     <tr>
                                         <t t-if="o.employee_id.codigo_empleado">
@@ -62,7 +62,7 @@
                             </table>
                             <br/>
                             <div class="centro" style="margin: 0 auto;">
-                                <table style="width:100%">
+                                <table style="width:100%" class="table table-sm table-borderless">
                                     <tr>
                                         <td>
                                             <table>
@@ -171,7 +171,7 @@
                                 <span t-field="o.date_from"/> al <span t-field="o.date_to"/>
                             </p>
 
-                            <table style="margin: 0px auto;width:100%">
+                            <table style="margin: 0px auto;width:100%" class="table table-sm table-borderless">
                                 <tbody>
                                     <tr>
                                         <t t-if="o.employee_id.codigo_empleado">
@@ -212,10 +212,10 @@
                             </table>
                             <br/>
                             <div class="centro" style="margin: 0 auto;">
-                                <table style="width:100%">
+                                <table style="width:100%" class="table table-sm table-borderless">
                                     <tr>
                                         <td>
-                                            <table>
+                                            <table class="table table-sm table-borderless">
                                                 <tr>
                                                     <td><strong>Ingresos</strong></td>
                                                     <td></td>
@@ -235,7 +235,7 @@
                                             </table>
                                         </td>
                                         <td>
-                                            <table>
+                                            <table class="table table-sm table-borderless">
                                                 <tr>
                                                     <td><strong>Deducciones</strong></td>
                                                     <td></td>
@@ -262,7 +262,7 @@
                                         </t>
                                         <t t-if="horas == 1">
                                             <td>
-                                                <table>
+                                                <table class="table table-sm table-borderless">
                                                     <tr>
                                                         <td><strong>Horas extras</strong></td>
                                                         <td></td>

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.release import version_info
 import logging
 import datetime
 import time
@@ -200,62 +199,39 @@ class HrPayslip(models.Model):
             if contracts.schedule_pay == 'bi-monthly':
                 dias_laborados = 15
 
+            if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
+                dias_laborados = 30
+            if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
+                dias_laborados = 15
 
+            reference_calendar = self._get_out_of_contract_calendar()
+            dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
 
-            if version_info[0] == 15 or version_info[0] == 16:
-                if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
-                    dias_laborados = 30
-                if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
-                    dias_laborados = 15
-
-                reference_calendar = self._get_out_of_contract_calendar()
-                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
-
-                if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
-                    dias_laborados = dias_laborados - ((contracts.date_start - self.date_from ).days)
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-                if contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
-                    dias_laborados =  ((contracts.date_end - self.date_from ).days)
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-                elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-                elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
-                    dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-                else:
-                    if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
-                        total_dias =  30 - dias_ausentados_restar
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
-                    if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
-                        total_dias =  15 - dias_ausentados_restar
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
-                    # Cálculo de días para catorcena
-                    if contracts.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
-                        dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
-
-                self.calculo_rrhh(self)
+            if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
+                dias_laborados = dias_laborados - ((contracts.date_start - self.date_from ).days)
+                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+            if contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
+                dias_laborados =  ((contracts.date_end - self.date_from ).days)
+                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+            elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
+                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+            elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
+                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
+                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
             else:
+                if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
+                    total_dias =  30 - dias_ausentados_restar
+                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
+                if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
+                    total_dias =  15 - dias_ausentados_restar
+                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
+                # Cálculo de días para catorcena
+                if contracts.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
+                    dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
+                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
 
-                dias_bonificacion = self.employee_id._get_work_days_data_batch(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
+            self.calculo_rrhh(self)
 
-                if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
-                    dias_laborados = dias_laborados - (contracts.date_start - self.date_from).days
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-                elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start :
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-                elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
-                    dias_bonificacion = self.employee_id._get_work_days_data_batch(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-                else:
-                    if contracts.schedule_pay == 'monthly':
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 30 - dias_ausentados_restar})
-                    if contracts.schedule_pay == 'bi-monthly':
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
-                    # Cálculo de días para catorcena
-                    if contracts.schedule_pay == 'bi-weekly':
-                        dias_laborados = self.employee_id._get_work_days_data_batch(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
         return res
 
     @api.depends('employee_id', 'contract_id', 'struct_id', 'date_from', 'date_to', 'struct_id')
@@ -324,14 +300,14 @@ class HrPayslipRun(models.Model):
         for nomina in self.slip_ids:
             if nomina.id not in nominas_pagadas:
                 total_nomina = 0
-                if nomina.employee_id.diario_pago_id and nomina.employee_id.address_home_id and nomina.state in ['done','close']:
+                if nomina.employee_id.diario_pago_id and nomina.employee_id.address_id and nomina.state in ['done','paid']:
                     res = self.env['report.rrhh.recibo'].lineas(nomina)
                     total_nomina = res['totales'][0] + res['totales'][1]
                     pago = {
                         'payment_type': 'outbound',
                         'partner_type': 'supplier',
-                        'payment_method_id': 2,
-                        'partner_id': nomina.employee_id.address_home_id.id,
+                        'payment_method_line_id': 2,
+                        'partner_id': nomina.employee_id.address_id.id,
                         'amount': total_nomina,
                         'journal_id': nomina.employee_id.diario_pago_id.id,
                         'nomina_id': nomina.id

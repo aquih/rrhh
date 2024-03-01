@@ -26,7 +26,7 @@
                     </div>
                     <div class="page">
                         <div style="height:4cm"/>
-                        <table style="margin: 0px auto;">
+                        <table style="margin: 0px auto;" class="table table-sm table-borderless">
                             <tr>
                                 <td style="text-align:center">
                                     <span t-field="empleado.name"/>
