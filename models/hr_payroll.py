@@ -194,15 +194,11 @@ class HrPayslip(models.Model):
 
         if contracts:
             dias_laborados = 0
-            if contracts.schedule_pay == 'monthly':
-                dias_laborados = 30
-            if contracts.schedule_pay == 'bi-monthly':
-                dias_laborados = 15
-
-            if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
-                dias_laborados = 30
-            if contracts.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
-                dias_laborados = 15
+            if self.struct_id:
+                if self.struct_id.schedule_pay == 'monthly':
+                    dias_laborados = 30
+                if self.struct_id.schedule_pay == 'bi-monthly':
+                    dias_laborados = 15
 
             reference_calendar = self._get_out_of_contract_calendar()
             dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
