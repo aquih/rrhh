@@ -197,9 +197,9 @@ class HrPayslip(models.Model):
             if self.struct_id:
                 if self.struct_id.schedule_pay == 'monthly':
                     dias_laborados = 30
-                if self.struct_id.schedule_pay == 'bi-monthly':
+                if self.struct_id.schedule_pay == 'semi-monthly':
                     dias_laborados = 15
-
+            
             reference_calendar = self._get_out_of_contract_calendar()
             dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
 
@@ -215,14 +215,14 @@ class HrPayslip(models.Model):
                 dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
             else:
-                if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
+                if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
                     total_dias =  30 - dias_ausentados_restar
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
-                if contracts.schedule_pay == 'bi-monthly' or contracts.structure_type_id.default_schedule_pay == 'bi-monthly':
+                if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
                     total_dias =  15 - dias_ausentados_restar
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
                 # Cálculo de días para catorcena
-                if contracts.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
+                if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
                     dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
 
