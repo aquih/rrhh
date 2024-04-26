@@ -360,7 +360,7 @@ class rrhh_informe_isr(models.TransientModel):
                             # cuota_igss = (empleado_planillas["igss_total"] * -1) + (valor_salario_nuevo)
                             # cuota_igss = (empleado_planillas["igss_total"] * -1) + (valor_salario_nuevo*0.0483)
                             # ------------------------ CALCULO CUOTA IGSS -------------------------------
-                            salario_devengado = empleado_planillas['salario'] * 0.0483
+                            salario_devengado = empleado_planillas['salario']
                             meses_proyectar_igss = (((fecha_fin_proyectar -  self.fecha_fin).days + 1)/30)
                             salario_devengado_proyectado = salario_total * int(meses_proyectar_igss)
                             valor_aplicar_igss = salario_devengado + salario_devengado_proyectado
