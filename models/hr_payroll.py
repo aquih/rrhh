@@ -191,40 +191,40 @@ class HrPayslip(models.Model):
             if len(ausencias_restar)>0:
                 if r['work_entry_type_id'] in ausencias_restar:
                     dias_ausentados_restar += r['number_of_days']
-
-        if contracts:
-            dias_laborados = 0
-            if self.struct_id:
-                if self.struct_id.schedule_pay == 'monthly':
-                    dias_laborados = 30
-                if self.struct_id.schedule_pay == 'semi-monthly':
-                    dias_laborados = 15
             
-            reference_calendar = self._get_out_of_contract_calendar()
-            dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
-
-            if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_laborados = dias_laborados - ((contracts.date_start - self.date_from ).days)
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-            if contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
-                dias_laborados =  ((contracts.date_end - self.date_from ).days)
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-            elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-            elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-            else:
-                if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
-                    total_dias =  30 - dias_ausentados_restar
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
-                if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
-                    total_dias =  15 - dias_ausentados_restar
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
-                # Cálculo de días para catorcena
-                if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
-                    dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
+            if contracts and r['work_entry_type_id'] == trabajo_id.id:
+                dias_laborados = 0
+                if self.struct_id:
+                    if self.struct_id.schedule_pay == 'monthly':
+                        dias_laborados = 30
+                    if self.struct_id.schedule_pay == 'semi-monthly':
+                        dias_laborados = 15
+                
+                reference_calendar = self._get_out_of_contract_calendar()
+                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
+    
+                if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
+                    dias_laborados = dias_laborados - ((contracts.date_start - self.date_from ).days)
+                    r['number_of_days'] = dias_laborados - dias_ausentados_restar
+                elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
+                    dias_laborados =  ((contracts.date_end - self.date_from ).days)
+                    r['number_of_days'] = dias_laborados - dias_ausentados_restar
+                elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
+                    r['number_of_days'] = dias_bonificacion['days']+1
+                elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
+                    dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
+                    r['number_of_days'] = dias_bonificacion['days']+1
+                else:
+                    if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
+                        total_dias =  30 - dias_ausentados_restar
+                        r['number_of_days'] = 0 if total_dias < 0 else total_dias
+                    if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
+                        total_dias =  15 - dias_ausentados_restar
+                        r['number_of_days'] = 0 if total_dias < 0 else total_dias
+                    # Cálculo de días para catorcena
+                    if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
+                        dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
+                        r['number_of_days'] = (dias_laborados['days']+1 - dias_ausentados_restar)
 
             self.calculo_rrhh(self)
 
