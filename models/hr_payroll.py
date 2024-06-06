@@ -207,7 +207,7 @@ class HrPayslip(models.Model):
                 dias_laborados = dias_laborados - ((contracts.date_start - self.date_from ).days)
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
             elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
-                dias_laborados =  ((contracts.date_end - self.date_from ).days)
+                dias_laborados =  ((contracts.date_end - self.date_from ).days) +1
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
             elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
@@ -217,6 +217,9 @@ class HrPayslip(models.Model):
             else:
                 if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
                     total_dias =  30 - dias_ausentados_restar
+                    if self.date_to.month == 2:
+                        if dias_ausentados_restar == self.date_to.day:
+                            total_dias =  30 - (dias_ausentados_restar + 1)
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
                 if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
                     total_dias =  15 - dias_ausentados_restar
