@@ -219,7 +219,7 @@ class HrPayslip(models.Model):
                     total_dias =  30 - dias_ausentados_restar
                     if self.date_to.month == 2:
                         if dias_ausentados_restar == self.date_to.day:
-                            total_dias =  30 - (dias_ausentados_restar + 1)
+                            total_dias =  0
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
                 if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
                     total_dias =  15 - dias_ausentados_restar
