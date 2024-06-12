@@ -156,7 +156,7 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 quincena = 0
-if payslip.struct_id.schedule_pay == 'bi-monthly':
+if payslip.struct_id.schedule_pay == 'semi-monthly':
   quincena = 1 if payslip.date_to.day &lt; 16 else 2
 result = quincena
             </field>

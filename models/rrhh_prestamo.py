@@ -133,11 +133,3 @@ class rrhh_prestamo_linea(models.Model):
     anio = fields.Integer('Año')
     nomina_id = fields.Many2many('hr.payslip','prestamo_nominda_id_rel',string='Nomina')
     prestamo_id = fields.Many2one('rrhh.prestamo','Prestamo')
-
-class rrhh_historial_salario(models.Model):
-    _name = "rrhh.historial_salario"
-    _order = "fecha asc"
-
-    salario = fields.Float('Salario', required=True)
-    fecha = fields.Date('Fecha', required=True)
-    contrato_id = fields.Many2one('hr.contract','Contato')

@@ -9,17 +9,17 @@ class HrEmployeeBase(models.AbstractModel):
 
     codigo_empleado = fields.Char('Código del empleado')
 
-class HrEmployee(models.Model):
+class HrEmployeePrivate(models.Model):
     _inherit = 'hr.employee'
 
-#    promedio_salario = fields.function(_promedio_salario, string='Promedio Salario', digits_compute=dp.get_precision('Account')),
+    # promedio_salario = fields.function(_promedio_salario, string='Promedio Salario', digits_compute=dp.get_precision('Account')),
     numero_liquidacion = fields.Char('Numero o identificacion de liquidacion',groups="hr.group_hr_user")
     codigo_centro_trabajo = fields.Char('Codigo de centro de trabajo asignado',groups="hr.group_hr_user")
     codigo_ocupacion = fields.Char('Codigo ocupacion',groups="hr.group_hr_user")
     condicion_laboral = fields.Selection([('P', 'Permanente'), ('T', 'Temporal')], 'Condicion laboral',groups="hr.group_hr_user")
 
-    job_id = fields.Many2one(track_visibility='onchange')
-    department_id = fields.Many2one('hr.department', 'Department', track_visibility='onchange')
+    # job_id = fields.Many2one(track_visibility='onchange')
+    # department_id = fields.Many2one('hr.department', 'Department', track_visibility='onchange')
     diario_pago_id = fields.Many2one('account.journal', 'Diario de Pago',groups="hr.group_hr_user")
     igss = fields.Char('IGSS',groups="hr.group_hr_user")
     irtra = fields.Char('IRTRA',groups="hr.group_hr_user")
@@ -36,7 +36,6 @@ class HrEmployee(models.Model):
     permiso_trabajo = fields.Char('Permiso de Trabajo',groups="hr.group_hr_user")
     contacto_emergencia = fields.Many2one('res.partner','Contacto de Emergencia',groups="hr.group_hr_user")
     marital = fields.Selection(selection_add=[('separado', 'Separado(a)'),('unido', 'Unido(a)')],groups="hr.group_hr_user")
-    # edad = fields.Integer(compute='_get_edad',string='Edad')
     edad = fields.Integer(string='Edad',compute="_get_edad",groups="hr.group_hr_user")
     vecindad_dpi = fields.Char('Vecindad DPI',groups="hr.group_hr_user")
     tarjeta_salud = fields.Boolean('Tarjeta de salud',groups="hr.group_hr_user")

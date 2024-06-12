@@ -19,9 +19,8 @@ class HrPayslip(models.Model):
     etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids')
     cuenta_analitica_id = fields.Many2one('account.analytic.account','Cuenta analítica')
 
-    # Dias trabajdas de los ultimos 12 meses hasta la fecha
+    # Dias calendario de los ultimos 12 meses hasta la fecha
     def dias_trabajados_ultimos_meses(self,empleado_id,fecha_desde,fecha_hasta):
-        dias = {'days': 0}
         if empleado_id.contract_id.date_start:
             diferencia_meses = (fecha_hasta - fecha_desde)
             if empleado_id.contract_id.date_start <= fecha_hasta and empleado_id.contract_id.date_start >= fecha_desde:
@@ -66,7 +65,7 @@ class HrPayslip(models.Model):
         res =  super(HrPayslip, self).compute_sheet()
         return res
 
-    def calculo_rrhh(self,nomina):
+    def calculo_entradas_anuales(self,nomina):
         salario = self.salario_promedio(self.employee_id,self.date_to)
         dias = self.dias_trabajados_ultimos_meses(self.contract_id.employee_id,self.date_from,self.date_to)
         for entrada in self.input_line_ids:
@@ -79,7 +78,7 @@ class HrPayslip(models.Model):
                 entrada.amount = dias_calendario
         return True
 
-    # SALARIO PROMEDIO POR 12 MESES LABORADOS O MENOS
+    # Salario promedio por 12 meses laborados o menos si el contrato empezó antes
     def salario_promedio(self,empleado_id,fecha_final_nomina):
         historial_salario = []
         salario_meses = {}
@@ -95,12 +94,13 @@ class HrPayslip(models.Model):
                     historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
                     contador_mes_historial = 0
 
+                    # Ordernar fechas cuando la fecha del historial no empieza en el primer día del mes
                     llave_salario = '01-'+str(linea.fecha.month)+'-'+str(linea.fecha.year)
                     llave_salario_fecha = datetime.datetime.strptime(str(llave_salario),'%d-%m-%Y').date()
                     llave_salario_fecha_str = '01-'+str(llave_salario_fecha.month)+'-'+str(llave_salario_fecha.year)
-                    # index = empleado_id.contract_ids[0].historial_salario_ids.index(linea)
                     if posicion_historial+1 >= len(empleado_id.contract_ids[0].historial_salario_ids):
                         while llave_salario_fecha < fecha_final_nomina:
+                            # Este código es el mismo de abajo, sería mejor refactorizar
                             salario_completo[str(llave_salario_fecha_str)] = linea.salario
                             mes = relativedelta(months=1)
                             llave_salario_fecha = llave_salario_fecha + mes
@@ -118,7 +118,6 @@ class HrPayslip(models.Model):
 
                         posicion_historial += 1
 
-            # historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
             fecha_inicio_contrato = datetime.datetime.strptime(str(empleado_id.contract_ids[0].date_start),"%Y-%m-%d")
             fecha_final_contrato = datetime.datetime.strptime(str(fecha_final_nomina),"%Y-%m-%d")
             meses_laborados = (fecha_final_contrato.year - fecha_inicio_contrato.year) * 12 + (fecha_final_contrato.month - fecha_inicio_contrato.month)
@@ -126,11 +125,11 @@ class HrPayslip(models.Model):
             contador_mes = 0
             if meses_laborados >= 12:
                 while contador_mes < 12:
+                    # Este código es el mismo de abajo, sería mejor refactorizar
                     mes = relativedelta(months=contador_mes)
                     resta_mes = fecha_final_contrato - mes
                     mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
                     llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    # llave_fecha = datetime.datetime.strptime(str(llave),'%Y-%m-%d')
                     salario = 0
                     if llave in salario_completo:
                         salario = salario_completo[llave]
@@ -146,14 +145,14 @@ class HrPayslip(models.Model):
                     salario = 0
                     if llave in salario_completo:
                         salario = salario_completo[llave]
-
                     salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': salario,'anio':resta_mes.year,'extra':0,'total':0}
-                    salario_sumatoria += salario
                     contador_mes += 1
+                    salario_sumatoria += salario
 
             salario_promedio_total =  salario_sumatoria / len(salario_meses)
         else:
             salario_promedio_total = empleado_id.contract_ids[0].wage
+
         return salario_promedio_total
 
     def horas_sumar(self,lineas):
@@ -201,35 +200,51 @@ class HrPayslip(models.Model):
                     dias_laborados = 15
             
             reference_calendar = self._get_out_of_contract_calendar()
-            dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
 
+            # Para determinar si la planilla es mensual o de aguinaldo o bono 14
+            dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False, domain=False)
+
+            # Cuando es una planilla mensual y de un empleado que ingresó después de la fecha de inicio la planilla
             if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_laborados = dias_laborados - ((contracts.date_start - self.date_from ).days)
+                dias_laborados = dias_laborados - ((contracts.date_start - self.date_from).days)
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+            
+            # Cuando es una planilla mensual y de un empleado que salió antes de la fecha de fin de la planilla
             elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
-                dias_laborados =  ((contracts.date_end - self.date_from ).days) +1
+                dias_laborados =  ((contracts.date_end - self.date_from).days) +1
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+
+            # Cuando es una planilla anual y de un empleado que ingresó antes de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+            
+            # Cuando es una planilla anual y de un empleado que ingresó después de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
+                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), compute_leaves=False, domain=False)
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+            
+            # Cuando el empleado ingreso antes de la fecha de la planilla y no ha salido
             else:
+                # Cálculo para mensualidad
                 if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
-                    total_dias =  30 - dias_ausentados_restar
-                    if self.date_to.month == 2:
-                        if dias_ausentados_restar == self.date_to.day:
-                            total_dias =  0
+                    total_dias = min(self.date_to.day, 30) - dias_ausentados_restar
+                    # total_dias =  30 - dias_ausentados_restar
+                    # if self.date_to.month == 2:
+                    #     if dias_ausentados_restar == self.date_to.day:
+                    #         total_dias =  0
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
+                
+                # Cálculo para quincena
                 if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
                     total_dias =  15 - dias_ausentados_restar
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
+                
                 # Cálculo de días para catorcena
                 if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
                     dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
 
-            self.calculo_rrhh(self)
+            self.calculo_entradas_anuales(self)
 
         return res
 
@@ -270,20 +285,22 @@ class HrPayslip(models.Model):
                                 entrada.amount = valor_entrada
         return res
 
+    # Mostrar menú de print
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(models.Model, self).fields_view_get(view_id, view_type, toolbar, submenu)
         return res
 
+    # Mostrar menú de print
     @api.model
     def get_views(self, views, options=None):
         res = super(models.Model, self).get_views(views, options)
         return res
 
     def action_payslip_cancel(self):
-        pago_id = self.env['account.payment'].search([('nomina_id','=',self.id),('state','=', 'posted')])
-        if len(pago_id) > 0:
-            raise ValidationError(_("No puede cancelar por que tiene un pago asociado"))
+        pagos_id = self.env['account.payment'].search([('nomina_id','in',self.id), ('state','=','posted')])
+        if len(pagos_id) > 0:
+            raise ValidationError(_("No puede cancelar por que tiene un pago asociado."))
         return super(HrPayslip, self).action_payslip_cancel()
 
 class HrPayslipRun(models.Model):
