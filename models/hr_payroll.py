@@ -298,9 +298,10 @@ class HrPayslip(models.Model):
         return res
 
     def action_payslip_cancel(self):
-        pagos_id = self.env['account.payment'].search([('nomina_id','in',self.id), ('state','=','posted')])
-        if len(pagos_id) > 0:
-            raise ValidationError(_("No puede cancelar por que tiene un pago asociado."))
+        for nomina in self:
+            pagos_id = self.env['account.payment'].search([('nomina_id','=',nomina.id), ('state','=','posted')])
+            if len(pagos_id) > 0:
+                raise ValidationError(_("No puede cancelar por que tiene un pago asociado."))
         return super(HrPayslip, self).action_payslip_cancel()
 
 class HrPayslipRun(models.Model):
