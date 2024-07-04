@@ -212,7 +212,7 @@ class HrPayslip(models.Model):
             # Cuando es una planilla mensual y de un empleado que salió antes de la fecha de fin de la planilla
             elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
                 dias_laborados =  ((contracts.date_end - self.date_from).days) +1
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
 
             # Cuando es una planilla anual y de un empleado que ingresó antes de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
