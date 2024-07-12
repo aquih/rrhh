@@ -68,6 +68,7 @@ class ReportLibroSalarios(models.AbstractModel):
             for linea in nomina.worked_days_line_ids:
                 if linea.work_entry_type_id.code == empleado.company_id.tipo_entrada_trabajo_id.code:
                     dias_trabajados = linea.number_of_days
+                    
         return dias_trabajados
 
     def _get_domingos_trabajados(self,fecha_inicio,fecha_fin):
