@@ -83,6 +83,7 @@ class res_company(models.Model):
     otro_salario_ids = fields.Many2many('hr.salary.rule','rrhh_otro_salario_rel',string='Otros salarios')
     boni_incentivo_decreto_ids = fields.Many2many('hr.salary.rule','rrhh_boni_incentivo_decreto_rel',string='Bonificacion incentivo decreto')
     devolucion_isr_otro_ids = fields.Many2many('hr.salary.rule','rrhh_dev_isr_otro_rel',string='Devolución ISR')
+    tipo_entrada_trabajo_id = fields.Many2one('hr.work.entry.type','Tipo de entrada de trabajo')
 
 class res_company_centro_trabajo(models.Model):
     _name = 'res.company.centro_trabajo'
