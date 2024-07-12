@@ -420,7 +420,8 @@ class rrhh_informe_empleador(models.TransientModel):
                                         if entrada.code == horas_entrada.code:
                                             numero_horas_extra += entrada.amount
                             for linea in nomina.worked_days_line_ids:
-                                dias_trabajados += linea.number_of_days
+                                if linea.work_entry_type_id.code == empleado.company_id.tipo_entrada_trabajo_id.code:
+                                    dias_trabajados += linea.number_of_days
                             for linea in nomina.line_ids:
                                 if linea.salary_rule_id.id in nomina.company_id.salario_ids.ids:
                                     salario_anual_nominal += linea.total

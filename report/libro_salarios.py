@@ -62,22 +62,12 @@ class ReportLibroSalarios(models.AbstractModel):
         return dias
 
     def _get_dias_laborados_netos(self,empleado,fecha_inicio,fecha_fin):
-        work = -1
-        trabajo = -1
         dias_trabajados = 0
         nominas = self.env['hr.payslip'].search([['employee_id','=',empleado.id],['date_from', '>=', fecha_inicio],['date_to','<=',fecha_fin]])
         for nomina in nominas:
             for linea in nomina.worked_days_line_ids:
-                if linea.number_of_days > 31:
-                    contiene_bono = True
-                if linea.work_entry_type_id.code == 'TRABAJO100':
-                    trabajo = linea.number_of_days
-                elif linea.work_entry_type_id.code == 'WORK100':
-                    work = linea.number_of_days
-            if trabajo >= 0:
-                dias_trabajados += trabajo
-            else:
-                dias_trabajados += work
+                if linea.work_entry_type_id.code == empleado.company_id.tipo_entrada_trabajo_id.code:
+                    dias_trabajados = linea.number_of_days
         return dias_trabajados
 
     def _get_domingos_trabajados(self,fecha_inicio,fecha_fin):
