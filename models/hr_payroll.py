@@ -216,7 +216,7 @@ class HrPayslip(models.Model):
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
                 elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
                     dias_laborados =  ((contracts.date_end - self.date_from ).days)
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
                 elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
                 elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
@@ -306,9 +306,10 @@ class HrPayslip(models.Model):
         return res
 
     def action_payslip_cancel(self):
-        pago_id = self.env['account.payment'].search([('nomina_id','=',self.id),('state','=', 'posted')])
-        if len(pago_id) > 0:
-            raise ValidationError(_("No puede cancelar por que tiene un pago asociado"))
+        for nomina in self:
+            pago_id = self.env['account.payment'].search([('nomina_id','=',nomina.id),('state','=', 'posted')])
+            if len(pago_id) > 0:
+                raise ValidationError(_("No puede cancelar por que tiene un pago asociado"))
         return super(HrPayslip, self).action_payslip_cancel()
 
 class HrPayslipRun(models.Model):
