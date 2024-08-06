@@ -207,6 +207,10 @@ class HrPayslip(models.Model):
             # Cuando es una planilla mensual y de un empleado que ingresó después de la fecha de inicio la planilla
             if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
                 dias_laborados = dias_laborados - ((contracts.date_start - self.date_from).days)
+                
+                #Cuando es una planilla mensual, y el empleado entra y sale el mismo mes
+                if contracts.date_end and (self.date_from <= contracts.date_end <= self.date_to):
+                    dias_laborados = ((contracts.date_end - contracts.date_start).days) +1
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
             
             # Cuando es una planilla mensual y de un empleado que salió antes de la fecha de fin de la planilla
@@ -243,7 +247,7 @@ class HrPayslip(models.Model):
                 if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
                     dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
-
+                    
             self.calculo_entradas_anuales(self)
 
         return res
