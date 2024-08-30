@@ -264,11 +264,11 @@ class rrhh_informe_isr(models.TransientModel):
                         fecha_actualizacion = ""
                         posicion_salario = 0
                         salario_anterior = 0
+                        #El campo historial de salario está ordenado de manera Ascendente por default, y como necesitamos el ultimo salario
+                        #mas cercano durante la fecha de la actualización, entonces el último salario que cumple la condición es el correcto
                         for linea_historial in empleado.contract_id.historial_salario_ids:
-                            if linea_historial.fecha and ( linea_historial.fecha >= self.fecha_inicio and linea_historial.fecha <= self.fecha_fin):
-                                posicion_salario = empleado.contract_id.historial_salario_ids.ids.index(linea_historial.id)
+                            if linea_historial.fecha and linea_historial.fecha <= self.fecha_fin:
                                 salario_total = linea_historial.salario
-                                fecha_actualizacion = linea_historial.fecha
 
                         salario_anterior = empleado.contract_id.historial_salario_ids[posicion_salario-1].salario
                         if salario_total == 0:
