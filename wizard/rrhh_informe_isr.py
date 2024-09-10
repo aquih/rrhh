@@ -447,7 +447,7 @@ class rrhh_informe_isr(models.TransientModel):
                     hoja_fin_labores.write(fila, 0, empleado.nit if empleado.nit else '')
                     # hoja_fin_labores.write(fila, 3, (empleado.contract_id.wage))
 
-                    otra_info = self._get_informacion(empleado.id, self.fecha_inicio, empleado.contract_id.date_end, 'liquidacion_labor')
+                    otra_info = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin, 'liquidacion_labor')
                     otra_info_extra = self._get_informacion(empleado.id, self.fecha_inicio, self.fecha_fin, 'liquidacion_labor_igss')
 
                     hoja_fin_labores.write(fila, 1, otra_info['renta_patrono_actual'])
