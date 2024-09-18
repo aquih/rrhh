@@ -241,11 +241,13 @@ class ReportLibroSalarios(models.AbstractModel):
         model = 'rrhh.libro_salarios'
         docs = data.get('ids', data.get('active_ids'))
         anio = data.get('form', {}).get('anio', False)
+        folio_inicial = data.get('form', {}).get('folio_inicial', False)
         return {
             'doc_ids': docids,
             'doc_model': model,
             'docs': docs,
             'anio': anio,
+            'folio_inicial': folio_inicial,
             '_get_empleado': self._get_empleado,
             '_get_contrato': self._get_contrato,
             '_get_nominas': self._get_nominas,

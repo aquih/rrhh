@@ -8,6 +8,7 @@
             <form string="Libro de salarios">
                 <group string="Año">
                     <field name="anio"/>
+                    <field name="folio_inicial"/>
                 </group>
                 <group>
                     <field name="name" invisible="1"/>
@@ -28,8 +29,6 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">rrhh.libro_salarios</field>
         <field name="report_file">rrhh.libro_salarios</field>
-        <field name="binding_model_id" ref="model_hr_employee"/>
-        <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_libro_salarios"/>
     </record>
 

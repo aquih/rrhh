@@ -12,12 +12,13 @@ class rrhh_libro_salarios(models.TransientModel):
     _name = 'rrhh.libro_salarios'
 
     anio = fields.Integer('Año', required=True)
+    folio_inicial = fields.Integer(string="Folio Inicial", required=True, default=1)
     name = fields.Char('Nombre archivo')
     archivo = fields.Binary('Archivo')
 
     def print_report(self):
         datas = {'ids': self.env.context.get('active_ids', [])}
-        res = self.read(['anio'])
+        res = self.read()
         res = res and res[0] or {}
         datas['form'] = res
         return self.env.ref('rrhh.action_libro_salarios').report_action([], data=datas)

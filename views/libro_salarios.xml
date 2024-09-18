@@ -10,17 +10,18 @@
                 <div class="article">
                     <div class="header">
                         <div class="encabezado" align="center">
-                                <p style="tex-align:center">
-                                    <span t-field="empleado.company_id.name"/>
-                                </p>
-                                <p style="tex-align:center">
-                                    <span t-field="empleado.company_id.vat"/>
-                                </p>
-                                <p style="tex-align:center">
-                                    LIBRO DE SALARIOS PARA TRABAJADORES PERMANENTES
-                                </p>
-                                <p style="tex-align:center">
-                                    AUTORIZADO POR EL MINISTERIO DE TRABAJO Y PREVISION SOCIAL, SEGÚN ARTÍCULO 102 DEL CODIGO DE TRABAJO
+                            Folio: <span class="page" t-esc="folio_inicial-1"></span>
+                            <p style="tex-align:center">
+                                <span t-field="empleado.company_id.name"/>
+                            </p>
+                            <p style="tex-align:center">
+                                <span t-field="empleado.company_id.vat"/>
+                            </p>
+                            <p style="tex-align:center">
+                                LIBRO DE SALARIOS PARA TRABAJADORES PERMANENTES
+                            </p>
+                            <p style="tex-align:center">
+                                AUTORIZADO POR EL MINISTERIO DE TRABAJO Y PREVISION SOCIAL, SEGÚN ARTÍCULO 102 DEL CODIGO DE TRABAJO
                                 </p>
                         </div>
                     </div>
