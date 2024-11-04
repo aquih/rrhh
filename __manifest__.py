@@ -12,7 +12,7 @@
     'website': "http://www.aquih.com",
 
     'category': 'Uncategorized',
-    'version': '2.0',
+    'version': '2.1',
 
     'depends': ['base', 'hr', 'hr_contract', 'hr_payroll_account'],
 
