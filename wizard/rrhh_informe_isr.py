@@ -7,6 +7,7 @@ import base64
 import xlsxwriter
 import logging
 import io
+import math
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -353,7 +354,7 @@ class rrhh_informe_isr(models.TransientModel):
                             valor_otros_ingresos_proyectados = empleado_planilla_anterior_fecha_fin['otro_ingreso']
 
                             # otros_ingresos_gravados = empleado_planillas["otro_ingreso"] + (valor_mes_proyectar * meses_proyectar)
-                            otros_ingresos_proyectados = valor_otros_ingresos_proyectados *int(meses_proyectar)
+                            otros_ingresos_proyectados = valor_otros_ingresos_proyectados * math.trunc(meses_proyectar)
                             otros_ingresos_gravados =  otros_ingresos_devengados+otros_ingresos_proyectados
 
                             # valor_salario_nuevo = ((salario_total * 12)/365)*dias_trabajados
