@@ -31,6 +31,15 @@ class rrhh_informe_isr(models.TransientModel):
         empleado_id = self.env['hr.employee'].search([('id', 'in', empleados)])
         return empleado_id
 
+    def obtener_otros_ingresos_ultima_planilla(self, empleado_id, fecha_inicio, fecha_fin):
+        otros_ingresos = 0
+        nomina_id = self.env['hr.payslip'].search([('employee_id','=', empleado_id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)], order = "date_to desc")
+        if nomina_id:
+            for linea in nomina_id[0].line_ids:
+                if linea.salary_rule_id.id in nomina_id[0].employee_id.company_id.otros_ingresos_gravados_ids.ids:
+                    otros_ingresos += linea.total
+        return otros_ingresos
+
     def _get_informacion(self, empleado_id, fecha_inicio, fecha_fin, tipo):
         otros_ingresos = 0
         viaticos = 0
@@ -350,8 +359,8 @@ class rrhh_informe_isr(models.TransientModel):
 
                             otros_ingresos_devengados = empleado_planillas['otro_ingreso']
                             mes_anterior_planilla = self.fecha_fin - relativedelta(months=1)
-                            empleado_planilla_anterior_fecha_fin = self._get_informacion(empleado.id, mes_anterior_planilla , False, 'actualizacion')
-                            valor_otros_ingresos_proyectados = empleado_planilla_anterior_fecha_fin['otro_ingreso']
+                            empleado_planilla_anterior_fecha_fin = self.obtener_otros_ingresos_ultima_planilla(empleado.id, self.fecha_inicio , self.fecha_fin)
+                            valor_otros_ingresos_proyectados = empleado_planilla_anterior_fecha_fin
 
                             # otros_ingresos_gravados = empleado_planillas["otro_ingreso"] + (valor_mes_proyectar * meses_proyectar)
                             otros_ingresos_proyectados = valor_otros_ingresos_proyectados * math.trunc(meses_proyectar)
