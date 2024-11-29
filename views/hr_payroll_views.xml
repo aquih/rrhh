@@ -11,6 +11,7 @@
                 </button>
                 <field name="company_id" position="before">
                     <field name="porcentaje_prestamo"/>
+                    <field name="descuento_isr"/>
                 </field>
             </data>
         </field>
@@ -24,6 +25,7 @@
             <field name="contract_id" position="after">
                 <field name="etiqueta_empleado_ids" widget="many2many_tags"/>
                 <field name="porcentaje_prestamo"/>
+                <field name="descuento_isr"/>
                 <field name="cuenta_analitica_id"/>
             </field>
             <button name="action_payslip_cancel" position="attributes">

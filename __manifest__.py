@@ -35,6 +35,7 @@
         'wizard/rrhh_informe_empleador_view.xml',
         'wizard/igss.xml',
         'wizard/cerrar_nominas.xml',
+        'wizard/rrhh_informe_isr_view.xml',
         'security/ir.model.access.csv',
         'security/rrhh_security.xml',
     ],

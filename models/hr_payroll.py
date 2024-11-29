@@ -18,6 +18,7 @@ class HrPayslip(models.Model):
     porcentaje_prestamo = fields.Float(related="payslip_run_id.porcentaje_prestamo",string='Prestamo (%)',store=True)
     etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids')
     cuenta_analitica_id = fields.Many2one('account.analytic.account','Cuenta analítica')
+    descuento_isr = fields.Boolean(related="payslip_run_id.descuento_isr",string='Descuento ISR',store=True)
 
     # Dias calendario de los ultimos 12 meses hasta la fecha
     def dias_trabajados_ultimos_meses(self,empleado_id,fecha_desde,fecha_hasta):
@@ -34,6 +35,101 @@ class HrPayslip(models.Model):
                 existe_entrada = True
         return existe_entrada
 
+    def calcular_sueldo_devengado(self, nomina):
+        devengado = 0
+        anio_actual = nomina.date_to.year
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        
+        for n in nomina_ids:
+            if n.date_to.month != nomina.date_to.month:
+                if n.line_ids:
+                    for linea in n.line_ids:
+                        if linea.salary_rule_id.id in n.employee_id.company_id.salario_ids.ids:
+                            devengado += linea.total
+
+        return devengado
+
+    def calcular_sueldo_proyectado(self, nomina):
+        proyectado = 0
+        ultimo_salario = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-'+str(mes_actual)+'-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
+        meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month) + 1
+        if nomina:
+            for linea in nomina.line_ids:
+                if linea.salary_rule_id.id in nomina.employee_id.company_id.salario_total_ids.ids:
+                    ultimo_salario = linea.total
+                        
+        proyectado = ultimo_salario * meses_proyectar
+        
+        return proyectado
+
+    def calcular_sueldos(self, nomina):
+        devengado = self.calcular_sueldo_devengado(nomina)
+        proyectado = self.calcular_sueldo_proyectado(nomina)
+        sueldos = devengado + proyectado
+        return sueldos
+    
+    def calcular_horas_extras(self, nomina):
+        horas_extras = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        if len(nomina_ids) > 0:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.horas_extras_ids.ids:
+                        horas_extras += linea.total
+        
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.horas_extras_ids.ids:
+                horas_extras += linea.total   
+        return horas_extras
+
+
+    def calcular_bonificacion_decreto_devengado(self, nomina):
+        devengado = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        if len(nomina_ids) > 0:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.boni_incentivo_decreto_ids.ids:
+                        devengado += linea.total
+              
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.boni_incentivo_decreto_ids.ids:
+                devengado += linea.total
+        return devengado
+        
+    def calcular_bonificacion_decreto_proyectado(self, nomina):
+        proyectado = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-'+str(mes_actual)+'-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
+        meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month) + 1
+        proyectado = nomina.contract_id.bonificacion_decreto * meses_proyectar
+        return proyectado
+        
+    def calcular_bonificacion_decreto(self, nomina):
+        bonificacion_decreto = 0
+        devengado = self.calcular_bonificacion_decreto_devengado(nomina)
+        proyectado = self.calcular_bonificacion_decreto_proyectado(nomina)
+        bonificacion_decreto = devengado + proyectado
+        return bonificacion_decreto
+        
     def compute_sheet(self):
         for nomina in self:
             mes_nomina = int(nomina.date_from.month)
@@ -64,10 +160,164 @@ class HrPayslip(models.Model):
                             prestamo.estado = "pagado"
         res =  super(HrPayslip, self).compute_sheet()
         return res
+        
+    def calcular_aguinaldo(self, nomina):
+        devengado = self.calcular_bonificacion_decreto_devengado(nomina)
+        aguinaldo = (nomina.contract_id.wage + devengado)
+        return aguinaldo
 
+    def calcular_bonoc(self, nomina):
+        devengado = self.calcular_bonificacion_decreto_devengado(nomina)
+        bonoc = (nomina.contract_id.wage + devengado)
+        return bonoc
+
+    def calcular_otro_ingreso_afecto(self, nomina):
+        otro_ingreso = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        if len(nomina_ids) > 0:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.otro_ingreso_afecto_ids.ids:
+                        otro_ingreso += linea.total
+                        
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.otro_ingreso_afecto_ids.ids:
+                otro_ingreso += linea.total
+                
+        return otro_ingreso
+
+    def calcular_bono_productividad(self, nomina):
+        bono_productividad = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        if len(nomina_ids) > 0:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.bonificaciones_adicionales_ids.ids:
+                        bono_productividad += linea.total
+              
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.bonificaciones_adicionales_ids.ids:
+                bono_productividad += linea.total        
+        
+        return bono_productividad
+
+    def calcular_igss_devengado(self, nomina):
+        igss_devengado = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        if len(nomina_ids) > 0:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.igss_ids.ids:
+                        igss_devengado += linea.total
+                        
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.igss_ids.ids:
+                igss_devengado += linea.total          
+        return igss_devengado
+
+    def calcular_igss_proyectado(self, nomina):
+        igss = 0
+        igss_proyectado = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_fin = nomina.date_to
+        fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
+        meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month) + 1
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.igss_ids.ids:
+                igss += linea.total
+        igss_proyectado = igss * meses_proyectar
+        return igss_proyectado
+
+    def calcular_cuota_igss(self, nomina):
+        igss_devengado = self.calcular_igss_devengado(nomina)
+        igss_proyectado = self.calcular_igss_proyectado(nomina)
+        igss = igss_devengado + igss_proyectado
+        return igss
+
+    def calcular_retencion_isr_descontado(self, nomina):
+        isr_descontado = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
+        fecha_fin = nomina.date_to
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_inicio)])
+        if len(nomina_ids) > 0:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.igss_ids.ids:
+                        isr_descontado += linea.total
+                        
+        return isr_descontado
+    
+    def calculo_isr(self, nomina):
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_fin = nomina.date_to
+        fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
+        meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month) + 1
+        
+        sueldos = self.calcular_sueldos(nomina)
+        horas_extras = self.calcular_horas_extras(nomina)
+        bonificacion_decreto = self.calcular_bonificacion_decreto(nomina)
+        aguinaldo = self.calcular_aguinaldo(nomina)
+        bonoc = self.calcular_bonoc(nomina)
+        bono_productividad = self.calcular_bono_productividad(nomina)
+        otro_ingreso_afecto = self.calcular_otro_ingreso_afecto(nomina)
+        aguinaldo_mes = sueldos / 12
+        bonoc_mes = sueldos / 12
+        cuota_igss = self.calcular_cuota_igss(nomina)
+        rubro_ingresos = sueldos + horas_extras + bonificacion_decreto + aguinaldo + bonoc + bono_productividad + otro_ingreso_afecto
+        rubro_deducciones = aguinaldo_mes + bonoc_mes + cuota_igss
+        deduccion_fija = nomina.company_id.monto_deduccion_fija
+        renta_impunible = 0 if (rubro_ingresos + rubro_deducciones - deduccion_fija) < 0 else (rubro_ingresos + rubro_deducciones - deduccion_fija)
+        rubro_renta_cinco = 15000 if ((renta_impunible * 0.05) > 15000) else (renta_impunible * 0.05)
+        rubro_renta_siete = ((renta_impunible - 30000) * 0.07) if ((renta_impunible * 0.05) > 15000) else 0
+        rubro_retencion_anual = rubro_renta_cinco + rubro_renta_siete
+        retencion_isr_descontado = self.calcular_retencion_isr_descontado(nomina)
+        isr_total = rubro_retencion_anual + retencion_isr_descontado / meses_proyectar        
+        
+        return {
+            "sueldos": sueldos,
+            "horas_extras": horas_extras,
+            "bonificacion_decreto": bonificacion_decreto,
+            "aguinaldo": aguinaldo,
+            "bonoc": bonoc,
+            "bono_productividad": bono_productividad,
+            "otro_ingreso_afecto": otro_ingreso_afecto,
+            "aguinaldo_mes": aguinaldo_mes,
+            "bonoc_mes": bonoc_mes,
+            "cuota_igss": cuota_igss,
+            "rubro_ingresos": rubro_ingresos,
+            "rubro_deducciones": rubro_deducciones,
+            "deduccion_fija": deduccion_fija,
+            "renta_impunible": renta_impunible,
+            "rubro_renta_cinco": rubro_renta_cinco,
+            "rubro_renta_siete": rubro_renta_siete,
+            "rubro_retencion_anual": rubro_retencion_anual,
+            "retencion_isr_descontado": retencion_isr_descontado,
+            "isr_total": isr_total,
+        }
+        
     def calculo_entradas_anuales(self,nomina):
         salario = self.salario_promedio(self.employee_id,self.date_to)
         dias = self.dias_trabajados_ultimos_meses(self.contract_id.employee_id,self.date_from,self.date_to)
+        
+        calculo_isr = False
+        if nomina.descuento_isr:
+            calculos_isr = self.calculo_isr(nomina)
         for entrada in self.input_line_ids:
             if entrada.input_type_id.code == 'SalarioPromedio':
                 entrada.amount = salario
@@ -76,6 +326,46 @@ class HrPayslip(models.Model):
             dias_calendario = monthrange(self.date_to.year, self.date_to.month)[1]
             if entrada.input_type_id.code == 'DiasCalendario':
                 entrada.amount = dias_calendario
+                
+            if calculos_isr:
+                if entrada.input_type_id.code == "sueldos":
+                    entrada.amount = calculos_isr["sueldos"]
+                if entrada.input_type_id.code == "horas_extras":
+                    entrada.amount = calculos_isr["horas_extras"]
+                if entrada.input_type_id.code == "bonificacion_decreto":
+                    entrada.amount = calculos_isr["bonificacion_decreto"]
+                if entrada.input_type_id.code == "aguinaldo":
+                    entrada.amount = calculos_isr["aguinaldo"]
+                if entrada.input_type_id.code == "bonoc":
+                    entrada.amount = calculos_isr["bonoc"]
+                if entrada.input_type_id.code == "bono_productividad":
+                    entrada.amount = calculos_isr["bono_productividad"]
+                if entrada.input_type_id.code == "otro_ingreso_afecto":
+                    entrada.amount = calculos_isr["otro_ingreso_afecto"]
+                if entrada.input_type_id.code == "aguinaldo_mes":
+                    entrada.amount = calculos_isr["aguinaldo_mes"]
+                if entrada.input_type_id.code == "bonoc_mes":
+                    entrada.amount = calculos_isr["bonoc_mes"]
+                if entrada.input_type_id.code == "cuota_igss":
+                    entrada.amount = calculos_isr["cuota_igss"]
+                if entrada.input_type_id.code == "rubro_ingresos":
+                    entrada.amount = calculos_isr["rubro_ingresos"]
+                if entrada.input_type_id.code == "rubro_deducciones":
+                    entrada.amount = calculos_isr["rubro_deducciones"]
+                if entrada.input_type_id.code == "deduccion_fija":
+                    entrada.amount = calculos_isr["deduccion_fija"]
+                if entrada.input_type_id.code == "renta_impunible":
+                    entrada.amount = calculos_isr["renta_impunible"]
+                if entrada.input_type_id.code == "rubro_renta_cinco":
+                    entrada.amount = calculos_isr["rubro_renta_cinco"]
+                if entrada.input_type_id.code == "rubro_renta_siete":
+                    entrada.amount = calculos_isr["rubro_renta_siete"]
+                if entrada.input_type_id.code == "rubro_retencion_anual":
+                    entrada.amount = calculos_isr["rubro_retencion_anual"]
+                if entrada.input_type_id.code == "retencion_isr_descontado":
+                    entrada.amount = calculos_isr["retencion_isr_descontado"]
+                if entrada.input_type_id.code == "isr_total":
+                    entrada.amount = calculos_isr["isr_total"]
         return True
 
     # Salario promedio por 12 meses laborados o menos si el contrato empezó antes
@@ -312,6 +602,7 @@ class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 
     porcentaje_prestamo = fields.Float('Prestamo (%)')
+    descuento_isr = fields.Boolean("Descuento ISR")
 
     def generar_pagos(self):
         pagos = self.env['account.payment'].search([('nomina_id', '!=', False)])
