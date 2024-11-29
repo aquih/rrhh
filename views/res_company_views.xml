@@ -28,6 +28,7 @@
                             <group string="Contrato">
                                 <group>
                                     <field name="representante_legal_id"/>
+                                    <field name="monto_deduccion_fija"/>
                                 </group>
                             </group>
                             <group string="Centros">
@@ -65,6 +66,7 @@
                                     <field name="tipo_entrada_trabajo_id"/>
                                     <field name="salario_promedio_ids" widget="many2many_tags"/>
                                     <field name="salario_ids" widget="many2many_tags"/>
+                                    <field name="salario_total_ids" widget="many2many_tags"/>
                                     <field name="ordinarias_ids" widget="many2many_tags"/>
                                     <field name="extras_ordinarias_ids" widget="many2many_tags"/>
                                     <field name="ordinario_ids" widget="many2many_tags"/>

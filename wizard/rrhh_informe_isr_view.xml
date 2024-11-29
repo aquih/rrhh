@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rrhh_informe_isr" model="ir.ui.view">
+            <field name="name">Informe ISR</field>
+            <field name="model">rrhh.informe_isr</field>
+            <field name="arch" type="xml">
+            <form string="Informe ISR">
+                <group>
+                    <field name="name" invisible="1"/>
+                    <field name="archivo" readonly="1" filename="name"/>
+                </group>
+                <footer>
+                    <button name="print_report_excel" string="Generar Excel"  type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+            </field>
+    </record>
+
+    <record id="action_rrhh_informe_isr" model="ir.actions.act_window">
+        <field name="name">Informe ISR</field>
+        <field name="res_model">rrhh.informe_isr</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rrhh_informe_isr"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_hr_payslip_run"/>
+    </record>
+
+</odoo>
