@@ -257,7 +257,7 @@ class HrPayslip(models.Model):
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
-                    if linea.salary_rule_id.id in n.employee_id.company_id.igss_ids.ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.isr_ids.ids:
                         isr_descontado += linea.total
                         
         return isr_descontado
