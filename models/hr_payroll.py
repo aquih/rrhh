@@ -315,7 +315,7 @@ class HrPayslip(models.Model):
         salario = self.salario_promedio(self.employee_id,self.date_to)
         dias = self.dias_trabajados_ultimos_meses(self.contract_id.employee_id,self.date_from,self.date_to)
         
-        calculo_isr = False
+        calculos_isr = False
         if nomina.descuento_isr:
             calculos_isr = self.calculo_isr(nomina)
         for entrada in self.input_line_ids:
