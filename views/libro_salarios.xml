@@ -10,7 +10,6 @@
                 <div class="article">
                     <div class="header">
                         <div class="encabezado" align="center">
-                            Folio: <span class="page" t-esc="folio_inicial-1"></span>
                             <div style="tex-align:center">
                                 <span t-field="empleado.company_id.name"/>
                             </div>
@@ -128,7 +127,7 @@
                                 <td style="width:100px">
                                 </td>
                                 <td style="text-align:center;width:100px">
-                                    <b style="font-size:18px">Folio No.</b>
+                                    <b style="font-size:18px">Folio No. <span class="page" t-esc="folio_inicial-1"></span></b>
                                 </td>
                             </tr>
                             <!-- <tr>
