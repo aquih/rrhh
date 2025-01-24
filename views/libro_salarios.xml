@@ -127,7 +127,7 @@
                                 <td style="width:100px">
                                 </td>
                                 <td style="text-align:center;width:100px">
-                                    <b style="font-size:18px">Folio No. <span class="page" t-esc="folio_inicial-1"></span></b>
+                                    <b style="font-size:18px">Folio No. <span class="page" t-esc="folio_inicial"></span></b>
                                 </td>
                             </tr>
                             <!-- <tr>
