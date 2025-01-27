@@ -612,14 +612,15 @@ class HrPayslipRun(models.Model):
         for nomina in self.slip_ids:
             if nomina.id not in nominas_pagadas:
                 total_nomina = 0
-                if nomina.employee_id.diario_pago_id and nomina.employee_id.address_id and nomina.state in ['done','paid']:
+                if nomina.employee_id.diario_pago_id and nomina.employee_id.work_contact_id and nomina.state in ['done','paid']:
                     res = self.env['report.rrhh.recibo'].lineas(nomina)
                     total_nomina = res['totales'][0] + res['totales'][1]
+                    payment_method_line_id = self.env["account.payment.method.line"].search([('journal_id','=', nomina.employee_id.diario_pago_id.id)])
                     pago = {
                         'payment_type': 'outbound',
                         'partner_type': 'supplier',
-                        'payment_method_line_id': 2,
-                        'partner_id': nomina.employee_id.address_id.id,
+                        'payment_method_line_id': payment_method_line_id[0].id,
+                        'partner_id': nomina.employee_id.work_contact_id.id,
                         'amount': total_nomina,
                         'journal_id': nomina.employee_id.diario_pago_id.id,
                         'nomina_id': nomina.id
