@@ -229,7 +229,7 @@ class HrPayslip(models.Model):
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
                 else:
                     if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
-                        total_dias = min(self.date_to.day, 30) - dias_ausentados_restar
+                        total_dias = 30 - dias_ausentados_restar
                         res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
                     if self.struct_id.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
                         total_dias =  15 - dias_ausentados_restar
