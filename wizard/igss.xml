@@ -35,6 +35,7 @@
                 </group>
                 <group>
                     <group>
+                        <field name="name" colspan="4" invisible="1"/>
                         <field name="archivo" filename="name" readonly="1"/>
                     </group>
                 </group>

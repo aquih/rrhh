@@ -53,7 +53,7 @@ class rrhh_igss_wizard(models.TransientModel):
                 for slip in payslip_run.slip_ids:
                     if slip.contract_id:
                         if slip.employee_id.id not in empleados:
-                            empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id.id,'informacion': [0] * 15,'suspension': ''}
+                            empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id.id,'informacion': [0] * 19,'suspension': ''}
 
                         contrato_ids = self.env['hr.contract'].search( [['employee_id', '=', slip.employee_id.id]],offset=0,limit=1,order='date_start desc')
                         numero_liquidacion = str(slip.employee_id.numero_liquidacion) if slip.employee_id.numero_liquidacion else ''
@@ -63,6 +63,13 @@ class rrhh_igss_wizard(models.TransientModel):
                         primer_apellido = str(slip.employee_id.primer_apellido) if slip.employee_id.primer_apellido else ''
                         segundo_apellido = str(slip.employee_id.segundo_apellido) if slip.employee_id.segundo_apellido else ''
                         apellido_casada = str(slip.employee_id.apellido_casada) if slip.employee_id.apellido_casada else ''
+                        tipo_salario = slip.employee_id.tipo_salario if slip.employee_id.tipo_salario else ''
+                        horas_laboradas = ''
+                        tiempo_contrato = slip.employee_id.tiempo_contrato if slip.employee_id.tiempo_contrato else ''
+                        dias_laborados = 0
+                        for linea in slip.worked_days_line_ids:
+                            if linea.work_entry_type_id.code == 'TRABAJO100':
+                                dias_laborados = linea.number_of_days
                         sueldo = 0
                         for linea in slip.line_ids:
                             if linea.salary_rule_id.id in slip.employee_id.company_id.igss_ids.ids:
@@ -95,6 +102,10 @@ class rrhh_igss_wizard(models.TransientModel):
                         empleados[slip.employee_id.id]['informacion'][12] = (codigo_ocupacion)
                         empleados[slip.employee_id.id]['informacion'][13] = (condicion_laboral)
                         empleados[slip.employee_id.id]['informacion'][14] = (deducciones)
+                        empleados[slip.employee_id.id]['informacion'][15] = (tipo_salario)
+                        empleados[slip.employee_id.id]['informacion'][16] = (horas_laboradas)
+                        empleados[slip.employee_id.id]['informacion'][17] = (tiempo_contrato)
+                        empleados[slip.employee_id.id]['informacion'][18] = (dias_laborados)
 
             if empleados:
                 for empleado in empleados.values():
