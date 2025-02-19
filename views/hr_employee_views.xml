@@ -73,6 +73,8 @@
                                 <field name="forma_trabajo_extranjero"/>
                                 <field name="pais_trabajo_extranjero_id"/>
                                 <field name="finalizacion_laboral_extranjero"/>
+                                <field name="tipo_salario"/>
+                                <field name="tiempo_contrato"/>
                             </group>
                             <group string="Tarjetas Alimentarias">
                                 <field name="tarjeta_salud"/>
