@@ -102,7 +102,6 @@ class rrhh_igss_wizard(models.TransientModel):
                         empleados[slip.employee_id.id]['informacion'][12] = (codigo_ocupacion)
                         empleados[slip.employee_id.id]['informacion'][13] = (condicion_laboral)
                         empleados[slip.employee_id.id]['informacion'][14] = (deducciones)
-                        
                         empleados[slip.employee_id.id]['informacion'][15] = (tipo_salario)
                         empleados[slip.employee_id.id]['informacion'][16] = (horas_laboradas)
                         empleados[slip.employee_id.id]['informacion'][17] = (tiempo_contrato)
