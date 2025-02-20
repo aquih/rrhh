@@ -72,7 +72,7 @@ class rrhh_igss_wizard(models.TransientModel):
                                 dias_laborados = linea.number_of_days
                         sueldo = 0
                         for linea in slip.line_ids:
-                            if linea.salary_rule_id.id in slip.employee_id.company_id.igss_ids.ids:
+                            if linea.salary_rule_id.id in slip.employee_id.company_id.salario_ids.ids:
                                 sueldo += linea.amount
 
                         mes_inicio_contrato = datetime.strptime(str(slip.contract_id.date_start), '%Y-%m-%d').month
@@ -105,12 +105,16 @@ class rrhh_igss_wizard(models.TransientModel):
                         empleados[slip.employee_id.id]['informacion'][15] = (tipo_salario)
                         empleados[slip.employee_id.id]['informacion'][16] = (horas_laboradas)
                         empleados[slip.employee_id.id]['informacion'][17] = (tiempo_contrato)
-                        empleados[slip.employee_id.id]['informacion'][18] = (dias_laborados)
+                        empleados[slip.employee_id.id]['informacion'][18] = int(dias_laborados)
 
             if empleados:
                 for empleado in empleados.values():
                     for dato in empleado['informacion']:
-                        datos += str(dato) + '|'
+                        index = empleado['informacion'].index(dato)
+                        if index != 18:
+                            datos += str(dato) + '|'
+                        else:
+                            datos += str(dato)
                     datos += '\r\n'
 
                     ausencias = self.env['hr.leave'].search([('employee_id','=', empleado['empleado_id']),('request_date_from','>=',self.fecha_inicial),('request_date_to','<=',self.fecha_final),('state','=','validate')])
