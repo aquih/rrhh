@@ -38,6 +38,7 @@
         'wizard/rrhh_informe_isr_view.xml',
         'security/ir.model.access.csv',
         'security/rrhh_security.xml',
+        'views/hr_leave_type_views.xml',
     ],
     'license': 'LGPL-3',
 }

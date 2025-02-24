@@ -111,7 +111,7 @@ class HrPayslip(models.Model):
         fecha_fin = nomina.date_to
         fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
         meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
-        proyectado = nomina.contract_id.bonificacion_decreto * meses_proyectar
+        proyectado = (nomina.contract_id.bonificacion_decreto + nomina.contract_id.base_extra) * meses_proyectar
         return proyectado
         
     def calcular_bonificacion_decreto(self, nomina):

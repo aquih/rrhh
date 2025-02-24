@@ -10,3 +10,4 @@ from . import rrhh_recibo
 from . import res_company
 from . import account_payment
 from . import hr_work_entry
+from . import hr_leave_type
