@@ -40,13 +40,17 @@ class HrPayslip(models.Model):
         anio_actual = nomina.date_to.year
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
-        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<', fecha_fin)])
         
         for n in nomina_ids:
             if n.line_ids:
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.salario_ids.ids:
                         devengado += linea.total
+                        
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in n.employee_id.company_id.salario_ids.ids:
+                devengado += linea.total
 
         return devengado
 
@@ -80,12 +84,16 @@ class HrPayslip(models.Model):
         mes_actual = nomina.date_to.month
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
-        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<', fecha_fin)])
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.horas_extras_ids.ids:
                         horas_extras += linea.total
+                        
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in n.employee_id.company_id.horas_extras_ids.ids:
+                horas_extras += linea.total
         return horas_extras
 
 
@@ -95,12 +103,16 @@ class HrPayslip(models.Model):
         mes_actual = nomina.date_to.month
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
-        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<', fecha_fin)])
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.boni_incentivo_decreto_ids.ids:
                         devengado += linea.total
+                        
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in n.employee_id.company_id.boni_incentivo_decreto_ids.ids:
+                devengado += linea.total            
         return devengado
         
     def calcular_bonificacion_decreto_proyectado(self, nomina):
@@ -166,7 +178,7 @@ class HrPayslip(models.Model):
         mes_actual = nomina.date_to.month
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
-        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<', fecha_fin)])
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
@@ -185,7 +197,7 @@ class HrPayslip(models.Model):
         mes_actual = nomina.date_to.month
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
-        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<', fecha_fin)])
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
@@ -204,13 +216,16 @@ class HrPayslip(models.Model):
         mes_actual = nomina.date_to.month
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
-        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<', fecha_fin)])
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.igss_ids.ids:
                         igss_devengado += linea.total
                         
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in n.employee_id.company_id.igss_ids.ids:
+                igss_devengado += linea.total
         return igss_devengado
 
     def calcular_igss_proyectado(self, nomina):
@@ -239,13 +254,16 @@ class HrPayslip(models.Model):
         mes_actual = nomina.date_to.month
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
-        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<', fecha_fin)])
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.isr_ids.ids:
                         isr_descontado += linea.total
                         
+        for linea in nomina.line_ids:
+            if linea.salary_rule_id.id in n.employee_id.company_id.isr_ids.ids:
+                isr_descontado += linea.total
         return isr_descontado
     
     def calculo_isr(self, nomina):
