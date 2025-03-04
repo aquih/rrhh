@@ -49,7 +49,7 @@ class HrPayslip(models.Model):
                         devengado += linea.total
                         
         for linea in nomina.line_ids:
-            if linea.salary_rule_id.id in n.employee_id.company_id.salario_ids.ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.salario_ids.ids:
                 devengado += linea.total
 
         return devengado
@@ -92,7 +92,7 @@ class HrPayslip(models.Model):
                         horas_extras += linea.total
                         
         for linea in nomina.line_ids:
-            if linea.salary_rule_id.id in n.employee_id.company_id.horas_extras_ids.ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.horas_extras_ids.ids:
                 horas_extras += linea.total
         return horas_extras
 
@@ -111,7 +111,7 @@ class HrPayslip(models.Model):
                         devengado += linea.total
                         
         for linea in nomina.line_ids:
-            if linea.salary_rule_id.id in n.employee_id.company_id.boni_incentivo_decreto_ids.ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.boni_incentivo_decreto_ids.ids:
                 devengado += linea.total            
         return devengado
         
@@ -224,7 +224,7 @@ class HrPayslip(models.Model):
                         igss_devengado += linea.total
                         
         for linea in nomina.line_ids:
-            if linea.salary_rule_id.id in n.employee_id.company_id.igss_ids.ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.igss_ids.ids:
                 igss_devengado += linea.total
         return igss_devengado
 
@@ -262,7 +262,7 @@ class HrPayslip(models.Model):
                         isr_descontado += linea.total
                         
         for linea in nomina.line_ids:
-            if linea.salary_rule_id.id in n.employee_id.company_id.isr_ids.ids:
+            if linea.salary_rule_id.id in nomina.employee_id.company_id.isr_ids.ids:
                 isr_descontado += linea.total
         return isr_descontado
     
