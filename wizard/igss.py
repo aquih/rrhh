@@ -68,18 +68,21 @@ class rrhh_igss_wizard(models.TransientModel):
                         tiempo_contrato = slip.employee_id.tiempo_contrato if slip.employee_id.tiempo_contrato else ''
                         dias_laborados = 0
                         for linea in slip.worked_days_line_ids:
-                            if linea.work_entry_type_id.code == 'TRABAJO100':
+                            if linea.work_entry_type_id.code == slip.employee_id.company_id.igss_dias_trabajo:
                                 dias_laborados = linea.number_of_days
                         sueldo = 0
                         for linea in slip.line_ids:
                             if linea.salary_rule_id.id in slip.employee_id.company_id.salario_ids.ids:
-                                sueldo += linea.amount
+                                sueldo += linea.total
 
                         mes_inicio_contrato = datetime.strptime(str(slip.contract_id.date_start), '%Y-%m-%d').month
+                        anio_inicio_contrato = datetime.strptime(str(slip.contract_id.date_start), '%Y-%m-%d').year
                         mes_final_contrato = datetime.strptime(str(slip.contract_id.date_end), '%Y-%m-%d').month if slip.contract_id.date_end else ''
+                        anio_final_contrato = datetime.strptime(str(slip.contract_id.date_end), '%Y-%m-%d').year if slip.contract_id.date_end else ''
                         mes_planilla = datetime.strptime(str(payslip_run.date_start), '%Y-%m-%d').month
-                        fecha_alta = str(datetime.strptime(str(slip.contract_id.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if mes_inicio_contrato == mes_planilla else ''
-                        fecha_baja = str(datetime.strptime(str(slip.contract_id.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if mes_final_contrato == mes_planilla else ''
+                        anio_planilla = datetime.strptime(str(payslip_run.date_start), '%Y-%m-%d').year
+                        fecha_alta = str(datetime.strptime(str(slip.contract_id.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if (mes_inicio_contrato == mes_planilla and anio_inicio_contrato == anio_planilla) else ''
+                        fecha_baja = str(datetime.strptime(str(slip.contract_id.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if (mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla) else ''
 
                         centro_trabajo = str(slip.employee_id.codigo_centro_trabajo) if slip.employee_id.codigo_centro_trabajo else ''
                         nit = str(slip.employee_id.nit) if slip.employee_id.nit else ''
