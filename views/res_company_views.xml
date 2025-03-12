@@ -59,6 +59,7 @@
                                     <field name="departamento_republica"/>
                                     <field name="actividad_economica"/>
                                     <field name="clase_planilla"/>
+                                    <field name="igss_dias_trabajo"/>
                                 </group>
                             </group>
                             <group string="Libro de salarios">

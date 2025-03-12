@@ -87,7 +87,8 @@ class res_company(models.Model):
     salario_total_ids = fields.Many2many('hr.salary.rule','rrhh_salario_total_rel',string='Salario total')
     otro_ingreso_afecto_ids = fields.Many2many('hr.salary.rule','rrhh_otro_ingresoa_rel',string='Otro ingreso afecto')
     monto_deduccion_fija = fields.Float("Deducion fija")
-
+    igss_dias_trabajo = fields.Char("Igss dias de trabajo")
+    
 class res_company_centro_trabajo(models.Model):
     _name = 'res.company.centro_trabajo'
     _description = 'Centro de trabajo'
