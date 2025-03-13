@@ -18,6 +18,7 @@
                         <field name="departamento_republica"/>
                         <field name="actividad_economica"/>
                         <field name="clase_planilla"/>
+                        <field name="tiempo_contrato"/>
                     </group>
                 </group>
                 <group>

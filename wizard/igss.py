@@ -34,6 +34,7 @@ class rrhh_igss_wizard(models.TransientModel):
     fecha_final = fields.Date('Fecha final de liquidación')
     tipo_liquidacion = fields.Char('Tipo de liquidación')
     numero_nota_cargo = fields.Char('Número nota de cargo')
+    tiempo_contrato = fields.Char('Tiempo de contrato')
 
     def generar(self):
         datos = ''
@@ -43,7 +44,7 @@ class rrhh_igss_wizard(models.TransientModel):
             for centro in w.payslip_run_id[0].slip_ids[0].company_id.centro_trabajo_ids:
                 datos += str(centro.codigo) + '|' + str(centro.nombre) + '|' + str(centro.direccion) + '|' + str(centro.zona) + '|' + str(centro.telefono) + '|' + str(centro.fax) + '|' + str(centro.nombre_contacto) + '|' + str(centro.correo_electronico) + '|' + str(centro.codigo_departamento) + '|' + str(centro.codigo_municipio) + '|' + str(centro.codigo_actividad_economica) + '\r\n'
             datos += '[tiposplanilla]' + '\r\n'
-            datos += self.identificacion_tipo_planilla + '|' + self.nombre_tipo_planilla + '|' + self.tipo_afiliados + '|' + self.periodo_planilla + '|' + self.departamento_republica + '|' + self.actividad_economica + '|' + self.clase_planilla + '|' +'\r\n'
+            datos += self.identificacion_tipo_planilla + '|' + self.nombre_tipo_planilla + '|' + self.tipo_afiliados + '|' + self.periodo_planilla + '|' + self.departamento_republica + '|' + self.actividad_economica + '|' + self.clase_planilla + '|' + self.tiempo_contrato + '|' +'\r\n'
             datos += '[liquidaciones]' + '\r\n'
             datos += self.numero_liquidacion + '|' + self.tipo_planilla_liquidacion + '|' + str(datetime.strptime(str(self.fecha_inicial),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + str(datetime.strptime(str(self.fecha_final),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + self.tipo_liquidacion + '|' + (self.numero_nota_cargo if self.numero_nota_cargo else '') + '|' +'\r\n'
             datos += '[empleados]' + '\r\n'
