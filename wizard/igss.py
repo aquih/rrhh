@@ -127,7 +127,7 @@ class rrhh_igss_wizard(models.TransientModel):
                             if ausencia.holiday_status_id.suspension_igss:
                                 fecha_inicio = str(datetime.strptime(str(ausencia.date_from),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
                                 fecha_fin = str(datetime.strptime(str(ausencia.date_to),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
-                                suspensiones.append(numero_liquidacion + '|' + numero_afiliado + '|' + primer_nombre + '|' + segundo_nombre + '|' + primer_apellido + '|' + segundo_apellido + '|' + apellido_casada + '|' + fecha_inicio + '|' + fecha_fin + '|' + '\r\n')
+                                suspensiones.append(numero_liquidacion + '|' + ausencia.employee_id.igss + '|' + ausencia.employee_id.primer_nombre + '|' + ausencia.employee_id.segundo_nombre + '|' + ausencia.employee_id.primer_apellido + '|' + ausencia.employee_id.segundo_apellido + '|' + (ausencia.employee_id.apellido_casada if ausencia.employee_id.apellido_casada else "")  + '|' + str(ausencia.request_date_from.strftime('%d/%m/%Y')) + '|' + str(ausencia.request_date_to.strftime('%d/%m/%Y')) + '|' + '\r\n')
 
             datos += '[suspendidos]' + '\r\n'
             if suspensiones:

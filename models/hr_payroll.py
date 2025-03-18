@@ -288,7 +288,8 @@ class HrPayslip(models.Model):
         rubro_renta_siete = ((renta_impunible - 30000) * 0.07) if ((renta_impunible * 0.05) > 15000) else 0
         rubro_retencion_anual = rubro_renta_cinco + rubro_renta_siete
         retencion_isr_descontado = self.calcular_retencion_isr_descontado(nomina)
-        isr_total = (rubro_retencion_anual + retencion_isr_descontado) / (meses_proyectar + 1)        
+        retencion_isr_descontado_total = (rubro_retencion_anual + retencion_isr_descontado) /  (meses_proyectar + 1)
+        isr_total = retencion_isr_descontado_total      
         
         return {
             "sueldos": sueldos,
@@ -308,7 +309,7 @@ class HrPayslip(models.Model):
             "rubro_renta_cinco": rubro_renta_cinco,
             "rubro_renta_siete": rubro_renta_siete,
             "rubro_retencion_anual": rubro_retencion_anual,
-            "retencion_isr_descontado": retencion_isr_descontado,
+            "retencion_isr_descontado": retencion_isr_descontado_total,
             "isr_total": isr_total,
         }
         
