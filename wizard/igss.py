@@ -127,7 +127,13 @@ class rrhh_igss_wizard(models.TransientModel):
                             if ausencia.holiday_status_id.suspension_igss:
                                 fecha_inicio = str(datetime.strptime(str(ausencia.date_from),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
                                 fecha_fin = str(datetime.strptime(str(ausencia.date_to),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
-                                suspensiones.append(numero_liquidacion + '|' + ausencia.employee_id.igss + '|' + ausencia.employee_id.primer_nombre + '|' + ausencia.employee_id.segundo_nombre + '|' + ausencia.employee_id.primer_apellido + '|' + ausencia.employee_id.segundo_apellido + '|' + (ausencia.employee_id.apellido_casada if ausencia.employee_id.apellido_casada else "")  + '|' + str(ausencia.request_date_from.strftime('%d/%m/%Y')) + '|' + str(ausencia.request_date_to.strftime('%d/%m/%Y')) + '|' + '\r\n')
+                                igss = ausencia.employee_id.igss if ausencia.employee_id.igss else ""
+                                primer_nombre = ausencia.employee_id.primer_nombre if ausencia.employee_id.primer_nombre else ""
+                                segundo_nombre = ausencia.employee_id.segundo_nombre if ausencia.employee_id.segundo_nombre else ""
+                                primer_apellido = ausencia.employee_id.primer_apellido if ausencia.employee_id.primer_apellido else ""
+                                segundo_apellido = ausencia.employee_id.segundo_apellido if ausencia.employee_id.segundo_apellido else ""
+                                apellido_casada = ausencia.employee_id.apellido_casada if ausencia.employee_id.apellido_casada else ""
+                                suspensiones.append(numero_liquidacion + '|' + igss + '|' + primer_nombre + '|' + segundo_nombre + '|' + primer_apellido + '|' + segundo_apellido + '|' + apellido_casada  + '|' + str(ausencia.request_date_from.strftime('%d/%m/%Y')) + '|' + str(ausencia.request_date_to.strftime('%d/%m/%Y')) + '|' + '\r\n')
 
             datos += '[suspendidos]' + '\r\n'
             if suspensiones:
