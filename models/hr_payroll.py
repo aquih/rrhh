@@ -47,11 +47,6 @@ class HrPayslip(models.Model):
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.salario_ids.ids:
                         devengado += linea.total
-                        
-        # for linea in nomina.line_ids:
-        #     if linea.salary_rule_id.id in nomina.employee_id.company_id.salario_ids.ids:
-        #         devengado += linea.total
-
         return devengado
 
     def calcular_sueldo_proyectado(self, nomina):
