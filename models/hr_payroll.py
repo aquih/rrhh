@@ -154,44 +154,8 @@ class HrPayslip(models.Model):
             if nomina.descuento_isr:
                 calculos_isr = self.calculo_isr(nomina)
                 for entrada in self.input_line_ids:
-                    if entrada.input_type_id.code == "sueldos":
-                        entrada.amount = calculos_isr["sueldos"]
-                    if entrada.input_type_id.code == "horas_extras":
-                        entrada.amount = calculos_isr["horas_extras"]
-                    if entrada.input_type_id.code == "bonificacion_decreto":
-                        entrada.amount = calculos_isr["bonificacion_decreto"]
-                    if entrada.input_type_id.code == "aguinaldo":
-                        entrada.amount = calculos_isr["aguinaldo"]
-                    if entrada.input_type_id.code == "bonoc":
-                        entrada.amount = calculos_isr["bonoc"]
-                    if entrada.input_type_id.code == "bono_productividad":
-                        entrada.amount = calculos_isr["bono_productividad"]
-                    if entrada.input_type_id.code == "otro_ingreso_afecto":
-                        entrada.amount = calculos_isr["otro_ingreso_afecto"]
-                    if entrada.input_type_id.code == "aguinaldo_mes":
-                        entrada.amount = calculos_isr["aguinaldo_mes"]
-                    if entrada.input_type_id.code == "bonoc_mes":
-                        entrada.amount = calculos_isr["bonoc_mes"]
-                    if entrada.input_type_id.code == "cuota_igss":
-                        entrada.amount = calculos_isr["cuota_igss"]
-                    if entrada.input_type_id.code == "rubro_ingresos":
-                        entrada.amount = calculos_isr["rubro_ingresos"]
-                    if entrada.input_type_id.code == "rubro_deducciones":
-                        entrada.amount = calculos_isr["rubro_deducciones"]
-                    if entrada.input_type_id.code == "deduccion_fija":
-                        entrada.amount = calculos_isr["deduccion_fija"]
-                    if entrada.input_type_id.code == "renta_impunible":
-                        entrada.amount = calculos_isr["renta_impunible"]
-                    if entrada.input_type_id.code == "rubro_renta_cinco":
-                        entrada.amount = calculos_isr["rubro_renta_cinco"]
-                    if entrada.input_type_id.code == "rubro_renta_siete":
-                        entrada.amount = calculos_isr["rubro_renta_siete"]
-                    if entrada.input_type_id.code == "rubro_retencion_anual":
-                        entrada.amount = calculos_isr["rubro_retencion_anual"]
-                    if entrada.input_type_id.code == "retencion_isr_descontado":
-                        entrada.amount = calculos_isr["retencion_isr_descontado"]
-                    if entrada.input_type_id.code == "isr_total":
-                        entrada.amount = calculos_isr["isr_total"]
+                    if entrada.input_type_id.code in calculos_isr:
+                        entrada.amount = calculos_isr[entrada.input_type_id.code]
                 nomina.with_context(payslip_no_recompute=True)._compute_line_ids()
         return res
         
