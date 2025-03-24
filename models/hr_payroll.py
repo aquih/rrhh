@@ -90,10 +90,6 @@ class HrPayslip(models.Model):
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.horas_extras_ids.ids:
                         horas_extras += linea.total
-                        
-        # for linea in nomina.line_ids:
-        #     if linea.salary_rule_id.id in nomina.employee_id.company_id.horas_extras_ids.ids:
-        #         horas_extras += linea.total
         return horas_extras
 
 
