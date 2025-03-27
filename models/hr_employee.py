@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 import datetime
 import logging
 
@@ -12,14 +12,10 @@ class HrEmployeeBase(models.AbstractModel):
 class HrEmployeePrivate(models.Model):
     _inherit = 'hr.employee'
 
-    # promedio_salario = fields.function(_promedio_salario, string='Promedio Salario', digits_compute=dp.get_precision('Account')),
     numero_liquidacion = fields.Char('Numero o identificacion de liquidacion',groups="hr.group_hr_user")
     codigo_centro_trabajo = fields.Char('Codigo de centro de trabajo asignado',groups="hr.group_hr_user")
     codigo_ocupacion = fields.Char('Codigo ocupacion',groups="hr.group_hr_user")
     condicion_laboral = fields.Selection([('P', 'Permanente'), ('T', 'Temporal')], 'Condicion laboral',groups="hr.group_hr_user")
-
-    # job_id = fields.Many2one(track_visibility='onchange')
-    # department_id = fields.Many2one('hr.department', 'Department', track_visibility='onchange')
     diario_pago_id = fields.Many2one('account.journal', 'Diario de Pago',groups="hr.group_hr_user")
     igss = fields.Char('IGSS',groups="hr.group_hr_user")
     irtra = fields.Char('IRTRA',groups="hr.group_hr_user")
@@ -35,7 +31,6 @@ class HrEmployeePrivate(models.Model):
     jornada_trabajo = fields.Char('Jornada de Trabajo',groups="hr.group_hr_user")
     permiso_trabajo = fields.Char('Permiso de Trabajo',groups="hr.group_hr_user")
     contacto_emergencia = fields.Many2one('res.partner','Contacto de Emergencia',groups="hr.group_hr_user")
-    marital = fields.Selection(selection_add=[('separado', 'Separado(a)'),('unido', 'Unido(a)')],groups="hr.group_hr_user")
     edad = fields.Integer(string='Edad',compute="_get_edad",groups="hr.group_hr_user")
     vecindad_dpi = fields.Char('Vecindad DPI',groups="hr.group_hr_user")
     tarjeta_salud = fields.Boolean('Tarjeta de salud',groups="hr.group_hr_user")
@@ -61,6 +56,12 @@ class HrEmployeePrivate(models.Model):
     tipo_salario = fields.Char('Tipo salario', default="1")
     tiempo_contrato = fields.Char('Tiempo de contrato', default="TC")
 
+    def _get_marital_status_selection(self):
+        result = super()._get_marital_status_selection()
+        otros = ('separado', _('Separado(a)')),('unido', _('Unido(a)')),
+        result.append(otros)
+        return result
+    
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
         res1 = super(HrEmployeePrivate, self).name_search(name, args, operator=operator, limit=limit)

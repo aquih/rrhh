@@ -102,7 +102,7 @@
                             </group>
                             <label for="centro_trabajo_ids" string="Centros de trabajo"/>
                             <field name="centro_trabajo_ids">
-                                <tree string="Centros" editable="bottom">
+                                <list string="Centros" editable="bottom">
                                     <field name="codigo"/>
                                     <field name="nombre"/>
                                     <field name="direccion"/>
@@ -114,7 +114,7 @@
                                     <field name="codigo_departamento"/>
                                     <field name="codigo_municipio"/>
                                     <field name="codigo_actividad_economica"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
