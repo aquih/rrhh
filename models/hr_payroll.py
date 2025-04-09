@@ -62,7 +62,8 @@ class HrPayslip(models.Model):
                                 cantidad_pagados +=1
                         if cantidad_pagados > 0 and cantidad_pagados < cantidad_pagos:
                             prestamo.estado = "proceso"
-                        if cantidad_pagados == cantidad_pagos and cantidad_pagos > 0:
+
+                        if prestamo.pendiente_pagar_prestamo == 0:
                             prestamo.estado = "pagado"
         res =  super(HrPayslip, self).compute_sheet()
         return res
