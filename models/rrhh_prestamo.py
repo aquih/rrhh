@@ -28,7 +28,7 @@ class rrhh_prestamo(models.Model):
     ], string='Status', help='Estado del prestamo',readonly=True, default='nuevo')
     pendiente_pagar_prestamo = fields.Float(compute='_compute_prestamo', string='Pendiente a pagar del prestamos', )
 
-    def _compute_prestamo (self):
+    def _compute_prestamo(self):
         for prestamo in self:
             total_prestamo = 0
             total_prestamo_pagado = 0
@@ -43,7 +43,7 @@ class rrhh_prestamo(models.Model):
             prestamo.pendiente_pagar_prestamo = total_prestamo - total_prestamo_pagado
             if prestamo.pendiente_pagar_prestamo == 0 and nominas > 0:
                 prestamo.estado = 'pagado'
-            return True
+        return True
 
     def generar_mensualidades(self):
         mes_inicial = self.fecha_inicio

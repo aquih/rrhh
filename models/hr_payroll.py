@@ -430,7 +430,7 @@ class HrPayslip(models.Model):
                 if self.struct_id.schedule_pay == 'semi-monthly':
                     dias_laborados = 15
             
-            reference_calendar = self._get_out_of_contract_calendar()
+            reference_calendar = contracts.resource_calendar_id
 
             # Para determinar si la planilla es mensual o de aguinaldo o bono 14
             dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False, domain=False)

@@ -61,6 +61,12 @@ class HrEmployeePrivate(models.Model):
     tipo_salario = fields.Char('Tipo salario', default="1")
     tiempo_contrato = fields.Char('Tiempo de contrato', default="TC")
 
+    def _get_marital_status_selection(self):
+        result = super()._get_marital_status_selection()
+        otros = ('separado', _('Separado(a)')),('unido', _('Unido(a)')),
+        result.append(otros)
+        return result
+
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
         res1 = super(HrEmployeePrivate, self).name_search(name, args, operator=operator, limit=limit)
