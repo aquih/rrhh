@@ -396,8 +396,8 @@ class HrPayslip(models.Model):
                 dias += linea['number_of_days']
         return {'dias':dias, 'horas': horas}
 
-    def _get_worked_day_lines(self):
-        res = super(HrPayslip, self)._get_worked_day_lines()
+    def _get_worked_day_lines(self, domain=None, check_out_of_contract=True):
+        res = super(HrPayslip, self)._get_worked_day_lines(domain, check_out_of_contract)
         tipos_ausencias_ids = self.env['hr.leave.type'].search([])
         datos = self.horas_sumar(res)
         ausencias_restar = []
