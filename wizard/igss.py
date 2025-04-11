@@ -73,7 +73,7 @@ class rrhh_igss_wizard(models.TransientModel):
                                 dias_laborados = linea.number_of_days
                         sueldo = 0
                         for linea in slip.line_ids:
-                            if linea.salary_rule_id.id in slip.employee_id.company_id.salario_ids.ids:
+                            if linea.salary_rule_id.id in slip.employee_id.company_id.sueldo_igss_ids.ids:
                                 sueldo += linea.total
 
                         mes_inicio_contrato = datetime.strptime(str(slip.contract_id.date_start), '%Y-%m-%d').month
@@ -98,7 +98,7 @@ class rrhh_igss_wizard(models.TransientModel):
                         empleados[slip.employee_id.id]['informacion'][4] = (primer_apellido)
                         empleados[slip.employee_id.id]['informacion'][5] = (segundo_apellido)
                         empleados[slip.employee_id.id]['informacion'][6] = (apellido_casada)
-                        empleados[slip.employee_id.id]['informacion'][7] += sueldo
+                        empleados[slip.employee_id.id]['informacion'][7] += round(sueldo,2)
                         empleados[slip.employee_id.id]['informacion'][8] = (fecha_alta)
                         empleados[slip.employee_id.id]['informacion'][9] = (fecha_baja)
                         empleados[slip.employee_id.id]['informacion'][10] = (centro_trabajo)
