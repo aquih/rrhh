@@ -1,13 +1,13 @@
 <odoo>
 
-    <record id="view_planilla_tree" model="ir.ui.view">
-        <field name="name">planilla.tree</field>
+    <record id="view_planilla_list" model="ir.ui.view">
+        <field name="name">planilla.list</field>
         <field name="model">rrhh.planilla</field>
         <field name="arch" type="xml">
-            <tree string="Planillas">
+            <list string="Planillas">
                 <field name="name"/>
                 <field name="descripcion"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -27,13 +27,13 @@
                 <notebook colspan="4">
                     <page string="Columnas">
                         <field name="columna_id">
-                            <tree editable="bottom">
+                            <list editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
                                 <field name="regla_id" widget="many2many_tags"/>
                                 <field name="entrada_id" widget="many2many_tags"/>
                                 <field name="sumar"/>
-                            </tree>
+                            </list>
                         </field>
                     </page>
                 </notebook>
@@ -69,14 +69,14 @@
 
     <menuitem action="action_planilla" id="menu_planilla" parent="hr_payroll.menu_hr_salary_configuration" sequence="2"/>
 
-    <record id="view_recibo_tree" model="ir.ui.view">
-        <field name="name">recibo.tree</field>
+    <record id="view_recibo_list" model="ir.ui.view">
+        <field name="name">recibo.list</field>
         <field name="model">rrhh.recibo</field>
         <field name="arch" type="xml">
-            <tree string="Recibos">
+            <list string="Recibos">
                 <field name="name"/>
                 <field name="descripcion"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -96,27 +96,27 @@
                 <notebook colspan="4">
                     <page string="Ingresos">
                         <field name="linea_ingreso_id">
-                            <tree editable="bottom">
+                            <list editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
                                 <field name="regla_id" widget="many2many_tags"/>
-                            </tree>
+                            </list>
                         </field>
                     </page>
                     <page string="Deducciones">
                         <field name="linea_deduccion_id">
-                            <tree editable="bottom">
+                            <list editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
                                 <field name="regla_id" widget="many2many_tags"/>
-                            </tree>
+                            </list>
                         </field>
                     </page>
                     <page string="Entradas">
                         <field name="entrada_id">
-                            <tree editable="bottom">
+                            <list editable="bottom">
                                 <field name="input_id"/>
-                            </tree>
+                            </list>
                         </field>
                     </page>
                 </notebook>

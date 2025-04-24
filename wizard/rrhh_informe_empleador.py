@@ -376,8 +376,8 @@ class rrhh_informe_empleador(models.TransientModel):
             hoja_empleado.write(0, 41, 'Bonificaciones Adicionales')
             hoja_empleado.write(0, 42, 'Retribución por vacaciones')
             hoja_empleado.write(0, 43, 'Retribución por Indemnización (Articulo 82)')
-            hoja_empleado.write(0, 44, 'Sucursal') 
-            
+            hoja_empleado.write(0, 44, 'Sucursal')
+
             fila = 1
             empleado_numero = 1
             numero = 1
@@ -450,9 +450,9 @@ class rrhh_informe_empleador(models.TransientModel):
 
                     salario_anual_nominal_promedio = salario_anual_nominal / len(nominas) if salario_anual_nominal > 0 else 0
                     if empleado.gender == 'male':
-                        genero = 1
+                        genero = '1'
                     if empleado.gender == 'female':
-                        genero = 2
+                        genero = '2'
                     if empleado.marital == 'single':
                         estado_civil = 1
                     if empleado.marital == 'married':
@@ -510,8 +510,8 @@ class rrhh_informe_empleador(models.TransientModel):
                     hoja_empleado.write(fila, 41, bonificaciones_adicionales)
                     hoja_empleado.write(fila, 42, retribucion_vacaciones)
                     hoja_empleado.write(fila, 43, indemnizacion)                    
-                    hoja_empleado.write(fila, 44, empleado.sucursal)   
-
+                    hoja_empleado.write(fila, 44, empleado.sucursal)
+                    
                     empleado_numero +=1
 
                     fila += 1

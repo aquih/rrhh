@@ -12,10 +12,10 @@
                     <field name="temporalidad_contrato"/>
                     <field name="calcula_indemnizacion"/>
                     <field name="historial_salario_ids">
-                        <tree string="Hitorial de salario" editable="bottom">
+                        <list string="Hitorial de salario" editable="bottom">
                             <field name="salario"/>
                             <field name="fecha"/>
-                        </tree>
+                        </list>
                     </field>
                 </field>
                 <field name="structure_type_id" position="after">

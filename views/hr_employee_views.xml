@@ -3,7 +3,7 @@
     <record id="act_rrhh_prestamo" model="ir.actions.act_window">
         <field name="name">Prestamo</field>
         <field name="res_model">rrhh.prestamo</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="context">{
             'search_default_employee_id': [active_id],
             'default_employee_id': active_id,
@@ -14,7 +14,7 @@
     <record id="act_rrhh_prestamo_2" model="ir.actions.act_window">
         <field name="name">Prestamo</field>
         <field name="res_model">rrhh.prestamo</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="context">{'search_default_employee_id': [active_id], 'default_employee_id': active_id}</field>
     </record>
 
@@ -131,22 +131,22 @@
                     </group>
                 </group>
                 <field name="prestamo_ids">
-                    <tree editable="bottom">
+                    <list editable="bottom">
                         <field name="mes" readonly="nomina_id != False"/>
                         <field name="anio" readonly="nomina_id != False"/>
                         <field name="monto" readonly="nomina_id != False"/>
                         <field name="nomina_id" widget="many2many_tags"/>
-                    </tree>
+                    </list>
                 </field>
             </form>
         </field>
     </record>
 
-    <record id="rrhh_prestamo_view_tree" model="ir.ui.view">
-        <field name="name">rrhh.prestamo.tree</field>
+    <record id="rrhh_prestamo_view_list" model="ir.ui.view">
+        <field name="name">rrhh.prestamo.list</field>
         <field name="model">rrhh.prestamo</field>
         <field name="arch" type="xml">
-            <tree string="Contracts">
+            <list string="Contracts">
                 <field name="employee_id"/>
                 <field name="fecha_inicio"/>
                 <field name="numero_descuentos"/>
@@ -154,7 +154,7 @@
                 <field name="mensualidad"/>
                 <field name="descripcion"/>
                 <field name="codigo"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -198,7 +198,7 @@
     <record id="action_rrhh_prestamo" model="ir.actions.act_window">
         <field name="name">Prestamos</field>
         <field name="res_model">rrhh.prestamo</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('employee_id', '!=', False)]</field>
         <field name="context">{'search_default_current':1, 'search_default_group_by_state': 1}</field>
         <field name="search_view_id" ref="rrhh_prestamo_view_search"/>

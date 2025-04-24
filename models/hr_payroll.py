@@ -397,7 +397,7 @@ class HrPayslip(models.Model):
         return {'dias':dias, 'horas': horas}
 
     def _get_worked_day_lines(self, domain=None, check_out_of_contract=True):
-        res = super(HrPayslip, self)._get_worked_day_lines(domain, check_out_of_contract)
+        res = super(HrPayslip, self)._get_worked_day_lines(domain=domain, check_out_of_contract=check_out_of_contract)
         tipos_ausencias_ids = self.env['hr.leave.type'].search([])
         datos = self.horas_sumar(res)
         ausencias_restar = []
@@ -433,7 +433,7 @@ class HrPayslip(models.Model):
             reference_calendar = contracts.resource_calendar_id
 
             # Para determinar si la planilla es mensual o de aguinaldo o bono 14
-            dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False, domain=False)
+            dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False, domain=[])
 
             # Cuando es una planilla mensual y de un empleado que ingresó después de la fecha de inicio la planilla
             if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
@@ -455,7 +455,7 @@ class HrPayslip(models.Model):
             
             # Cuando es una planilla anual y de un empleado que ingresó después de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), compute_leaves=False, domain=False)
+                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), compute_leaves=False, domain=[])
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
             
             # Cuando el empleado ingreso antes de la fecha de la planilla y no ha salido
@@ -472,7 +472,7 @@ class HrPayslip(models.Model):
                 
                 # Cálculo de días para catorcena
                 if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
-                    dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
+                    dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = [])
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
                     
             self.calculo_entradas_anuales(self)
