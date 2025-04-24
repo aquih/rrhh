@@ -28,7 +28,7 @@ class rrhh_prestamo(models.Model):
     ], string='Status', help='Estado del prestamo',readonly=True, default='nuevo')
     pendiente_pagar_prestamo = fields.Float(compute='_compute_prestamo', string='Pendiente a pagar del prestamos', )
 
-    def _compute_prestamo (self):
+    def _compute_prestamo(self):
         for prestamo in self:
             total_prestamo = 0
             total_prestamo_pagado = 0
