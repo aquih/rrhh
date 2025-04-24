@@ -49,27 +49,25 @@ class HrEmployeePrivate(models.Model):
     pueblo_pertenencia = fields.Char('Pueblo de pertenencia',groups="hr.group_hr_user")
     primer_nombre = fields.Char('Primer nombre',groups="hr.group_hr_user")
     segundo_nombre = fields.Char('Segundo nombre',groups="hr.group_hr_user")
+    tercer_nombre = fields.Char('Tercer nombre',groups="hr.group_hr_user")
     primer_apellido = fields.Char('Primer apellido',groups="hr.group_hr_user")
     segundo_apellido = fields.Char('Segundo apellido',groups="hr.group_hr_user")
     apellido_casada = fields.Char('Apellido casada',groups="hr.group_hr_user")
     centro_trabajo_id = fields.Many2one('res.company.centro_trabajo',string='Centro de trabajo',groups="hr.group_hr_user")
     tipo_salario = fields.Char('Tipo salario', default="1")
     tiempo_contrato = fields.Char('Tiempo de contrato', default="TC")
+    nacionalidad = fields.Char("Nacionalidad")
+    tipo_discapacidad = fields.Char('Tipo de discapacidad',groups="hr.group_hr_user")
+    comunidad_linguistica = fields.Char('Comunidad Linguística',groups="hr.group_hr_user")
+    sucursal = fields.Char("Sucursal", groups="hr.group_hr_user")
+    tipo_contrato = fields.Char("Tipo de contrato", groups="hr.group_hr_user")
+    codigo_pais_origen = fields.Char('Codigo pais',groups="hr.group_hr_user")
 
     def _get_marital_status_selection(self):
         result = super()._get_marital_status_selection()
         otros = ('separado', _('Separado(a)')),('unido', _('Unido(a)')),
         result.append(otros)
         return result
-    
-    @api.model
-    def name_search(self, name, args=None, operator='ilike', limit=100):
-        res1 = super(HrEmployeePrivate, self).name_search(name, args, operator=operator, limit=limit)
-
-        records = self.search([('codigo_empleado', 'ilike', name)], limit=limit)
-        res2 = records.name_get()
-
-        return res1+res2
 
     def _get_edad(self):
         for employee in self:

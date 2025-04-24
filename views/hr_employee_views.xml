@@ -50,6 +50,7 @@
                             <group string="Información Laboral">
                                 <field name="primer_nombre"/>
                                 <field name="segundo_nombre"/>
+                                <field name="tercer_nombre"/>
                                 <field name="primer_apellido"/>
                                 <field name="segundo_apellido"/>
                                 <field name="apellido_casada"/>
@@ -63,6 +64,7 @@
                                 <field name="etnia"/>
                                 <field name="idioma"/>
                                 <field name="pais_origen"/>
+                                <field name="codigo_pais_origen"/>
                                 <field name="trabajado_extranjero"/>
                                 <field name="motivo_finalizacion"/>
                                 <field name="jornada_trabajo"/>
@@ -75,6 +77,11 @@
                                 <field name="finalizacion_laboral_extranjero"/>
                                 <field name="tipo_salario"/>
                                 <field name="tiempo_contrato"/>
+                                <field name="nacionalidad"/>
+                                <field name="tipo_discapacidad"/>
+                                <field name="comunidad_linguistica"/>
+                                <field name="sucursal"/>
+                                <field name="tipo_contrato"/>
                             </group>
                             <group string="Tarjetas Alimentarias">
                                 <field name="tarjeta_salud"/>

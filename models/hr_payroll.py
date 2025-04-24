@@ -147,7 +147,7 @@ class HrPayslip(models.Model):
                                 cantidad_pagados +=1
                         if cantidad_pagados > 0 and cantidad_pagados < cantidad_pagos:
                             prestamo.estado = "proceso"
-                        if cantidad_pagados == cantidad_pagos and cantidad_pagos > 0:
+                        if prestamo.pendiente_pagar_prestamo == 0:
                             prestamo.estado = "pagado"
         res =  super(HrPayslip, self).compute_sheet()
         for nomina in self:
@@ -396,8 +396,8 @@ class HrPayslip(models.Model):
                 dias += linea['number_of_days']
         return {'dias':dias, 'horas': horas}
 
-    def _get_worked_day_lines(self):
-        res = super(HrPayslip, self)._get_worked_day_lines()
+    def _get_worked_day_lines(self, domain=None, check_out_of_contract=True):
+        res = super(HrPayslip, self)._get_worked_day_lines(domain=domain, check_out_of_contract=check_out_of_contract)
         tipos_ausencias_ids = self.env['hr.leave.type'].search([])
         datos = self.horas_sumar(res)
         ausencias_restar = []

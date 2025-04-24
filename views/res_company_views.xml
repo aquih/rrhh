@@ -62,6 +62,11 @@
                                     <field name="igss_dias_trabajo"/>
                                 </group>
                             </group>
+                            <group string="IGSS">
+                                <group>
+                                    <field name="sueldo_igss_ids" widget="many2many_tags"/>
+                                </group>
+                            </group>
                             <group string="Libro de salarios">
                                 <group>
                                     <field name="tipo_entrada_trabajo_id"/>
