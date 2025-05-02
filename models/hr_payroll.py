@@ -202,7 +202,6 @@ class HrPayslip(models.Model):
                 dias_laborados = 15
 
 
-            logging.warning(contracts.schedule_pay)
             if version_info[0] == 15 or version_info[0] == 16:
                 if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
                     dias_laborados = 30
