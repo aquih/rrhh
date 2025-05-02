@@ -202,7 +202,7 @@ class HrPayslip(models.Model):
                 dias_laborados = 15
 
 
-
+            logging.warning(contracts.schedule_pay)
             if version_info[0] == 15 or version_info[0] == 16:
                 if contracts.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
                     dias_laborados = 30
@@ -222,7 +222,10 @@ class HrPayslip(models.Model):
 
                 elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
                     dias_laborados =  ((contracts.date_end - self.date_from ).days) +1
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
+                    if contracts.schedule_pay == 'bi-weekly':
+                        res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,15) - dias_ausentados_restar})
+                    else:
+                        res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
                 elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
                 elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
