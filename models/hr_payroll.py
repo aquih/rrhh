@@ -262,8 +262,8 @@ class HrPayslip(models.Model):
                         res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 15 - dias_ausentados_restar})
                     # Cálculo de días para catorcena
                     if contracts.schedule_pay == 'bi-weekly':
-                        dias_laborados = self.employee_id._get_work_days_data_batch(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), calendar=contracts.resource_calendar_id)
-                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
+                        dias_laborados = 14
+                        res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados - dias_ausentados_restar)})
         return res
 
     @api.depends('employee_id', 'contract_id', 'struct_id', 'date_from', 'date_to', 'struct_id')
