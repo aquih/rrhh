@@ -90,7 +90,6 @@ class HrPayslip(models.Model):
         meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
         meses_transcurrido = (nomina.date_to.month - fecha_inicio.month) + 1
         horas_extras = (horas_extras / meses_transcurrido ) * meses_proyectar
-        
         return horas_extras
 
 
