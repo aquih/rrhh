@@ -74,15 +74,6 @@ class HrEmployeePrivate(models.Model):
         result.append(otros)
         return result
 
-    @api.model
-    def name_search(self, name, args=None, operator='ilike', limit=100):
-        res1 = super(HrEmployeePrivate, self).name_search(name, args, operator=operator, limit=limit)
-
-        records = self.search([('codigo_empleado', 'ilike', name)], limit=limit)
-        res2 = records.name_get()
-
-        return res1+res2
-
     def _get_edad(self):
         for employee in self:
             if employee.birthday:

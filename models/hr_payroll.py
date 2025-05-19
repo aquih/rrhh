@@ -79,12 +79,17 @@ class HrPayslip(models.Model):
         mes_actual = nomina.date_to.month
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
+        fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
         nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.horas_extras_ids.ids:
                         horas_extras += linea.total
+                        
+        meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
+        meses_transcurrido = (nomina.date_to.month - fecha_inicio.month) + 1
+        horas_extras = (horas_extras / meses_transcurrido ) * meses_proyectar
         return horas_extras
 
 
@@ -262,7 +267,7 @@ class HrPayslip(models.Model):
         otro_ingreso_afecto = self.calcular_otro_ingreso_afecto(nomina)
         aguinaldo_mes = sueldos / 12
         bonoc_mes = sueldos / 12
-        cuota_igss = self.calcular_cuota_igss(nomina)
+        cuota_igss = abs(self.calcular_cuota_igss(nomina))
         rubro_ingresos = sueldos + horas_extras + bonificacion_decreto + aguinaldo + bonoc + bono_productividad + otro_ingreso_afecto
         rubro_deducciones = aguinaldo_mes + bonoc_mes + abs(cuota_igss)
         deduccion_fija = nomina.company_id.monto_deduccion_fija
@@ -447,8 +452,13 @@ class HrPayslip(models.Model):
             # Cuando es una planilla mensual y de un empleado que salió antes de la fecha de fin de la planilla
             elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
                 dias_laborados =  ((contracts.date_end - self.date_from).days) +1
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
-
+                #Cuando el contrato finaliza dentro del rango en el que se genera la planilla, es necesario verificar si el pago es quincenal o mensual
+                #por que necesitamos parametrizar que los dias trabajados no sea mayor que a los días dentro del rango de la planilla
+                if contracts.schedule_pay == 'bi-weekly':
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,15) - dias_ausentados_restar})
+                else:
+                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
+                    
             # Cuando es una planilla anual y de un empleado que ingresó antes de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
@@ -471,9 +481,9 @@ class HrPayslip(models.Model):
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
                 
                 # Cálculo de días para catorcena
-                if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
-                    dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
+                if self.struct_id.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
+                    dias_laborados = 14
+                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados - dias_ausentados_restar)})
                     
             self.calculo_entradas_anuales(self)
         return res

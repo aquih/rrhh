@@ -9,6 +9,7 @@
         <field name="report_file">rrhh.recibo</field>
         <field name="binding_model_id" ref="model_hr_payslip"/>
         <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_recibo"/>
     </record>
 
 </odoo>
