@@ -12,13 +12,13 @@
     'website': "http://www.aquih.com",
 
     'category': 'Uncategorized',
-    'version': '0.7',
+    'version': '0.8',
 
     'depends': ['base', 'hr', 'hr_contract', 'hr_payroll_account', 'l10n_gt_extra', 'account_followup', 'hr_holidays', 'hr_work_entry'],
 
     'data': [
         'data/rrhh_data.xml',
-        'data/paperformat_libro_salarios.xml',
+        'data/rrhh_paperformat.xml',
         'data/hr_payroll_expense_data.xml',
         'views/hr_employee_views.xml',
         'views/hr_contract_views.xml',
