@@ -5,7 +5,6 @@
             <t t-set="data_report_margin_top" t-value="12"/>
             <t t-set="data_report_header_spacing" t-value="9"/>
             <t t-set="data_report_dpi" t-value="110"/>
-            <t t-set="contador" t-value="folio_inicial"/>
             <t t-foreach="docs" t-as="o">
                 <t t-set="empleado" t-value="_get_empleado(o)"/>
                 <div class="article">
@@ -128,7 +127,7 @@
                                 <td style="width:100px">
                                 </td>
                                 <td style="text-align:center;width:100px">
-                                    <b style="font-size:18px">Folio No. <span class="page" t-esc="contador"></span></b>
+                                    <b style="font-size:18px">Folio No. <span class="page" t-esc="folio_inicial"></span></b>
                                 </td>
                             </tr>
                             <!-- <tr>
@@ -289,7 +288,6 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <t t-set="contador" t-value="contador + 1"/>
                     </div>
                 </div>
             </t>
