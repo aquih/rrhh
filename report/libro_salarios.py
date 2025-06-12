@@ -52,7 +52,7 @@ class ReportLibroSalarios(models.AbstractModel):
             dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(nomina_id.date_to), compute_leaves=False,domain = [])
             dias = (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) >= 30 else 30
         elif contracts.date_end and nomina_id.date_from <= contracts.date_end <= nomina_id.date_to:
-            dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(nomina_id.date_from), Datetime.from_string(contracts.date_end), compute_leaves=False,domain = []])
+            dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(nomina_id.date_from), Datetime.from_string(contracts.date_end), compute_leaves=False,domain = [])
             dias = (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) <= 30 else 30
         else:
             if contracts.schedule_pay == 'monthly':
