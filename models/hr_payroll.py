@@ -58,10 +58,12 @@ class HrPayslip(models.Model):
         fecha_fin = nomina.date_to
         fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
         meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
-        if nomina:
-            for linea in nomina.line_ids:
-                if linea.salary_rule_id.id in nomina.employee_id.company_id.salario_total_ids.ids:
-                    ultimo_salario += linea.total
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=',  nomina.date_to)])
+        if nomina_ids:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.salario_total_ids.ids:
+                        ultimo_salario += linea.total
                         
         proyectado = ultimo_salario * meses_proyectar
         
@@ -223,11 +225,15 @@ class HrPayslip(models.Model):
         anio_actual = nomina.date_to.year
         mes_actual = nomina.date_to.month
         fecha_fin = nomina.date_to
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-'+str(mes_actual)+'-01', '%Y-%m-%d').date()
         fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
         meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
-        for linea in nomina.line_ids:
-            if linea.salary_rule_id.id in nomina.employee_id.company_id.igss_ids.ids:
-                igss += linea.total
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=',  nomina.date_to)])
+        if nomina_ids:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.igss_ids.ids:
+                        igss += linea.total
         igss_proyectado = igss * meses_proyectar
         return igss_proyectado
 
