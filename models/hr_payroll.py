@@ -175,8 +175,8 @@ class HrPayslip(models.Model):
 
     def calcular_bonoc(self, nomina):
         bonoc = (nomina.contract_id.wage * 12) / 12 
-            if nomina.company_id.isr_sueldo_base_extra:
-                bonoc = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12 
+        if nomina.company_id.isr_sueldo_base_extra:
+            bonoc = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12 
         return bonoc
 
     def calcular_otro_ingreso_afecto(self, nomina):
