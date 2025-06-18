@@ -29,6 +29,7 @@
                                 <group>
                                     <field name="representante_legal_id"/>
                                     <field name="monto_deduccion_fija"/>
+                                    <field name="isr_sueldo_base_extra"/>
                                 </group>
                             </group>
                             <group string="Centros">
@@ -102,6 +103,7 @@
                                     <field name="otro_salario_ids" widget="many2many_tags"/>
                                     <field name="boni_incentivo_decreto_ids" widget="many2many_tags"/>
                                     <field name="devolucion_isr_otro_ids" widget="many2many_tags"/>
+                                    <field name="otro_ingreso_afecto_ids" widget="many2many_tags"/>
 
                                 </group>
                             </group>
