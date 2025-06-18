@@ -106,7 +106,7 @@ class HrPayslip(models.Model):
         if len(nomina_ids) > 0:
             for n in nomina_ids:
                 for linea in n.line_ids:
-                    if linea.salary_rule_id.id in n.employee_id.company_id.boni_incentivo_decreto_ids.ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.bonificacion_ids.ids:
                         devengado += linea.total
                         
         return devengado
@@ -119,7 +119,7 @@ class HrPayslip(models.Model):
         fecha_fin = nomina.date_to
         fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
         meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
-        proyectado = (nomina.contract_id.bonificacion_decreto + nomina.contract_id.base_extra) * meses_proyectar
+        proyectado = nomina.contract_id.base_extra * meses_proyectar
         return proyectado
         
     def calcular_bonificacion_decreto(self, nomina):
@@ -168,11 +168,15 @@ class HrPayslip(models.Model):
         return res
         
     def calcular_aguinaldo(self, nomina):
-        aguinaldo = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12
+        aguinaldo = (nomina.contract_id.wage * 12) / 12
+        if nomina.company_id.isr_sueldo_base_extra:
+            aguinaldo = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12
         return aguinaldo
 
     def calcular_bonoc(self, nomina):
-        bonoc = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12   
+        bonoc = (nomina.contract_id.wage * 12) / 12 
+            if nomina.company_id.isr_sueldo_base_extra:
+                bonoc = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12 
         return bonoc
 
     def calcular_otro_ingreso_afecto(self, nomina):
