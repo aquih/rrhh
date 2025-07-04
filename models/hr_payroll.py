@@ -195,6 +195,7 @@ class HrPayslip(models.Model):
 
     def calcular_bono_productividad(self, nomina):
         bono_productividad = 0
+        bono_productividad_proyectado = 0
         anio_actual = nomina.date_to.year
         mes_actual = nomina.date_to.month
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
@@ -206,6 +207,28 @@ class HrPayslip(models.Model):
                     if linea.salary_rule_id.id in n.employee_id.company_id.bonificaciones_adicionales_ids.ids:
                         bono_productividad += linea.total
         
+        if nomina.company_id.proyectar_bonificaciones_adicionales:
+            bono_productividad_proyectado = self.calcular_bono_productividad_proyectado(nomina)
+            bono_productividad += bono_productividad_proyectado
+
+        return bono_productividad
+
+    def calcular_bono_productividad_proyectado(self, nomina):
+        bono_productividad = 0
+        bono = 0
+        anio_actual = nomina.date_to.year
+        mes_actual = nomina.date_to.month
+        fecha_fin = nomina.date_to
+        fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-'+str(mes_actual)+'-01', '%Y-%m-%d').date()
+        fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
+        meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=',  nomina.date_to)])
+        if nomina_ids:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.bonificaciones_adicionales_ids.ids:
+                        bono += linea.total
+        bono_productividad = bono * meses_proyectar
         return bono_productividad
 
     def calcular_igss_devengado(self, nomina):
