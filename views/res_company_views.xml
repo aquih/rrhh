@@ -97,6 +97,7 @@
                                     <field name="indemnizacion_ids" widget="many2many_tags"/>
                                     <field name="retribucion_vacaciones_ids" widget="many2many_tags"/>
                                     <field name="bonificaciones_adicionales_ids" widget="many2many_tags"/>
+                                    <field name="proyectar_bonificaciones_adicionales"/>
                                     <field name="decreto_ids" widget="many2many_tags"/>
                                     <field name="fija_ids" widget="many2many_tags"/>
                                     <field name="variable_ids" widget="many2many_tags"/>
