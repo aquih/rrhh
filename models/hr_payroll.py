@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, Command
 from odoo.release import version_info
 import logging
 import datetime
@@ -269,7 +269,14 @@ class HrPayslip(models.Model):
 
     @api.depends('employee_id', 'contract_id', 'struct_id', 'date_from', 'date_to', 'struct_id')
     def _compute_input_line_ids(self):
+
+        for slip in self:
+            if slip.input_line_ids:
+                lines_to_remove = slip.input_line_ids
+                slip.update({'input_line_ids': [Command.unlink(line.id) for line in lines_to_remove]})
+                
         res = super(HrPayslip, self)._compute_input_line_ids()
+        
         for slip in self:
             if slip.employee_id and slip.struct_id and slip.struct_id.input_line_type_ids:
 
@@ -277,8 +284,6 @@ class HrPayslip(models.Model):
                     slip.cuenta_analitica_id = slip.contract_id.analytic_account_id.id
 
                 input_line_vals = []
-                if slip.input_line_ids:
-                    slip.input_line_ids.unlink()
 
                 for line in slip.struct_id.input_line_type_ids:
                     input_line_vals.append((0,0,{
