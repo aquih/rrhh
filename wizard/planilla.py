@@ -105,17 +105,11 @@ class rrhh_planilla_wizard(models.TransientModel):
                                 hoja.write(linea, 2, l.employee_id.name)
                                 hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
                                 hoja.write(linea, 4, l.employee_id.job_id.name)
-                                work = -1
-                                trabajo = -1
+                                codigo = l.company_id.tipo_entrada_trabajo_id.code
                                 for d in l.worked_days_line_ids:
-                                    if d.code == 'TRABAJO100':
-                                        trabajo = d.number_of_days
-                                    elif d.code == 'WORK100':
-                                        work = d.number_of_days
-                                if trabajo >= 0:
-                                    dias += trabajo
-                                else:
-                                    dias += work
+                                    if d.code == codigo:
+                                        dias = d.number_of_days
+
                                 hoja.write(linea, 5, dias)
 
                                 columna = 6
@@ -155,17 +149,11 @@ class rrhh_planilla_wizard(models.TransientModel):
                                 hoja.write(linea, 2, l.employee_id.name)
                                 hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
                                 hoja.write(linea, 4, l.employee_id.job_id.name)
-                                work = -1
-                                trabajo = -1
+                                codigo = l.company_id.tipo_entrada_trabajo_id.code
                                 for d in l.worked_days_line_ids:
-                                    if d.code == 'TRABAJO100':
-                                        trabajo = d.number_of_days
-                                    elif d.code == 'WORK100':
-                                        work = d.number_of_days
-                                if trabajo >= 0:
-                                    dias += trabajo
-                                else:
-                                    dias += work
+                                    if d.code == codigo:
+                                        dias = d.number_of_days
+
                                 hoja.write(linea, 5, dias)
 
                                 columna = 6
@@ -204,17 +192,10 @@ class rrhh_planilla_wizard(models.TransientModel):
                                 hoja.write(linea, 2, l.employee_id.name)
                                 hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
                                 hoja.write(linea, 4, l.employee_id.job_id.name)
-                                work = -1
-                                trabajo = -1
+                                codigo = l.company_id.tipo_entrada_trabajo_id.code
                                 for d in l.worked_days_line_ids:
-                                    if d.code == 'TRABAJO100':
-                                        trabajo = d.number_of_days
-                                    elif d.code == 'WORK100':
-                                        work = d.number_of_days
-                                if trabajo >= 0:
-                                    dias += trabajo
-                                else:
-                                    dias += work
+                                    if d.code == codigo:
+                                        dias = d.number_of_days
                                 hoja.write(linea, 5, dias)
 
                                 columna = 6
@@ -290,17 +271,10 @@ class rrhh_planilla_wizard(models.TransientModel):
                     hoja.write(linea, 2, l.employee_id.name)
                     hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
                     hoja.write(linea, 4, l.employee_id.job_id.name)
-                    work = -1
-                    trabajo = -1
+                    codigo = l.company_id.tipo_entrada_trabajo_id.code
                     for d in l.worked_days_line_ids:
-                        if d.code == 'TRABAJO100':
-                            trabajo = d.number_of_days
-                        elif d.code == 'WORK100':
-                            work = d.number_of_days
-                    if trabajo >= 0:
-                        dias += trabajo
-                    else:
-                        dias += work
+                        if d.code == codigo:
+                            dias = d.number_of_days
                     hoja.write(linea, 5, dias)
 
                     columna = 6
