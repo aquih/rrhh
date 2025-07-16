@@ -278,7 +278,7 @@ class HrPayslip(models.Model):
         rubro_ingresos = sueldos + horas_extras + bonificacion_decreto + aguinaldo + bonoc + bono_productividad + otro_ingreso_afecto
         rubro_deducciones = aguinaldo_mes + bonoc_mes + abs(cuota_igss)
         deduccion_fija = nomina.company_id.monto_deduccion_fija
-        renta_impunible = 0 if (rubro_ingresos + rubro_deducciones - deduccion_fija) < 0 else (rubro_ingresos - rubro_deducciones - deduccion_fija)
+        renta_impunible = 0 if (rubro_ingresos - rubro_deducciones - deduccion_fija) < 0 else (rubro_ingresos - rubro_deducciones - deduccion_fija)
         rubro_renta_cinco = 15000 if ((renta_impunible * 0.05) > 15000) else (renta_impunible * 0.05)
         rubro_renta_siete = ((renta_impunible - 300000) * 0.07) if ((renta_impunible * 0.05) > 15000) else 0
         rubro_retencion_anual = rubro_renta_cinco + rubro_renta_siete
