@@ -461,7 +461,7 @@ class HrPayslip(models.Model):
                 dias_laborados =  ((contracts.date_end - self.date_from).days) +1
                 #Cuando el contrato finaliza dentro del rango en el que se genera la planilla, es necesario verificar si el pago es quincenal o mensual
                 #por que necesitamos parametrizar que los dias trabajados no sea mayor que a los días dentro del rango de la planilla
-                if contracts.schedule_pay == 'bi-weekly':
+                if contracts.schedule_pay == 'semi-monthly':
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,15) - dias_ausentados_restar})
                 else:
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
