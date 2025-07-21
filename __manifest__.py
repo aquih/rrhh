@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
 {
     'name': "RRHH",
-
     'summary': """ Módulo de RRHH para Guatemala """,
-
     'description': """
         Módulo de RRHH para Guatemala
     """,
-
     'author': "Rodolfo Borstcheff",
     'website': "http://www.aquih.com",
-
     'category': 'Uncategorized',
     'version': '1.6',
-
     'depends': ['base', 'hr', 'hr_contract', 'hr_payroll_account', 'l10n_gt_extra', 'account_followup', 'hr_holidays', 'hr_work_entry'],
-
     'data': [
         'data/rrhh_data.xml',
         'data/rrhh_paperformat.xml',
@@ -40,5 +34,5 @@
         'security/rrhh_security.xml',
         'views/hr_leave_type_views.xml',
     ],
-    'license': 'LGPL-3',
+    'license': 'Other OSI approved licence',
 }
