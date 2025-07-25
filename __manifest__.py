@@ -8,7 +8,7 @@
     'author': "Rodolfo Borstcheff",
     'website': "http://www.aquih.com",
     'category': 'Uncategorized',
-    'version': '1.6',
+    'version': '1.7',
     'depends': ['base', 'hr', 'hr_contract', 'hr_payroll_account', 'l10n_gt_extra', 'account_followup', 'hr_holidays', 'hr_work_entry'],
     'data': [
         'data/rrhh_data.xml',
