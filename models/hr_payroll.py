@@ -485,7 +485,7 @@ class HrPayslip(models.Model):
                 # Cálculo para quincena
                 if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
                     # Calcular los días reales del período de la quincena
-                    dias_periodo = (self.date_to - self.date_from).days + 1
+                    dias_periodo = min((self.date_to - self.date_from).days + 1, 15)
                     dias_trabajados = dias_periodo - dias_ausentados_restar
                     res.append({
                         'work_entry_type_id': trabajo_id.id,
