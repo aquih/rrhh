@@ -272,11 +272,9 @@ class HrPayslip(models.Model):
         bonoc = self.calcular_bonoc(nomina)
         bono_productividad = self.calcular_bono_productividad(nomina)
         otro_ingreso_afecto = self.calcular_otro_ingreso_afecto(nomina)
-        aguinaldo_mes = sueldos / 12
-        bonoc_mes = sueldos / 12
         cuota_igss = abs(self.calcular_cuota_igss(nomina))
         rubro_ingresos = sueldos + horas_extras + bonificacion_decreto + aguinaldo + bonoc + bono_productividad + otro_ingreso_afecto
-        rubro_deducciones = aguinaldo_mes + bonoc_mes + abs(cuota_igss)
+        rubro_deducciones = aguinaldo + bonoc + abs(cuota_igss)
         deduccion_fija = nomina.company_id.monto_deduccion_fija
         renta_impunible = 0 if (rubro_ingresos - rubro_deducciones - deduccion_fija) < 0 else (rubro_ingresos - rubro_deducciones - deduccion_fija)
         rubro_renta_cinco = 15000 if ((renta_impunible * 0.05) > 15000) else (renta_impunible * 0.05)
