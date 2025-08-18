@@ -485,8 +485,17 @@ class HrPayslip(models.Model):
                 # Cálculo para quincena
                 if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
                     # Calcular los días reales del período de la quincena
-                    dias_periodo = min((self.date_to - self.date_from).days + 1, 15)
-                    dias_trabajados = dias_periodo - dias_ausentados_restar
+                    if dias_ausentados_restar == 0:
+                        # Si no hubo ausencias, siempre 15 días
+                        dias_trabajados = 15
+                    else:
+                        dias_periodo = min((self.date_to - self.date_from).days + 1, 15)
+                        
+                        if dias_ausentados_restar < dias_periodo:
+                            dias_trabajados = 15 - dias_ausentados_restar
+                        else:
+                            dias_trabajados = dias_periodo - dias_ausentados_restar
+                        
                     res.append({
                         'work_entry_type_id': trabajo_id.id,
                         'sequence': 10,
