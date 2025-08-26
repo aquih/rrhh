@@ -330,7 +330,7 @@ class HrPayslip(models.Model):
             "rubro_renta_siete": rubro_renta_siete,
             "rubro_retencion_anual": rubro_retencion_anual,
             "retencion_isr_descontado": retencion_isr_descontado_total,
-            "isr_total": isr_total,
+            "isr_total": max(isr_total,0),
         }
         
     def calculo_entradas_anuales(self,nomina):
@@ -509,13 +509,37 @@ class HrPayslip(models.Model):
                 
                 # Cálculo para quincena
                 if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
-                    # Calcular los días reales del período de la quincena
+                    # Dentro del bloque semi-monthly...
                     dias_periodo = min((self.date_to - self.date_from).days + 1, 15)
-                    dias_trabajados = dias_periodo - dias_ausentados_restar
+
+                    # Calcular días de ausencia solo dentro del período de la nómina
+                    dias_ausencia_en_periodo = 0
+                    ausencias = self.env['hr.leave'].search([
+                        ('employee_id', '=', self.employee_id.id),
+                        ('state', '=', 'validate'),
+                        ('request_date_from', '<=', self.date_to),
+                        ('request_date_to', '>=', self.date_from),
+                    ])
+
+                    for ausencia in ausencias:
+                        # determinar el rango de intersección de la ausencia
+                        inicio = max(ausencia.request_date_from, self.date_from)
+                        fin = min(ausencia.request_date_to, self.date_to)
+                        if inicio <= fin:
+                            dias_ausencia_en_periodo += (fin - inicio).days + 1
+                    
+                    # Ahora calcular los días trabajados
+                    if dias_ausencia_en_periodo == 0:
+                        dias_trabajados = 15
+                    elif dias_ausencia_en_periodo >= dias_periodo:
+                        dias_trabajados = 0
+                    else:
+                        dias_trabajados = dias_periodo - dias_ausencia_en_periodo
+
                     res.append({
                         'work_entry_type_id': trabajo_id.id,
                         'sequence': 10,
-                        'number_of_days': max(0, dias_trabajados)
+                        'number_of_days': dias_trabajados
                     })
                 
                 # Cálculo de días para catorcena
