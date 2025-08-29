@@ -18,7 +18,7 @@
 
     'data': [
         'data/rrhh_data.xml',
-        'data/paperformat_libro_salarios.xml',
+        'data/rrhh_paperformat.xml',
         'data/hr_payroll_expense_data.xml',
         'views/hr_views.xml',
         'views/hr_contract_views.xml',
