@@ -209,8 +209,11 @@ class HrPayslip(models.Model):
                     dias_laborados = 15
 
                 reference_calendar = self._get_out_of_contract_calendar()
+                
+                # Para determinar si la planilla es mensual o de aguinaldo o bono 14
                 dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = False)
 
+                # Cuando es una planilla mensual y de un empleado que ingresó después de la fecha de inicio la planilla
                 if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
                     dias_laborados = dias_laborados - ((contracts.date_start - self.date_from ).days)
 
@@ -218,6 +221,8 @@ class HrPayslip(models.Model):
                     if contracts.date_end and (self.date_from <= contracts.date_end <= self.date_to):
                         dias_laborados = ((contracts.date_end - contracts.date_start).days) +1 
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+
+                # Cuando es una planilla mensual y de un empleado que salió antes de la fecha de fin de la planilla
                 elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
                     dias_laborados =  ((contracts.date_end - self.date_from ).days) +1
                     #Cuando el contrato finaliza dentro del rango en el que se genera la planilla, es necesario verificar si el pago es quincenal o mensual
@@ -226,15 +231,23 @@ class HrPayslip(models.Model):
                         res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,15) - dias_ausentados_restar})
                     else:
                         res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
+
+                # Cuando es una planilla anual y de un empleado que ingresó antes de la fecha de inicio de la planilla
                 elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+                
+                # Cuando es una planilla anual y de un empleado que ingresó después de la fecha de inicio de la planilla
                 elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
                     dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to),compute_leaves=False,domain = False)
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+                
+                # Cuando el empleado ingreso antes de la fecha de la planilla y no ha salido
                 else:
+                    # Cálculo para mensualidad
                     if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
                         total_dias = 30 - dias_ausentados_restar
                         res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
+                    # Cálculo para quincena
                     if self.struct_id.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
                         total_dias =  15 - dias_ausentados_restar
                         res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
