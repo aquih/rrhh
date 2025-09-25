@@ -9,16 +9,16 @@
                 <group>
                     <separator colspan="4" string="Tipo de planilla"/>
                     <group>
-                        <field name="identificacion_tipo_planilla"/>
-                        <field name="nombre_tipo_planilla"/>
-                        <field name="tipo_afiliados"/>
-                        <field name="periodo_planilla"/>
+                        <field name="identificacion_tipo_planilla" required="True"/>
+                        <field name="nombre_tipo_planilla" required="True"/>
+                        <field name="tipo_afiliados" required="True"/>
+                        <field name="periodo_planilla" required="True"/>
                     </group>
                     <group>
-                        <field name="departamento_republica"/>
-                        <field name="actividad_economica"/>
-                        <field name="clase_planilla"/>
-                        <field name="tiempo_contrato"/>
+                        <field name="departamento_republica" required="True"/>
+                        <field name="actividad_economica" required="True"/>
+                        <field name="clase_planilla" required="True"/>
+                        <field name="tiempo_contrato" required="True"/>
                     </group>
                 </group>
                 <group>
