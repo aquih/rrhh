@@ -51,7 +51,7 @@ class rrhh_informe_isr(models.TransientModel):
             hoja.write(5, 5, "Nombre", bold)
             hoja.write(5, 6, "Sueldos", bold)
             hoja.write(5, 7, "Horas extras", bold)
-            hoja.write(5, 8, "Bonificacion2", bold)
+            hoja.write(5, 8, "Bonificacion decreto", bold)
             hoja.write(5, 9, "Aguinaldo", bold)
             hoja.write(5, 10, "Bono 14", bold)
             hoja.write(5, 11, "Bonificaciones adicionales", bold)
