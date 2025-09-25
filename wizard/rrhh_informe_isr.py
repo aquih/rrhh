@@ -17,12 +17,34 @@ class rrhh_informe_isr(models.TransientModel):
         lote_id = self.env["hr.payslip.run"].search([("id","in",id)])
         return lote_id
 
+    def _obtener_fecha_alta(self, nomina):
+        mes = nomina.date_to.month
+        anio = nomina.date_to.year
+        fecha_alta = ""
+        if nomina.contract_id.date_start:
+            mes_contrato_inicio = nomina.contract_id.date_start.month
+            anio_contrato_inicio = nomina.contract_id.date_start.year
+            if anio == anio_contrato_inicio and mes == mes_contrato_inicio:
+                fecha_alta = str(nomina.contract_id.date_start)
+        return fecha_alta
+
+    def _obtener_fecha_baja(self, nomina):
+        mes = nomina.date_to.month
+        anio = nomina.date_to.year
+        fecha_baja = ""
+        if nomina.contract_id.date_end:
+            mes_contrato_fin = nomina.contract_id.date_end.month
+            anio_contrato_fin = nomina.contract_id.date_end.year
+            if anio == anio_contrato_fin and mes == mes_contrato_fin:
+                fecha_baja = str(nomina.contract_id.date_end)
+        return fecha_baja
+
     def print_report_excel(self):
         for w in self:
             dic = {}
             f = io.BytesIO()
             libro = xlsxwriter.Workbook(f)
-            
+
             bold = libro.add_format({'bold': True})
             center = libro.add_format({'align': 'center'})
             text_wrap_bold = libro.add_format({'text_wrap': 'true', 'bold': True, 'align': 'center', 'valign': 'vcenter'})
@@ -30,19 +52,19 @@ class rrhh_informe_isr(models.TransientModel):
             num_format = libro.add_format({'num_format': 'Q#,##0.00'})
             num_format_top = libro.add_format({'num_format': 'Q#,##0.00', 'top': 1,})
             date_format = libro.add_format({'num_format': 'dd/mm/yy', 'align': 'center'})
-            
+
             ids = self.env.context.get('active_ids', [])
             lote_id = self.obtener_lote(ids)
             company = lote_id.company_id.name
             hoja = libro.add_worksheet("ISR")
-            
+
             hoja.write(1, 0, lote_id.company_id.name, bold)
             hoja.write(2, 0, "Reporte general ISR", bold)
             hoja.write(3, 0, "Periodo", bold)
             hoja.write(3, 1, str(lote_id.date_start), bold)
             hoja.write(3, 2, "al", bold)
             hoja.write(3, 3, str(lote_id.date_end), bold)
-            
+
             hoja.write(5, 0, "Correlativo", bold)
             hoja.write(5, 1, "Código", bold)
             hoja.write(5, 2, "Fecha alta", bold)
@@ -51,7 +73,7 @@ class rrhh_informe_isr(models.TransientModel):
             hoja.write(5, 5, "Nombre", bold)
             hoja.write(5, 6, "Sueldos", bold)
             hoja.write(5, 7, "Horas extras", bold)
-            hoja.write(5, 8, "Bonificacion decreto", bold)
+            hoja.write(5, 8, "Bonificacion2", bold)
             hoja.write(5, 9, "Aguinaldo", bold)
             hoja.write(5, 10, "Bono 14", bold)
             hoja.write(5, 11, "Bonificaciones adicionales", bold)
@@ -69,26 +91,12 @@ class rrhh_informe_isr(models.TransientModel):
             hoja.write(5, 23, "Retencion Descontar", bold)
             hoja.write(5, 24, "ISR descontar", bold)
             fila = 6
-            
+
             if lote_id.slip_ids:
                 correlativo = 1
                 for nomina in lote_id.slip_ids:
-                    mes = nomina.date_to.month
-                    anio = nomina.date_to.year
-                    fecha_alta = ""
-                    fecha_baja = ""
-                    if nomina.contract_id.date_start:
-                        mes_contrato_inicio = nomina.contract_id.date_start.month
-                        anio_contrato_inicio = nomina.contract_id.date_start.year
-                        if anio == anio_contrato_inicio and mes == mes_contrato_inicio:
-                            fecha_alta = str(nomina.contract_id.date_start)
-                            
-                    if nomina.contract_id.date_end:
-                        mes_contrato_fin = nomina.contract_id.date_end.month
-                        anio_contrato_fin = nomina.contract_id.date_end.year
-                        if anio == anio_contrato_fin and mes == mes_contrato_fin:
-                            fecha_baja = str(nomina.contract_id.date_end)
-                            
+                    fecha_alta = self._obtener_fecha_alta(nomina)
+                    fecha_baja = self._obtener_fecha_baja(nomina)
                     calculo_isr = self.env["hr.payslip"].calculo_isr(nomina)
                     hoja.write(fila, 0, correlativo)
                     hoja.write(fila, 1, nomina.employee_id.codigo_empleado)
@@ -117,7 +125,7 @@ class rrhh_informe_isr(models.TransientModel):
                     hoja.write(fila, 24, calculo_isr["isr_total"])
                     correlativo += 1
                     fila += 1
-                
+
             libro.close()
             datos = base64.b64encode(f.getvalue())
             self.write({'archivo':datos, 'name':'informe_isr.xlsx'})
