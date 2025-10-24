@@ -91,6 +91,7 @@ class res_company(models.Model):
     sueldo_igss_ids = fields.Many2many('hr.salary.rule','rrhh_sueldo_igss_rel', string='Sueldo IGSS')
     isr_sueldo_base_extra = fields.Boolean('Isr sueldo base extra')
     proyectar_bonificaciones_adicionales = fields.Boolean('Proyectar bonificaciones adicionales')
+    ajuste_ids = fields.Many2many('hr.salary.rule','rrhh_ajustes_rel',string='Ajustes ISR')
 
 class res_company_centro_trabajo(models.Model):
     _name = 'res.company.centro_trabajo'
