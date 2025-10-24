@@ -30,6 +30,7 @@
                                     <field name="representante_legal_id"/>
                                     <field name="monto_deduccion_fija"/>
                                     <field name="isr_sueldo_base_extra"/>
+                                    <field name="ajuste_ids" widget="many2many_tags"/> 
                                 </group>
                             </group>
                             <group string="Centros">
