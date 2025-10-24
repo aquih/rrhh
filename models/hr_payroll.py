@@ -168,11 +168,15 @@ class HrPayslip(models.Model):
         return res
         
     def calcular_aguinaldo(self, nomina):
-        aguinaldo = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12
+        aguinaldo = (nomina.contract_id.wage * 12) / 12
+        if nomina.company_id.isr_sueldo_base_extra:
+            aguinaldo = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12
         return aguinaldo
 
     def calcular_bonoc(self, nomina):
-        bonoc = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12   
+        bonoc = (nomina.contract_id.wage * 12) / 12 
+        if nomina.company_id.isr_sueldo_base_extra:
+            bonoc = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12 
         return bonoc
 
     def calcular_otro_ingreso_afecto(self, nomina):
@@ -258,6 +262,16 @@ class HrPayslip(models.Model):
                         
         return isr_descontado
     
+    def ajuste_isr(self, nomina):
+        ajuste = 0
+        nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', nomina.date_from),('date_to', '<=', nomina.date_to)])
+        if len(nomina_ids) > 0:
+            for n in nomina_ids:
+                for linea in n.line_ids:
+                    if linea.salary_rule_id.id in n.employee_id.company_id.ajuste_ids.ids:
+                        ajuste += (linea.total * -1) if linea.total < 0 else ( linea.total * -1 if linea.total > 0 else 0)
+        return ajuste
+    
     def calculo_isr(self, nomina):
         anio_actual = nomina.date_to.year
         mes_actual = nomina.date_to.month
@@ -281,7 +295,8 @@ class HrPayslip(models.Model):
         rubro_renta_siete = ((renta_impunible - 300000) * 0.07) if ((renta_impunible * 0.05) > 15000) else 0
         rubro_retencion_anual = rubro_renta_cinco + rubro_renta_siete
         retencion_isr_descontado = self.calcular_retencion_isr_descontado(nomina)
-        retencion_isr_descontado_total = (rubro_retencion_anual + retencion_isr_descontado) /  (meses_proyectar + 1)
+        ajuste = self.ajuste_isr(nomina)
+        retencion_isr_descontado_total = ((rubro_retencion_anual + retencion_isr_descontado) /  (meses_proyectar + 1) ) + ajuste
         isr_total = retencion_isr_descontado_total      
         
         return {
