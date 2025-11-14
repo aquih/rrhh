@@ -41,7 +41,7 @@ class HrPayslip(models.Model):
         fecha_inicio = datetime.datetime.strptime(str(anio_actual)+'-01-01', '%Y-%m-%d').date()
         fecha_fin = nomina.date_to
         nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', fecha_inicio),('date_to', '<=', fecha_fin)])
-        
+
         for n in nomina_ids:
             if n.line_ids:
                 for linea in n.line_ids:
@@ -64,9 +64,9 @@ class HrPayslip(models.Model):
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.salario_total_ids.ids:
                         ultimo_salario += linea.total
-                        
+
         proyectado = ultimo_salario * meses_proyectar
-        
+
         return proyectado
 
     def calcular_sueldos(self, nomina):
@@ -74,7 +74,7 @@ class HrPayslip(models.Model):
         proyectado = self.calcular_sueldo_proyectado(nomina)
         sueldos = devengado + proyectado
         return sueldos
-    
+
     def calcular_horas_extras(self, nomina):
         horas_extras = 0
         anio_actual = nomina.date_to.year
@@ -88,7 +88,7 @@ class HrPayslip(models.Model):
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.horas_extras_ids.ids:
                         horas_extras += linea.total
-                        
+
         horas_extras_devengado = horas_extras
         meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
         meses_transcurrido = (nomina.date_to.month - fecha_inicio.month) + 1
@@ -108,9 +108,9 @@ class HrPayslip(models.Model):
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.bonificacion_ids.ids:
                         devengado += linea.total
-                        
+
         return devengado
-        
+
     def calcular_bonificacion_decreto_proyectado(self, nomina):
         proyectado = 0
         anio_actual = nomina.date_to.year
@@ -121,14 +121,14 @@ class HrPayslip(models.Model):
         meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
         proyectado = nomina.contract_id.base_extra * meses_proyectar
         return proyectado
-        
+
     def calcular_bonificacion_decreto(self, nomina):
         bonificacion_decreto = 0
         devengado = self.calcular_bonificacion_decreto_devengado(nomina)
         proyectado = self.calcular_bonificacion_decreto_proyectado(nomina)
         bonificacion_decreto = devengado + proyectado
         return bonificacion_decreto
-        
+
     def compute_sheet(self):
         for nomina in self:
             mes_nomina = int(nomina.date_from.month)
@@ -166,7 +166,7 @@ class HrPayslip(models.Model):
                         entrada.amount = calculos_isr[entrada.input_type_id.code]
                 nomina.with_context(payslip_no_recompute=True)._compute_line_ids()
         return res
-        
+
     def calcular_aguinaldo(self, nomina):
         aguinaldo = (nomina.contract_id.wage * 12) / 12
         if nomina.company_id.isr_sueldo_base_extra:
@@ -174,9 +174,9 @@ class HrPayslip(models.Model):
         return aguinaldo
 
     def calcular_bonoc(self, nomina):
-        bonoc = (nomina.contract_id.wage * 12) / 12 
+        bonoc = (nomina.contract_id.wage * 12) / 12
         if nomina.company_id.isr_sueldo_base_extra:
-            bonoc = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12 
+            bonoc = ((nomina.contract_id.wage + nomina.contract_id.base_extra) * 12) / 12
         return bonoc
 
     def calcular_otro_ingreso_afecto(self, nomina):
@@ -206,7 +206,7 @@ class HrPayslip(models.Model):
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.bonificaciones_adicionales_ids.ids:
                         bono_productividad += linea.total
-        
+
         if nomina.company_id.proyectar_bonificaciones_adicionales:
             bono_productividad_proyectado = self.calcular_bono_productividad_proyectado(nomina)
             bono_productividad += bono_productividad_proyectado
@@ -243,7 +243,7 @@ class HrPayslip(models.Model):
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.igss_ids.ids:
                         igss_devengado += linea.total
-                        
+
         return igss_devengado
 
     def calcular_igss_proyectado(self, nomina):
@@ -282,9 +282,9 @@ class HrPayslip(models.Model):
                 for linea in n.line_ids:
                     if linea.salary_rule_id.id in n.employee_id.company_id.isr_ids.ids:
                         isr_descontado += linea.total
-                        
+
         return isr_descontado
-    
+
     def ajuste_isr(self, nomina):
         ajuste = 0
         nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id),('date_from', '>=', nomina.date_from),('date_to', '<=', nomina.date_to)])
@@ -301,7 +301,7 @@ class HrPayslip(models.Model):
         fecha_fin = nomina.date_to
         fecha_fin_proyectar = datetime.datetime.strptime(str(anio_actual)+'-12-31', '%Y-%m-%d').date()
         meses_proyectar = (fecha_fin_proyectar.month - nomina.date_to.month)
-        
+
         sueldos = self.calcular_sueldos(nomina)
         horas_extras = self.calcular_horas_extras(nomina)
         bonificacion_decreto = self.calcular_bonificacion_decreto(nomina)
@@ -312,7 +312,7 @@ class HrPayslip(models.Model):
         cuota_igss = abs(self.calcular_cuota_igss(nomina))
         rubro_ingresos = sueldos + horas_extras + bonificacion_decreto + aguinaldo + bonoc + bono_productividad + otro_ingreso_afecto
         rubro_deducciones = aguinaldo + bonoc + abs(cuota_igss)
-        deduccion_fija = nomina.company_id.monto_deduccion_fija 
+        deduccion_fija = nomina.company_id.monto_deduccion_fija
         renta_impunible = 0 if (rubro_ingresos - rubro_deducciones - deduccion_fija) < 0 else (rubro_ingresos - rubro_deducciones - deduccion_fija)
         rubro_renta_cinco = 15000 if ((renta_impunible * 0.05) > 15000) else (renta_impunible * 0.05)
         rubro_renta_siete = ((renta_impunible - 300000) * 0.07) if ((renta_impunible * 0.05) > 15000) else 0
@@ -320,8 +320,8 @@ class HrPayslip(models.Model):
         retencion_isr_descontado = self.calcular_retencion_isr_descontado(nomina)
         ajuste = self.ajuste_isr(nomina)
         retencion_isr_descontado_total = ((rubro_retencion_anual + retencion_isr_descontado) /  (meses_proyectar + 1) ) + ajuste
-        isr_total = retencion_isr_descontado_total      
-        
+        isr_total = retencion_isr_descontado_total
+
         return {
             "sueldos": sueldos,
             "horas_extras": horas_extras,
@@ -343,7 +343,7 @@ class HrPayslip(models.Model):
             "retencion_isr_descontado": retencion_isr_descontado_total,
             "isr_total": max(isr_total,0),
         }
-        
+
     def calculo_entradas_anuales(self,nomina):
         salario = self.salario_promedio(self.employee_id,self.date_to)
         dias = self.dias_trabajados_ultimos_meses(self.contract_id.employee_id,self.date_from,self.date_to)
@@ -477,7 +477,7 @@ class HrPayslip(models.Model):
                     dias_laborados = 30
                 if self.struct_id.schedule_pay == 'semi-monthly':
                     dias_laborados = 15
-            
+
             reference_calendar = contracts.resource_calendar_id
 
             # Para determinar si la planilla es mensual o de aguinaldo o bono 14
@@ -486,12 +486,12 @@ class HrPayslip(models.Model):
             # Cuando es una planilla mensual y de un empleado que ingresó después de la fecha de inicio la planilla
             if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
                 dias_laborados = dias_laborados - ((contracts.date_start - self.date_from).days)
-                
+
                 #Cuando es una planilla mensual, y el empleado entra y sale el mismo mes
                 if contracts.date_end and (self.date_from <= contracts.date_end <= self.date_to):
                     dias_laborados = ((contracts.date_end - contracts.date_start).days) +1
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-            
+
             # Cuando es una planilla mensual y de un empleado que salió antes de la fecha de fin de la planilla
             elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
                 dias_laborados =  ((contracts.date_end - self.date_from).days) +1
@@ -505,19 +505,19 @@ class HrPayslip(models.Model):
             # Cuando es una planilla anual y de un empleado que ingresó antes de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-            
+
             # Cuando es una planilla anual y de un empleado que ingresó después de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
                 dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), compute_leaves=False, domain=[])
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-            
+
             # Cuando el empleado ingreso antes de la fecha de la planilla y no ha salido
             else:
                 # Cálculo para mensualidad
                 if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
                     total_dias = 30 - dias_ausentados_restar
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
-                
+
                 # Cálculo para quincena
                 if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
                     # Dentro del bloque semi-monthly...
@@ -533,12 +533,13 @@ class HrPayslip(models.Model):
                     ])
 
                     for ausencia in ausencias:
-                        # determinar el rango de intersección de la ausencia
-                        inicio = max(ausencia.request_date_from, self.date_from)
-                        fin = min(ausencia.request_date_to, self.date_to)
-                        if inicio <= fin:
-                            dias_ausencia_en_periodo += (fin - inicio).days + 1
-                    
+                        if ausencia.holiday_status_id.work_entry_type_id.descontar_nomina == True:
+                            # determinar el rango de intersección de la ausencia
+                            inicio = max(ausencia.request_date_from, self.date_from)
+                            fin = min(ausencia.request_date_to, self.date_to)
+                            if inicio <= fin:
+                                dias_ausencia_en_periodo += (fin - inicio).days + 1
+
                     # Ahora calcular los días trabajados
                     if dias_ausencia_en_periodo == 0:
                         dias_trabajados = 15
@@ -552,12 +553,12 @@ class HrPayslip(models.Model):
                         'sequence': 10,
                         'number_of_days': dias_trabajados
                     })
-                
+
                 # Cálculo de días para catorcena
                 if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
                     dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = [])
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
-                    
+
             self.calculo_entradas_anuales(self)
         return res
 
