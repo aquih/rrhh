@@ -454,7 +454,7 @@ class HrPayslip(models.Model):
                     dias_laborados = 30
                 if self.struct_id.schedule_pay == 'semi-monthly':
                     dias_laborados = 15
-
+            
             reference_calendar = contracts.resource_calendar_id
 
             # Para determinar si la planilla es mensual o de aguinaldo o bono 14
@@ -463,12 +463,12 @@ class HrPayslip(models.Model):
             # Cuando es una planilla mensual y de un empleado que ingresó después de la fecha de inicio la planilla
             if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
                 dias_laborados = dias_laborados - ((contracts.date_start - self.date_from).days)
-
+                
                 #Cuando es una planilla mensual, y el empleado entra y sale el mismo mes
                 if contracts.date_end and (self.date_from <= contracts.date_end <= self.date_to):
                     dias_laborados = ((contracts.date_end - contracts.date_start).days) +1
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
-
+            
             # Cuando es una planilla mensual y de un empleado que salió antes de la fecha de fin de la planilla
             elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
                 dias_laborados =  ((contracts.date_end - self.date_from).days) +1
@@ -478,28 +478,28 @@ class HrPayslip(models.Model):
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,15) - dias_ausentados_restar})
                 else:
                     res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
-
+                    
             # Cuando es una planilla anual y de un empleado que ingresó antes de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-
+            
             # Cuando es una planilla anual y de un empleado que ingresó después de la fecha de inicio de la planilla
             elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
                 dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), compute_leaves=False, domain=False)
                 res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-
+            
             # Cuando el empleado ingreso antes de la fecha de la planilla y no ha salido
             else:
                 # Cálculo para mensualidad
-                if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
+                if self.struct_id.schedule_pay == 'monthly':
                     total_dias = 30 - dias_ausentados_restar
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
-
+                
                 # Cálculo para quincena
-                if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
+                elif self.struct_id.schedule_pay == 'semi-monthly':
                     # Dentro del bloque semi-monthly...
                     dias_periodo = min((self.date_to - self.date_from).days + 1, 15)
-
+                    
                     # Calcular días de ausencia solo dentro del período de la nómina
                     dias_ausencia_en_periodo = 0
                     ausencias = self.env['hr.leave'].search([
@@ -508,7 +508,7 @@ class HrPayslip(models.Model):
                         ('request_date_from', '<=', self.date_to),
                         ('request_date_to', '>=', self.date_from),
                     ])
-
+                    
                     for ausencia in ausencias:
                         if ausencia.holiday_status_id.work_entry_type_id.descontar_nomina == True:
                             # determinar el rango de intersección de la ausencia
@@ -516,7 +516,7 @@ class HrPayslip(models.Model):
                             fin = min(ausencia.request_date_to, self.date_to)
                             if inicio <= fin:
                                 dias_ausencia_en_periodo += (fin - inicio).days + 1
-
+                    
                     # Ahora calcular los días trabajados
                     if dias_ausencia_en_periodo == 0:
                         dias_trabajados = 15
@@ -524,18 +524,20 @@ class HrPayslip(models.Model):
                         dias_trabajados = 0
                     else:
                         dias_trabajados = dias_periodo - dias_ausencia_en_periodo
-
+                    
                     res.append({
                         'work_entry_type_id': trabajo_id.id,
                         'sequence': 10,
                         'number_of_days': dias_trabajados
                     })
-
+                                    
                 # Cálculo de días para catorcena
-                if self.struct_id.schedule_pay == 'bi-weekly' or contracts.structure_type_id.default_schedule_pay == 'bi-weekly':
+                elif self.struct_id.schedule_pay == 'bi-weekly':
                     dias_laborados = 14
                     res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados - dias_ausentados_restar)})
-
+                else:
+                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados - dias_ausentados_restar)})
+                    
             self.calculo_entradas_anuales(self)
         return res
 
