@@ -510,11 +510,12 @@ class HrPayslip(models.Model):
                     ])
                     
                     for ausencia in ausencias:
-                        # determinar el rango de intersección de la ausencia
-                        inicio = max(ausencia.request_date_from, self.date_from)
-                        fin = min(ausencia.request_date_to, self.date_to)
-                        if inicio <= fin:
-                            dias_ausencia_en_periodo += (fin - inicio).days + 1
+                        if ausencia.holiday_status_id.work_entry_type_id.descontar_nomina == True:
+                            # determinar el rango de intersección de la ausencia
+                            inicio = max(ausencia.request_date_from, self.date_from)
+                            fin = min(ausencia.request_date_to, self.date_to)
+                            if inicio <= fin:
+                                dias_ausencia_en_periodo += (fin - inicio).days + 1
                     
                     # Ahora calcular los días trabajados
                     if dias_ausencia_en_periodo == 0:
