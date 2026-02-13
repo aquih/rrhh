@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
         <record id="paperformat_libro_salarios" model="report.paperformat">
-            <field name="name">Libro salarios Formato</field>
+            <field name="name">Formato de papel de libro salarios</field>
             <field name="default" eval="True"/>
             <field name="format">custom</field>
             <field name="page_height">355</field>
@@ -18,7 +19,7 @@
         </record>
 
         <record id="paperformat_recibo" model="report.paperformat">
-            <field name="name">Formato Recibo de pago</field>
+            <field name="name">Formato de papel de recibo de pago</field>
             <field name="default" eval="True"/>
             <field name="format">A5</field>
             <field name="orientation">Landscape</field>

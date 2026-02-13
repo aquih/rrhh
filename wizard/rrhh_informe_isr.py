@@ -102,7 +102,7 @@ class rrhh_informe_isr(models.TransientModel):
                     hoja.write(fila, 1, nomina.employee_id.codigo_empleado)
                     hoja.write(fila, 2, fecha_alta)
                     hoja.write(fila, 3, fecha_baja)
-                    hoja.write(fila, 4, nomina.employee_id.nit)
+                    hoja.write(fila, 4, nomina.employee_id.work_contact_id.nit)
                     hoja.write(fila, 5, nomina.employee_id.name)
                     hoja.write(fila, 6, calculo_isr["sueldos"])
                     hoja.write(fila, 7, calculo_isr["horas_extras"])

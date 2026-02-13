@@ -13,7 +13,9 @@
                                 <group>
                                     <field name="version_mensaje"/>
                                     <field name="numero_patronal"/>
-                                    <field name="marca"/>
+                                    <!--<field name="marca"/>-->
+                                    <field name="barrio_colonia"/>
+                                    <field name="zona"/>
                                 </group>
                                 <group>
                                     <field name="tipo_planilla"/>
@@ -33,12 +35,12 @@
                                     <field name="ajuste_ids" widget="many2many_tags"/> 
                                 </group>
                             </group>
+                            <!--
                             <group string="Centros">
                                 <group>
                                     <field name="codigo_centro_trabajo"/>
                                     <field name="nombre_centro_trabajo"/>
                                     <field name="direccion_centro_trabajo"/>
-                                    <field name="zona_centro_trabajo"/>
                                     <field name="telefonos"/>
                                     <field name="fax"/>
                                 </group>
@@ -50,6 +52,8 @@
                                     <field name="codigo_actividad_economica"/>
                                 </group>
                             </group>
+                            -->
+                            <!--
                             <group string="Tipos de planilla">
                                 <group>
                                     <field name="identificacion_tipo_planilla"/>
@@ -61,18 +65,19 @@
                                     <field name="departamento_republica"/>
                                     <field name="actividad_economica"/>
                                     <field name="clase_planilla"/>
-                                    <field name="igss_dias_trabajo"/>
                                 </group>
                             </group>
+                            -->
                             <group string="IGSS">
                                 <group>
-                                    <field name="sueldo_igss_ids" widget="many2many_tags"/>
+                                    <field name="sueldo_igss_ids" widget="many2many_tags"/>                                    <field name="igss_dias_trabajo"/>
+                                    <field name="igss_dias_trabajo" widget="many2many_tags"/>
                                 </group>
                             </group>
                             <group string="Libro de salarios">
                                 <group>
                                     <field name="tipo_entrada_trabajo_id"/>
-                                    <field name="salario_promedio_ids" widget="many2many_tags"/>
+                                    <!--<field name="salario_promedio_ids" widget="many2many_tags"/>-->
                                     <field name="salario_ids" widget="many2many_tags"/>
                                     <field name="salario_total_ids" widget="many2many_tags"/>
                                     <field name="ordinarias_ids" widget="many2many_tags"/>
@@ -83,8 +88,8 @@
                                     <field name="retribucion_comisiones_ids" widget="many2many_tags"/>
                                     <field name="viaticos_ids" widget="many2many_tags"/>
                                     <field name="extras_ids" widget="many2many_tags"/>
-                                    <field name="descuentos_ids" widget="many2many_tags"/>
-                                    <field name="septimos_asuetos_ids" widget="many2many_tags"/>
+                                    <!--<field name="descuentos_ids" widget="many2many_tags"/>-->
+                                    <!--<field name="septimos_asuetos_ids" widget="many2many_tags"/>-->
                                     <field name="vacaciones_ids" widget="many2many_tags"/>
                                     <field name="numero_horas_extras_ids" widget="many2many_tags"/>
                                 </group>
@@ -106,7 +111,6 @@
                                     <field name="boni_incentivo_decreto_ids" widget="many2many_tags"/>
                                     <field name="devolucion_isr_otro_ids" widget="many2many_tags"/>
                                     <field name="otro_ingreso_afecto_ids" widget="many2many_tags"/>
-
                                 </group>
                             </group>
                             <label for="centro_trabajo_ids" string="Centros de trabajo"/>

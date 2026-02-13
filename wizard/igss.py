@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 from odoo import models, fields, api, _
 import time
 import base64
@@ -69,7 +67,7 @@ class rrhh_igss_wizard(models.TransientModel):
                         tiempo_contrato = slip.employee_id.tiempo_contrato if slip.employee_id.tiempo_contrato else ''
                         dias_laborados = 0
                         for linea in slip.worked_days_line_ids:
-                            if linea.work_entry_type_id.code == slip.employee_id.company_id.igss_dias_trabajo:
+                            if linea.work_entry_type_id in slip.employee_id.company_id.igss_dias_trabajo:
                                 dias_laborados = linea.number_of_days
                         sueldo = 0
                         for linea in slip.line_ids:
@@ -86,7 +84,7 @@ class rrhh_igss_wizard(models.TransientModel):
                         fecha_baja = str(datetime.strptime(str(slip.contract_id.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if (mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla) else ''
 
                         centro_trabajo = str(slip.employee_id.codigo_centro_trabajo) if slip.employee_id.codigo_centro_trabajo else ''
-                        nit = str(slip.employee_id.nit) if slip.employee_id.nit else ''
+                        nit = slip.employee_id.work_contact_id.nit if slip.employee_id.work_contact_id.nit else ''
                         codigo_ocupacion = str(slip.employee_id.codigo_ocupacion) if slip.employee_id.codigo_ocupacion else ''
                         condicion_laboral = str(slip.employee_id.condicion_laboral) if slip.employee_id.condicion_laboral else ''
                         deducciones = ''

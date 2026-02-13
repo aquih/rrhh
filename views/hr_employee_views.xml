@@ -58,23 +58,23 @@
                                 <field name="codigo_empleado"/>
                                 <field name="igss"/>
                                 <field name="irtra"/>
-                                <field name="nit"/>
+                                <!--<field name="nit"/>-->
                                 <field name="nivel_academico"/>
                                 <field name="profesion"/>
-                                <field name="etnia"/>
-                                <field name="idioma"/>
-                                <field name="pais_origen"/>
-                                <field name="codigo_pais_origen"/>
-                                <field name="trabajado_extranjero"/>
-                                <field name="motivo_finalizacion"/>
+                                <!--<field name="etnia"/>-->
+                                <!--<field name="idioma"/>-->
+                                <!--<field name="pais_origen"/>-->
+                                <!--<field name="codigo_pais_origen"/>-->
+                                <!--<field name="trabajado_extranjero"/>-->
+                                <!--<field name="motivo_finalizacion"/>-->
                                 <field name="jornada_trabajo"/>
                                 <field name="permiso_trabajo"/>
-                                <field name="contacto_emergencia"/>
-                                <field name="vecindad_dpi"/>
+                                <!--<field name="contacto_emergencia"/>-->
+                                <!--<field name="vecindad_dpi"/>-->
                                 <field name="documento_identificacion"/>
-                                <field name="forma_trabajo_extranjero"/>
-                                <field name="pais_trabajo_extranjero_id"/>
-                                <field name="finalizacion_laboral_extranjero"/>
+                                <!--<field name="forma_trabajo_extranjero"/>-->
+                                <!--<field name="pais_trabajo_extranjero_id"/>-->
+                                <!--<field name="finalizacion_laboral_extranjero"/>-->
                                 <field name="tipo_salario"/>
                                 <field name="tiempo_contrato"/>
                                 <field name="nacionalidad"/>
@@ -83,18 +83,21 @@
                                 <field name="sucursal"/>
                                 <field name="tipo_contrato"/>
                             </group>
+                            <!--
                             <group string="Tarjetas Alimentarias">
                                 <field name="tarjeta_salud"/>
                                 <field name="tarjeta_fecha_vencimiento"/>
                                 <field name="tarjeta_manipulacion"/>
                                 <field name="tarjeta_pulmones"/>
                             </group>
+                            -->
                         </group>
                     </page>
                 </page>
                 <field name="birthday" position="after">
                     <field name="edad"/>
                 </field>
+                <!--
                 <field name="identification_id" position="after">
                     <label for="departamento_id" string="Extendido en"/>
                     <div class="o_address_format">
@@ -102,6 +105,7 @@
                         <field name="pais_id" placeholder="Pais..." class="o_address_street"/>
                     </div>
                 </field>
+                -->
             </data>
         </field>
     </record>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="EstructuraBase" model="hr.payroll.structure">
+            <field name="name">Estructura Base</field>
+            <field name="type_id" ref="hr.structure_type_employee"/>
+        </record>
+
+    </data>
+</odoo>

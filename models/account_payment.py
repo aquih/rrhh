@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 from odoo import models, fields, api, _
-
 
 class account_payment(models.Model):
     _inherit = "account.payment"

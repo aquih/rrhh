@@ -16,9 +16,9 @@ class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
     porcentaje_prestamo = fields.Float(related="payslip_run_id.porcentaje_prestamo",string='Prestamo (%)',store=True)
-    etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids')
     cuenta_analitica_id = fields.Many2one('account.analytic.account','Cuenta analítica')
     descuento_isr = fields.Boolean(related="payslip_run_id.descuento_isr",string='Descuento ISR',store=True)
+    # etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids') no parece usarse
 
     # Dias calendario de los ultimos 12 meses hasta la fecha
     def dias_trabajados_ultimos_meses(self,empleado_id,fecha_desde,fecha_hasta):
@@ -562,7 +562,7 @@ class HrPayslip(models.Model):
             self.calculo_entradas_anuales(self)
         return res
 
-    @api.depends('employee_id', 'contract_id', 'struct_id', 'date_from', 'date_to', 'struct_id')
+    @api.depends('employee_id', 'version_id', 'struct_id', 'date_from', 'date_to', 'struct_id')
     def _compute_input_line_ids(self):
         res = super(HrPayslip, self)._compute_input_line_ids()
         for slip in self:

@@ -6,7 +6,7 @@
     </record>
 
     <record id="dias_trabajados_entrada" model="hr.payslip.input.type">
-        <field name="name">Dias Trabajados 12 Meses</field>
+        <field name="name">Dias trabajados 12 meses</field>
         <field name="code">DiasTrabajados12Meses</field>
     </record>
 
