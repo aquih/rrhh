@@ -18,7 +18,7 @@
                     </group>
                 </group>
                 <footer>
-                    <button name="generar" string="Generar" type="object" class="oe_highlight"/>
+                    <button name="generar_excel" string="Generar excel" type="object" class="oe_highlight"/>
                     or
                     <button name="print_report" string="Generar PDF" type="object" class="oe_highlight"/>
                     or

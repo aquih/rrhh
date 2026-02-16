@@ -16,6 +16,22 @@ class report_planilla_pdf(models.AbstractModel):
                     partidas[slip.move_id.id] = 0
         return partidas
 
+    def obtener_dias(self, slip):
+        dias = 0
+        work = -1
+        trabajo = -1
+        for d in slip.worked_days_line_ids:
+            if d.code == 'TRABAJO100':
+                trabajo = d.number_of_days
+            elif d.code == 'WORK100':
+                work = d.number_of_days
+        if trabajo >= 0:
+            dias += trabajo
+        else:
+            dias += work
+
+        return dias
+
     def reporte(self, datos):
         planilla = self.env['rrhh.planilla'].browse(datos['planilla_id'][0])
         nomina = self.env['hr.payslip.run'].browse(datos['nomina_id'][0])
@@ -40,7 +56,6 @@ class report_planilla_pdf(models.AbstractModel):
         columnas.append('Liquido a recibir')
 
         lineas = {}
-        numero = 1
 
         if datos['agrupado']:
             # partidas_iguales, contiene un diccionario de todas las partidas de la nomina, en el caso de que unifiquen todas las nóminas
@@ -85,27 +100,16 @@ class report_planilla_pdf(models.AbstractModel):
                 if slip.employee_id.job_id.name not in reporte['puestos'][llave]:
                     reporte['puestos'][llave].append(slip.employee_id.job_id.name)
 
-
                 linea = {'estatico': {}, 'dinamico': []}
-                linea['estatico']['numero'] = numero
+                linea['estatico']['numero'] = len(lineas[llave][slip.employee_id.job_id.name]['datos']) + 1
                 linea['estatico']['codigo_empleado'] = slip.employee_id.codigo_empleado
                 linea['estatico']['nombre_empleado'] = slip.employee_id.name
                 linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
     #            linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
                 linea['estatico']['puesto'] = slip.employee_id.job_id.name
 
-                dias = 0
-                work = -1
-                trabajo = -1
-                for d in slip.worked_days_line_ids:
-                    if d.code == 'TRABAJO100':
-                        trabajo = d.number_of_days
-                    elif d.code == 'WORK100':
-                        work = d.number_of_days
-                if trabajo >= 0:
-                    dias += trabajo
-                else:
-                    dias += work
+                dias = self.obtener_dias(slip)
+
                 linea['estatico']['dias'] = dias
 
                 total_salario = 0
@@ -151,28 +155,16 @@ class report_planilla_pdf(models.AbstractModel):
 
                 lineas[llave][slip.employee_id.job_id.name]['datos'].append(linea)
 
-
             reporte['columnas'] = columnas
             reporte['lineas'] = lineas
         else:
             listas_totales = []
             for slip in nomina.slip_ids:
-                dias = 0
-                work = -1
-                trabajo = -1
-                for d in slip.worked_days_line_ids:
-                    if d.code == 'TRABAJO100':
-                        trabajo = d.number_of_days
-                    elif d.code == 'WORK100':
-                        work = d.number_of_days
-                if trabajo >= 0:
-                    dias += trabajo
-                else:
-                    dias += work
 
+                dias = self.obtener_dias(slip)
 
-                datos_empeado = {
-                    'numero': numero,
+                datos_empleado = {
+                    'numero': len(reporte['no_agrupado']) + 1,
                     'codigo_empleado': slip.employee_id.codigo_empleado,
                     'nombre_empleado': slip.employee_id.name,
                     'fecha_ingreso': slip.contract_id.date_start,
@@ -199,11 +191,10 @@ class report_planilla_pdf(models.AbstractModel):
                     if c.sumar:
                         total_salario += total_columna
 
-                    datos_empeado['columnas'].append(total_columna)
-                datos_empeado['columnas'].append(total_salario)
-                listas_totales.append(datos_empeado['columnas'])
-                numero += 1
-                reporte['no_agrupado'].append(datos_empeado)
+                    datos_empleado['columnas'].append(total_columna)
+                datos_empleado['columnas'].append(total_salario)
+                listas_totales.append(datos_empleado['columnas'])
+                reporte['no_agrupado'].append(datos_empleado)
             reporte['columnas'] = columnas
             reporte['total'] = [sum(y) for y in zip(*listas_totales)]
         return reporte
