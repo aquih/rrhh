@@ -33,199 +33,90 @@ class rrhh_planilla_wizard(models.TransientModel):
                     partidas[slip.move_id.id] = 0
         return partidas
 
-    def generar(self):
+    def generar_excel(self):
         for w in self:
+            dict = {}
+            dict['planilla_id'] = [w.planilla_id.id, w.planilla_id.name]
+            dict['nomina_id'] = [w.nomina_id.id, w.nomina_id.name]
+            dict['agrupado'] = w['agrupado']
+            reporte = self.env['report.rrhh.planilla_pdf'].reporte(dict)
+
             f = io.BytesIO()
             libro = xlsxwriter.Workbook(f)
             formato_fecha = libro.add_format({'num_format': 'dd/mm/yy'})
+
             if w.agrupado:
-                # partidas_iguales, contiene un diccionario de todas las partidas de la nomina, en el caso de que unifiquen todas las nóminas
-                # en una partida o en el caso que no, asi mas adelante podemos clasificar por cuenta analítica de la partida o por la cuenta analítica de la nómina
-                partidas_iguales = self.buscar_partida_nominas(w.nomina_id.slip_ids)
-                cuentas_analiticas = set([])
-                for l in w.nomina_id.slip_ids:
-                    if l.cuenta_analitica_id:
-                        cuentas_analiticas.add(l.cuenta_analitica_id.name)
-                    else:
-                        if len(partidas_iguales) > 1:
-                            if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
-                                cuentas_analiticas.add(l.move_id.line_ids[0].analytic_account_id.name)
-                            else:
-                                cuentas_analiticas.add('Indefinido')
-                        else:
-                            cuentas_analiticas.add('Indefinido')
-                for i in cuentas_analiticas:
-                    hoja = libro.add_worksheet(i)
+                for cuenta in reporte['cuentas_analiticas']:
+                    hoja = libro.add_worksheet(cuenta)
 
                     hoja.write(0, 0, 'Planilla')
                     hoja.write(0, 1, w.nomina_id.name)
                     hoja.write(0, 2, 'Periodo')
                     hoja.write(0, 3, w.nomina_id.date_start, formato_fecha)
                     hoja.write(0, 4, w.nomina_id.date_end, formato_fecha)
-
+                    
                     linea = 2
-                    num = 1
+                    for puesto in reporte['puestos'][cuenta]:
+    
+                        num = 1
 
-                    hoja.write(linea, 0, 'No')
-                    hoja.write(linea, 1, 'Cod. de empleado')
-                    hoja.write(linea, 2, 'Nombre de empleado')
-                    hoja.write(linea, 3, 'Fecha de ingreso')
-                    hoja.write(linea, 4, 'Puesto')
-                    hoja.write(linea, 5, 'Dias')
+                        hoja.write(linea, 0, puesto)
+                        linea += 2
 
-                    totales = []
-                    columna = 6
-                    for c in w.planilla_id.columna_id:
-                        hoja.write(linea, columna, c.name)
+                        hoja.write(linea, 0, 'No')
+                        hoja.write(linea, 1, 'Cod. de empleado')
+                        hoja.write(linea, 2, 'Nombre de empleado')
+                        hoja.write(linea, 3, 'Fecha de ingreso')
+                        hoja.write(linea, 4, 'Dias')
+
+                        columna = 4
+                        for nombre_columna in reporte['columnas']:
+                            columna += 1
+                            hoja.write(linea, columna, nombre_columna)
+    
+                        hoja.write(linea, columna+1, 'Banco a depositar')
+                        hoja.write(linea, columna+2, 'Cuenta a depositar')
+                        hoja.write(linea, columna+3, 'Observaciones')
+
+                        linea += 1
+                        for linea_reporte in reporte['lineas'][cuenta][puesto]['datos']:
+                            hoja.write(linea, 0, linea_reporte['estatico']['numero'] or '')
+                            hoja.write(linea, 1, linea_reporte['estatico']['codigo_empleado'] or '')
+                            hoja.write(linea, 2, linea_reporte['estatico']['nombre_empleado'] or '')
+                            hoja.write(linea, 3, linea_reporte['estatico']['fecha_ingreso'] or '', formato_fecha)
+                            hoja.write(linea, 4, linea_reporte['estatico']['dias'] or '')
+
+                            columna = 4
+                            for l in linea_reporte['dinamico']:
+                                columna += 1
+                                hoja.write(linea, columna, l or '')
+        
+                            hoja.write(linea, columna+1, linea_reporte['estatico']['banco_depositar'] or '')
+                            hoja.write(linea, columna+2, linea_reporte['estatico']['cuenta_depositar'] or '')
+                            hoja.write(linea, columna+3, linea_reporte['estatico']['observaciones'] or '')
+                            linea += 1
+
+                        hoja.write(linea, 3, 'TOTALES')
+                        columna = 4
+                        for t in reporte['lineas'][cuenta][puesto]['totales']:
+                            columna += 1
+                            hoja.write(linea, columna, t)
+
+                        linea += 1
+
+                    linea += 2
+                    columna = 4
+                    for t in reporte['columnas']:
                         columna += 1
-                        totales.append(0)
-                    totales.append(0)
+                        hoja.write(linea, columna, t)
 
-                    hoja.write(linea, columna, 'Liquido a recibir')
-                    hoja.write(linea, columna+1, 'Banco a depositar')
-                    hoja.write(linea, columna+2, 'Cuenta a depositar')
-                    hoja.write(linea, columna+3, 'Observaciones')
-                    hoja.write(linea, columna+4, 'Cuenta analítica')
-                    for l in w.nomina_id.slip_ids:
-                        cuenta_analitica = False
-                        if l.cuenta_analitica_id:
-                            cuenta_analitica = l.cuenta_analitica_id.name
-                        else:
-                            if len(partidas_iguales) > 1:
-                                if l.move_id and len(l.move_id.line_ids) > 0 and l.move_id.line_ids[0].analytic_account_id:
-                                    cuenta_analitica = l.move_id.line_ids[0].analytic_account_id.name
-                        if cuenta_analitica:
-                            if cuenta_analitica == i:
-                                linea += 1
-                                dias = 0
-                                total_salario = 0
-
-                                hoja.write(linea, 0, num)
-                                hoja.write(linea, 1, l.employee_id.codigo_empleado)
-                                hoja.write(linea, 2, l.employee_id.name)
-                                hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
-                                hoja.write(linea, 4, l.employee_id.job_id.name)
-                                codigo = l.company_id.tipo_entrada_trabajo_id.code
-                                for d in l.worked_days_line_ids:
-                                    if d.code == codigo:
-                                        dias = d.number_of_days
-                                hoja.write(linea, 5, dias)
-
-                                columna = 6
-                                for c in w.planilla_id.columna_id:
-                                    reglas = [x.id for x in c.regla_id]
-                                    entradas = [x.name for x in c.entrada_id]
-                                    total_columna = 0
-                                    for r in l.line_ids:
-                                        if r.salary_rule_id.id in reglas:
-                                            total_columna += r.total
-                                    for r in l.input_line_ids:
-                                        if r.name in entradas:
-                                            total_columna += r.amount
-                                    if c.sumar:
-                                        total_salario += total_columna
-                                    totales[columna-6] += total_columna
-
-                                    hoja.write(linea, columna, total_columna)
-                                    columna += 1
-
-                                totales[columna-6] += total_salario
-                                hoja.write(linea, columna, total_salario)
-                                hoja.write(linea, columna+1, l.employee_id.bank_account_id.bank_id.name)
-                                hoja.write(linea, columna+2, l.employee_id.bank_account_id.acc_number)
-                                hoja.write(linea, columna+3, l.note)
-                                hoja.write(linea, columna+4, l.cuenta_analitica_id.name)
-
-                                num += 1
-                        else:
-                            if cuenta_analitica == False and i == 'Indefinido':
-                                linea += 1
-                                dias = 0
-                                total_salario = 0
-
-                                hoja.write(linea, 0, num)
-                                hoja.write(linea, 1, l.employee_id.codigo_empleado)
-                                hoja.write(linea, 2, l.employee_id.name)
-                                hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
-                                hoja.write(linea, 4, l.employee_id.job_id.name)
-                                codigo = l.company_id.tipo_entrada_trabajo_id.code
-                                for d in l.worked_days_line_ids:
-                                    if d.code == codigo:
-                                        dias = d.number_of_days
-                                hoja.write(linea, 5, dias)
-
-                                columna = 6
-                                for c in w.planilla_id.columna_id:
-                                    reglas = [x.id for x in c.regla_id]
-                                    entradas = [x.name for x in c.entrada_id]
-                                    total_columna = 0
-                                    for r in l.line_ids:
-                                        if r.salary_rule_id.id in reglas:
-                                            total_columna += r.total
-                                    for r in l.input_line_ids:
-                                        if r.name in entradas:
-                                            total_columna += r.amount
-                                    if c.sumar:
-                                        total_salario += total_columna
-                                    totales[columna-6] += total_columna
-
-                                    hoja.write(linea, columna, total_columna)
-                                    columna += 1
-
-                                totales[columna-6] += total_salario
-                                hoja.write(linea, columna, total_salario)
-                                hoja.write(linea, columna+1, l.employee_id.bank_account_id.bank_id.name)
-                                hoja.write(linea, columna+2, l.employee_id.bank_account_id.acc_number)
-                                hoja.write(linea, columna+3, l.note)
-                                hoja.write(linea, columna+4, 'indefinido')
-
-                                num += 1
-                            if l.cuenta_analitica_id and l.cuenta_analitica_id.name == i:
-                                linea += 1
-                                dias = 0
-                                total_salario = 0
-
-                                hoja.write(linea, 0, num)
-                                hoja.write(linea, 1, l.employee_id.codigo_empleado)
-                                hoja.write(linea, 2, l.employee_id.name)
-                                hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
-                                hoja.write(linea, 4, l.employee_id.job_id.name)
-                                codigo = l.company_id.tipo_entrada_trabajo_id.code
-                                for d in l.worked_days_line_ids:
-                                    if d.code == codigo:
-                                        dias = d.number_of_days
-                                hoja.write(linea, 5, dias)
-
-                                columna = 6
-                                for c in w.planilla_id.columna_id:
-                                    reglas = [x.id for x in c.regla_id]
-                                    entradas = [x.name for x in c.entrada_id]
-                                    total_columna = 0
-                                    for r in l.line_ids:
-                                        if r.salary_rule_id.id in reglas:
-                                            total_columna += r.total
-                                    for r in l.input_line_ids:
-                                        if r.name in entradas:
-                                            total_columna += r.amount
-                                    if c.sumar:
-                                        total_salario += total_columna
-                                    totales[columna-6] += total_columna
-
-                                    hoja.write(linea, columna, total_columna)
-                                    columna += 1
-
-                                totales[columna-6] += total_salario
-                                hoja.write(linea, columna, total_salario)
-                                hoja.write(linea, columna+1, l.employee_id.bank_account_id.bank_id.name)
-                                hoja.write(linea, columna+2, l.employee_id.bank_account_id.acc_number)
-                                hoja.write(linea, columna+3, l.note)
-                                hoja.write(linea, columna+4, l.cuenta_analitica_id.name)
-
-                                num += 1
-                    columna = 6
-                    for t in totales:
-                        hoja.write(linea+1, columna, totales[columna-6])
+                    linea += 1
+                    hoja.write(linea, 3, 'TOTALES')
+                    columna = 4
+                    for t in reporte['suma'][cuenta]:
                         columna += 1
+                        hoja.write(linea, columna, t)
+            
             else:
                 hoja = libro.add_worksheet('reporte')
 
@@ -236,7 +127,6 @@ class rrhh_planilla_wizard(models.TransientModel):
                 hoja.write(0, 4, w.nomina_id.date_end, formato_fecha)
 
                 linea = 2
-                num = 1
 
                 hoja.write(linea, 0, 'No')
                 hoja.write(linea, 1, 'Cod. de empleado')
@@ -245,70 +135,39 @@ class rrhh_planilla_wizard(models.TransientModel):
                 hoja.write(linea, 4, 'Puesto')
                 hoja.write(linea, 5, 'Dias')
 
-                totales = []
-                columna = 6
-                for c in w.planilla_id.columna_id:
-                    hoja.write(linea, columna, c.name)
+                columna = 5
+                for nombre_columna in reporte['columnas']:
                     columna += 1
-                    totales.append(0)
-                totales.append(0)
+                    hoja.write(linea, columna, nombre_columna)
 
-                hoja.write(linea, columna, 'Liquido a recibir')
                 hoja.write(linea, columna+1, 'Banco a depositar')
                 hoja.write(linea, columna+2, 'Cuenta a depositar')
                 hoja.write(linea, columna+3, 'Observaciones')
-                hoja.write(linea, columna+4, 'Cuenta analítica')
 
                 linea += 1
-                for l in w.nomina_id.slip_ids:
-                    dias = 0
-                    total_salario = 0
+                for empleado in reporte['no_agrupado']:
+                    hoja.write(linea, 0, empleado['numero'] or '')
+                    hoja.write(linea, 1, empleado['codigo_empleado'] or '')
+                    hoja.write(linea, 2, empleado['nombre_empleado'] or '')
+                    hoja.write(linea, 3, empleado['fecha_ingreso'] or '', formato_fecha)
+                    hoja.write(linea, 4, empleado['puesto'] or '')
+                    hoja.write(linea, 5, empleado['dias'] or '')
 
-                    hoja.write(linea, 0, num)
-                    hoja.write(linea, 1, l.employee_id.codigo_empleado)
-                    hoja.write(linea, 2, l.employee_id.name)
-                    hoja.write(linea, 3, l.contract_id.date_start,formato_fecha)
-                    hoja.write(linea, 4, l.employee_id.job_id.name)
-                    codigo = l.company_id.tipo_entrada_trabajo_id.code
-                    for d in l.worked_days_line_ids:
-                        if d.code == codigo:
-                            dias = d.number_of_days
-                    hoja.write(linea, 5, dias)
-
-                    columna = 6
-                    for c in w.planilla_id.columna_id:
-                        reglas = [x.id for x in c.regla_id]
-                        entradas = [x.name for x in c.entrada_id]
-                        total_columna = 0
-                        for r in l.line_ids:
-                            if r.salary_rule_id.id in reglas:
-                                total_columna += r.total
-                        for r in l.input_line_ids:
-                            if r.name in entradas:
-                                total_columna += r.amount
-                        if c.sumar:
-                            total_salario += total_columna
-                        totales[columna-6] += total_columna
-
-                        hoja.write(linea, columna, total_columna)
+                    columna = 5
+                    for l in empleado['columnas']:
                         columna += 1
+                        hoja.write(linea, columna, l or '')
 
-                    totales[columna-6] += total_salario
-                    hoja.write(linea, columna, total_salario)
-                    hoja.write(linea, columna+1, l.employee_id.bank_account_id.bank_id.name)
-                    hoja.write(linea, columna+2, l.employee_id.bank_account_id.acc_number)
-                    hoja.write(linea, columna+3, l.note)
-                    if l.cuenta_analitica_id:
-                        hoja.write(linea, columna+4, l.cuenta_analitica_id.name)
-                    else:
-                        hoja.write(linea, columna+4, 'indefinido')
+                    hoja.write(linea, columna+1, empleado['banco_depositar'] or '')
+                    hoja.write(linea, columna+2, empleado['cuenta_depositar'] or '')
+                    hoja.write(linea, columna+3, empleado['observaciones'] or '')
                     linea += 1
-                    num += 1
 
-                columna = 6
-                for t in totales:
-                    hoja.write(linea, columna, totales[columna-6])
+                hoja.write(linea,4, 'GRAN TOTAL')
+                columna = 5
+                for t in reporte['total']:
                     columna += 1
+                    hoja.write(linea, columna, t)
 
             libro.close()
             datos = base64.b64encode(f.getvalue())
