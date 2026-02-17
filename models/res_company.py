@@ -58,29 +58,30 @@ class res_company(models.Model):
     proyectar_bonificaciones_adicionales = fields.Boolean('Proyectar bonificaciones adicionales')
     ajuste_ids = fields.Many2many('hr.salary.rule','rrhh_ajustes_rel', string='Ajustes ISR')
 
-    # telefonos = fields.Char('Telefonos (separados por guiones o diagonales)') no parece usarse
-    # fax = fields.Char('Fax') no parece usarse
-    # nombre_contacto = fields.Char('Nombre del contacto en centro de trabajo') no parece usarse
-    # correo_electronico = fields.Char('correo_electronico') no parece usarse
-    # codigo_departamento = fields.Char('Codigo departamento de la Republica') no parece usarse
-    # codigo_municipio = fields.Char('Codigo municipio de la Republica') no parece usarse
-    # codigo_actividad_economica = fields.Char('Codigo actividad economica') no parece usarse
-    # identificacion_tipo_planilla = fields.Char('Identificacion de tipo de planilla') no parece usarse
-    # nombre_tipo_planilla = fields.Char('Nombre del tipo de planilla') no parece usarse
-    # tipo_afiliados = fields.Selection([('S', 'Sin IVS'), ('C', 'Con IVS')], 'Tipo de afiliados') no parece usarse
-    # periodo_planilla = fields.Selection([('M', 'Mensual'), ('C', 'Catorcenal'), ('S', 'Semanal')], 'Periodo de planilla') no parece usarse
-    # departamento_republica = fields.Char('Depto. de la Rep. donde laboran los empleados') no parece usarse
-    # actividad_economica = fields.Char('Actividad economica') no parece usarse
-    # clase_planilla = fields.Selection([('N', 'Normal'), ('V', 'Sin movimiento')], 'Clase de planilla') no parece usarse
-    # codigo_centro_trabajo = fields.Char('Codigo del centro de trabajo') no parece usarse
-    # nombre_centro_trabajo = fields.Char('Nombre del centro de trabajo') no parece usarse
-    # direccion_centro_trabajo = fields.Char('Direccion del centro de trabajo') no parece usarse
-    # salario_promedio_ids = fields.Many2many('hr.salary.rule','rrhh_salario_promedio_rel', string="Salario promedio") no parece usarse
-    # descuentos_ids = fields.Many2many('hr.salary.rule','rrhh_descuentos_rel',string='Descuentos') no parece usarse
-    # septimos_asuetos_ids = fields.Many2many('hr.salary.rule','rrhh_septimos_asuetos_rel', string="Septimos y asuetos") no parece usarse
-    # marca = fields.Char('Marca') no parece usarse
-    # rango_ingresos = fields.Selection([('si', 'Si'), ('no', 'No')], 'Rango ingresos anual') no parece usarse
-    # origen_compania = fields.Selection([('nacional', 'Nacional'), ('extranjero', 'Extranjero')], 'Nacional o Extranjero') no parece usarse
+    # TODO: Quitar en la siguiente versión
+    telefonos = fields.Char('Telefonos (separados por guiones o diagonales)') # no parece usarse
+    fax = fields.Char('Fax') # no parece usarse
+    nombre_contacto = fields.Char('Nombre del contacto en centro de trabajo') # no parece usarse
+    correo_electronico = fields.Char('correo_electronico') # no parece usarse
+    codigo_departamento = fields.Char('Codigo departamento de la Republica') # no parece usarse
+    codigo_municipio = fields.Char('Codigo municipio de la Republica') # no parece usarse
+    codigo_actividad_economica = fields.Char('Codigo actividad economica') # no parece usarse
+    identificacion_tipo_planilla = fields.Char('Identificacion de tipo de planilla') # no parece usarse
+    nombre_tipo_planilla = fields.Char('Nombre del tipo de planilla') # no parece usarse
+    tipo_afiliados = fields.Selection([('S', 'Sin IVS'), ('C', 'Con IVS')], 'Tipo de afiliados') # no parece usarse
+    periodo_planilla = fields.Selection([('M', 'Mensual'), ('C', 'Catorcenal'), ('S', 'Semanal')], 'Periodo de planilla') # no parece usarse
+    departamento_republica = fields.Char('Depto. de la Rep. donde laboran los empleados') # no parece usarse
+    actividad_economica = fields.Char('Actividad economica') # no parece usarse
+    clase_planilla = fields.Selection([('N', 'Normal'), ('V', 'Sin movimiento')], 'Clase de planilla') # no parece usarse
+    codigo_centro_trabajo = fields.Char('Codigo del centro de trabajo') # no parece usarse
+    nombre_centro_trabajo = fields.Char('Nombre del centro de trabajo') # no parece usarse
+    direccion_centro_trabajo = fields.Char('Direccion del centro de trabajo') # no parece usarse
+    salario_promedio_ids = fields.Many2many('hr.salary.rule','rrhh_salario_promedio_rel', string="Salario promedio") # no parece usarse
+    descuentos_ids = fields.Many2many('hr.salary.rule','rrhh_descuentos_rel',string='Descuentos') # no parece usarse
+    septimos_asuetos_ids = fields.Many2many('hr.salary.rule','rrhh_septimos_asuetos_rel', string="Septimos y asuetos") # no parece usarse
+    marca = fields.Char('Marca') # no parece usarse
+    rango_ingresos = fields.Selection([('si', 'Si'), ('no', 'No')], 'Rango ingresos anual') # no parece usarse
+    origen_compania = fields.Selection([('nacional', 'Nacional'), ('extranjero', 'Extranjero')], 'Nacional o Extranjero') # no parece usarse
 
 class res_company_centro_trabajo(models.Model):
     _name = 'res.company.centro_trabajo'

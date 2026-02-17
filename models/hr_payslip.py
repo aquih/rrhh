@@ -18,7 +18,9 @@ class HrPayslip(models.Model):
     porcentaje_prestamo = fields.Float(related="payslip_run_id.porcentaje_prestamo",string='Prestamo (%)',store=True)
     cuenta_analitica_id = fields.Many2one('account.analytic.account','Cuenta analítica')
     descuento_isr = fields.Boolean(related="payslip_run_id.descuento_isr",string='Descuento ISR',store=True)
-    # etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids') no parece usarse
+    
+    # TODO: Quitar en la siguiente versión
+    etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids') # no parece usarse
 
     # Dias calendario de los ultimos 12 meses hasta la fecha
     def dias_trabajados_ultimos_meses(self,empleado_id,fecha_desde,fecha_hasta):

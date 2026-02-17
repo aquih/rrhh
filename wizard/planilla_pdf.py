@@ -102,7 +102,7 @@ class report_planilla_pdf(models.AbstractModel):
 
                 linea = {'estatico': {}, 'dinamico': []}
                 linea['estatico']['numero'] = len(lineas[llave][slip.employee_id.job_id.name]['datos']) + 1
-                linea['estatico']['codigo_empleado'] = slip.employee_id.codigo_empleado
+                linea['estatico']['codigo_empleado'] = slip.employee_id.registration_number
                 linea['estatico']['nombre_empleado'] = slip.employee_id.name
                 linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
     #            linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
@@ -165,7 +165,7 @@ class report_planilla_pdf(models.AbstractModel):
 
                 datos_empleado = {
                     'numero': len(reporte['no_agrupado']) + 1,
-                    'codigo_empleado': slip.employee_id.codigo_empleado,
+                    'codigo_empleado': slip.employee_id.registration_number,
                     'nombre_empleado': slip.employee_id.name,
                     'fecha_ingreso': slip.contract_id.date_start,
                     'puesto': slip.employee_id.job_id.name,

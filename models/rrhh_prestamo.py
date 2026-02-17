@@ -13,20 +13,22 @@ class rrhh_prestamo(models.Model):
     _description = 'Prestamo'
     _rec_name = 'descripcion'
 
-    employee_id = fields.Many2one('hr.employee','Empleado')
+    employee_id = fields.Many2one('hr.employee', 'Empleado')
     fecha_inicio = fields.Date('Fecha inicio')
     numero_descuentos = fields.Integer('Numero de descuentos')
-    total = fields.Float('Total')
-    mensualidad = fields.Float('Mensualidad')
-    prestamo_ids = fields.One2many('rrhh.prestamo.linea','prestamo_id',string='Lineas de prestamo')
-    descripcion = fields.Char(string='Descripción',required=True)
-    codigo = fields.Char(string='Código',required=True)
+    total = fields.Monetary('Total')
+    mensualidad = fields.Monetary('Mensualidad')
+    prestamo_ids = fields.One2many('rrhh.prestamo.linea', 'prestamo_id', string='Lineas de prestamo')
+    descripcion = fields.Char(string='Descripción', required=True)
+    codigo = fields.Char(string='Código', required=True)
     estado = fields.Selection([
         ('nuevo', 'Nuevo'),
         ('proceso','Proceso'),
         ('pagado', 'Pagado')
-    ], string='Status', help='Estado del prestamo',readonly=True, default='nuevo')
-    pendiente_pagar_prestamo = fields.Float(compute='_compute_prestamo', string='Pendiente a pagar del prestamos', )
+    ], string='Status', help='Estado del prestamo', readonly=True, default='nuevo')
+    pendiente_pagar_prestamo = fields.Monetary(compute='_compute_prestamo', string='Pendiente a pagar del prestamos')
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company, tracking=True)
+    currency_id = fields.Many2one(string="Currency", related='company_id.currency_id', readonly=True)
 
     def _compute_prestamo(self):
         for prestamo in self:
@@ -131,5 +133,5 @@ class rrhh_prestamo_linea(models.Model):
         ], string='Mes')
     monto = fields.Float('Monto')
     anio = fields.Integer('Año')
-    nomina_id = fields.Many2many('hr.payslip','prestamo_nominda_id_rel',string='Nomina')
-    prestamo_id = fields.Many2one('rrhh.prestamo','Prestamo')
+    nomina_id = fields.Many2many('hr.payslip' ,string='Nomina')
+    prestamo_id = fields.Many2one('rrhh.prestamo', 'Prestamo')

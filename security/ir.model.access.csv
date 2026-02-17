@@ -5,10 +5,10 @@ access_rrhh_planilla_usuario,rrhh.planilla.usuario,model_rrhh_planilla,base.grou
 access_rrhh_recibo_usuario,rrhh.recibo.usuario,model_rrhh_recibo,base.group_user,1,0,0,0
 access_rrhh_planilla_columna_manager,rrhh.planilla.columna.manager,model_rrhh_planilla_columna,hr.group_hr_manager,1,1,1,1
 access_rrhh_planilla_columna_usuario,rrhh.planilla.columna.usuario,model_rrhh_planilla_columna,base.group_user,1,0,0,0
-access_rrhh_recibo_linea_manager,rrhh.recibo.linea.manager,model_rrhh_recibo_linea,hr.group_hr_manager,1,1,1,1
-access_rrhh_recibo_linea_usuario,rrhh.recibo.linea.usuario,model_rrhh_recibo_linea,base.group_user,1,0,0,0
-access_rrhh_entrada_linea_manager,rrhh.entrada.linea.manager,model_rrhh_entrada_linea,hr.group_hr_manager,1,1,1,1
-access_rrhh_entrada_linea_usuario,rrhh.entrada.linea.usuario,model_rrhh_entrada_linea,base.group_user,1,0,0,0
+access_rrhh_recibo_regla_manager,rrhh.recibo.linea.manager,model_rrhh_recibo_regla,hr.group_hr_manager,1,1,1,1
+access_rrhh_recibo_regla_usuario,rrhh.recibo.linea.usuario,model_rrhh_recibo_regla,base.group_user,1,0,0,0
+access_rrhh_recibo_entrada_manager,rrhh.entrada.linea.manager,model_rrhh_recibo_entrada,hr.group_hr_manager,1,1,1,1
+access_rrhh_recibo_entrada_usuario,rrhh.entrada.linea.usuario,model_rrhh_recibo_entrada,base.group_user,1,0,0,0
 access_rrhh_prestamo_usuario,rrhh.prestamo.usuario,model_rrhh_prestamo,base.group_user,1,0,0,0
 access_rrhh_prestamo_manager,rrhh.prestamo.manager,model_rrhh_prestamo,hr.group_hr_manager,1,1,1,1
 access_rrhh_prestamo_linea_usuario,rrhh.prestamo.linea.usuario,model_rrhh_prestamo_linea,base.group_user,1,0,0,0

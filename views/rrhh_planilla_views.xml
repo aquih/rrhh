@@ -113,7 +113,7 @@
                         </field>
                     </page>
                     <page string="Entradas">
-                        <field name="entrada_id">
+                        <field name="linea_entrada_id">
                             <list editable="bottom">
                                 <field name="input_id"/>
                             </list>
@@ -126,7 +126,7 @@
 
     <record id="view_recibo_linea_form" model="ir.ui.view">
         <field name="name">recibo_linea.form</field>
-        <field name="model">rrhh.recibo.linea</field>
+        <field name="model">rrhh.recibo.regla</field>
         <field name="arch" type="xml">
             <form string="Lineas">
                 <group>

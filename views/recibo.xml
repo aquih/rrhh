@@ -24,8 +24,8 @@
                             <table style="margin: 0px auto;width:100%" class="table table-sm table-borderless">
                                 <tbody>
                                     <tr>
-                                        <t t-if="o.employee_id.codigo_empleado">
-                                            <td><strong>Código:</strong> <span t-field="o.employee_id.codigo_empleado"/></td>
+                                        <t t-if="o.employee_id.registration_number">
+                                            <td><strong>Código:</strong> <span t-field="o.employee_id.registration_number"/></td>
                                             <td><strong>Empleado:</strong> <span t-field="o.employee_id.name"/></td>
                                         </t>
                                         <t t-else="">

@@ -8,14 +8,14 @@ class rrhh_recibo(models.Model):
 
     name = fields.Char('Nombre', size=40, required=True)
     descripcion = fields.Char('Descripción', size=120)
-    linea_id = fields.One2many('rrhh.recibo.linea', 'recibo_id', 'Lineas')
-    linea_ingreso_id = fields.One2many('rrhh.recibo.linea', 'recibo_id', 'Ingresos', domain=[('tipo','=','ingreso')], context={'default_tipo':'ingreso'})
-    linea_deduccion_id = fields.One2many('rrhh.recibo.linea', 'recibo_id', 'Deducciones', domain=[('tipo','=','deduccion')], context={'default_tipo':'deduccion'})
-    entrada_id = fields.One2many('rrhh.entrada.linea','recibo_id',string='Entradas')
+    linea_id = fields.One2many('rrhh.recibo.regla', 'recibo_id', 'Lineas')
+    linea_ingreso_id = fields.One2many('rrhh.recibo.regla', 'recibo_id', 'Ingresos', domain=[('tipo','=','ingreso')], context={'default_tipo':'ingreso'})
+    linea_deduccion_id = fields.One2many('rrhh.recibo.regla', 'recibo_id', 'Deducciones', domain=[('tipo','=','deduccion')], context={'default_tipo':'deduccion'})
+    linea_entrada_id = fields.One2many('rrhh.recibo.entrada','recibo_id', string='Entradas')
 
 class rrhh_recibo_linea(models.Model):
-    _name = 'rrhh.recibo.linea'
-    _description = 'Linea de recibo'
+    _name = 'rrhh.recibo.regla'
+    _description = 'Linea de regla'
 
     name = fields.Char('Nombre', size=40, required=True)
     tipo = fields.Selection([ ('ingreso','Ingreso'), ('deduccion','Deducción') ], 'Tipo')
@@ -24,7 +24,7 @@ class rrhh_recibo_linea(models.Model):
     recibo_id = fields.Many2one('rrhh.recibo', 'Recibo', required=False)
 
 class rrhh_entrada_linea(models.Model):
-    _name = 'rrhh.entrada.linea'
+    _name = 'rrhh.recibo.entrada'
     _description = 'Linea de entrada'
 
     input_id = fields.Many2one('hr.payslip.input.type',string='Entradas')

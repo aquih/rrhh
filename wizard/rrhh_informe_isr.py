@@ -99,7 +99,7 @@ class rrhh_informe_isr(models.TransientModel):
                     fecha_baja = self._obtener_fecha_baja(nomina)
                     calculo_isr = self.env["hr.payslip"].calculo_isr(nomina)
                     hoja.write(fila, 0, correlativo)
-                    hoja.write(fila, 1, nomina.employee_id.codigo_empleado)
+                    hoja.write(fila, 1, nomina.employee_id.registration_number)
                     hoja.write(fila, 2, fecha_alta)
                     hoja.write(fila, 3, fecha_baja)
                     hoja.write(fila, 4, nomina.employee_id.work_contact_id.nit)
