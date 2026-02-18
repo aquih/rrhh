@@ -8,7 +8,6 @@
             <data>
                 <field name="date_start" position="after">
                     <field name="fecha_reinicio_labores"/>
-                    <!--<field name="motivo_terminacion"/>-->
                     <field name="temporalidad_contrato"/>
                     <field name="calcula_indemnizacion"/>
                     <field name="historial_salario_ids">
@@ -17,6 +16,7 @@
                             <field name="fecha"/>
                         </list>
                     </field>
+                    <!--<field name="motivo_terminacion"/>-->
                 </field>
                 <field name="structure_type_id" position="after">
                     <label for="base_extra"/>

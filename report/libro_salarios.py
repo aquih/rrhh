@@ -10,6 +10,7 @@ import logging
 
 class ReportLibroSalarios(models.AbstractModel):
     _name = 'report.rrhh.libro_salarios'
+    _description = 'Estructura de libro de salarios'
 
     def _get_contrato(self,id):
         contract = False

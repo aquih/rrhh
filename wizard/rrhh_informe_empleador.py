@@ -18,10 +18,11 @@ from odoo.addons.l10n_gt_extra import a_letras
 
 class rrhh_informe_empleador(models.TransientModel):
     _name = 'rrhh.informe_empleador'
+    _description = 'Wizard para generar informe de empleador'
 
     anio = fields.Integer('Año', required=True)
     name = fields.Char('Nombre archivo', size=32)
-    archivo = fields.Binary('Archivo', filters='.xls')
+    archivo = fields.Binary('Archivo')
 
     def _get_empleado(self,id):
         empleado_id = self.env['hr.employee'].search([('id', '=', id)])
@@ -481,7 +482,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     hoja_empleado.write(fila, 12, empleado.country_of_birth.code)
                     hoja_empleado.write(fila, 13, empleado.permiso_trabajo)
                     hoja_empleado.write(fila, 14, empleado.place_of_birth)
-                    hoja_empleado.write(fila, 15, empleado.work_contact_id.nit)
+                    hoja_empleado.write(fila, 15, empleado.work_contact_id.vat or empleado.nit)
                     hoja_empleado.write(fila, 16, empleado.igss)
                     hoja_empleado.write(fila, 17, genero)
                     hoja_empleado.write(fila, 18, empleado.birthday)

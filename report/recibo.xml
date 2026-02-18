@@ -24,8 +24,8 @@
                             <table style="margin: 0px auto;width:100%" class="table table-sm table-borderless">
                                 <tbody>
                                     <tr>
-                                        <t t-if="o.employee_id.registration_number">
-                                            <td><strong>Código:</strong> <span t-field="o.employee_id.registration_number"/></td>
+                                        <t t-if="o.employee_id.registration_number or o.employee_id.codigo_empleado">
+                                            <td><strong>Código:</strong> <span t-field="o.employee_id.registration_number or o.employee_id.codigo_empleado"/></td>
                                             <td><strong>Empleado:</strong> <span t-field="o.employee_id.name"/></td>
                                         </t>
                                         <t t-else="">
@@ -45,9 +45,9 @@
                                         <td><strong>Sueldo base mensual:</strong> <span t-field="o.contract_id.wage"/></td>
                                         <t t-set="horas" t-value="horas_extras(o)"/>
                                         <td><strong>DPI: </strong><span t-field="o.employee_id.identification_id"/>
-                                            <t t-if="o.employee_id.work_contact_id.nit">
+                                            <t t-if="o.employee_id.work_contact_id.vat or o.employee_id.nit">
                                                 <br/>
-                                                <strong>NIT: </strong><span t-esc="o.employee_id.work_contact_id.nit"/>
+                                                <strong>NIT: </strong><span t-esc="o.employee_id.work_contact_id.vat or o.employee_id.nit"/>
                                             </t>
                                         </td>
                                         <t t-set="dias" t-value="0.0"/>

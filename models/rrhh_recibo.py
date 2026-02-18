@@ -20,7 +20,7 @@ class rrhh_recibo_linea(models.Model):
     name = fields.Char('Nombre', size=40, required=True)
     tipo = fields.Selection([ ('ingreso','Ingreso'), ('deduccion','Deducción') ], 'Tipo')
     sequence = fields.Integer('Secuencia', required=True, index=True, default=5)
-    regla_id = fields.Many2many('hr.salary.rule', id1='linea_id', id2='regla_id', string='Reglas')
+    regla_id = fields.Many2many('hr.salary.rule', string='Reglas')
     recibo_id = fields.Many2one('rrhh.recibo', 'Recibo', required=False)
 
 class rrhh_entrada_linea(models.Model):

@@ -5,5 +5,5 @@ from odoo.release import version_info
 class HrWorkEntryType(models.Model):
     _inherit = "hr.work.entry.type"
 
-    # TODO: Creo que se debería quitar
-    descontar_nomina = fields.Boolean('Descontar en nómina')
+    # TODO: Quitar en la siguiente versión
+    descontar_nomina = fields.Boolean('Descontar en nómina') # usar mejor la forma nativa de calcular horas y días de Odoo

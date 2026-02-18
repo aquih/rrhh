@@ -27,7 +27,7 @@ class rrhh_prestamo(models.Model):
         ('pagado', 'Pagado')
     ], string='Status', help='Estado del prestamo', readonly=True, default='nuevo')
     pendiente_pagar_prestamo = fields.Monetary(compute='_compute_prestamo', string='Pendiente a pagar del prestamos')
-    company_id = fields.Many2one('res.company', default=lambda self: self.env.company, tracking=True)
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id = fields.Many2one(string="Currency", related='company_id.currency_id', readonly=True)
 
     def _compute_prestamo(self):

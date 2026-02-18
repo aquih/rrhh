@@ -9,6 +9,7 @@ import logging
 
 class ReportInformeEmpleador(models.AbstractModel):
     _name = 'report.rrhh.informe_empleador'
+    _description = 'Reporte de informe de empleador'
 
     @api.model
     def _get_report_values(self, docids, data=None):

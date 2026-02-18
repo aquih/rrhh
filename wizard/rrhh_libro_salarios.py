@@ -10,6 +10,7 @@ import xlsxwriter
 
 class rrhh_libro_salarios(models.TransientModel):
     _name = 'rrhh.libro_salarios'
+    _description = 'Wizard para generar libro de salarios'
 
     anio = fields.Integer('Año', required=True)
     folio_inicial = fields.Integer(string="Folio Inicial", required=True, default=1)

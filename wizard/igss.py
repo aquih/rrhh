@@ -8,6 +8,7 @@ from datetime import datetime
 
 class rrhh_igss_wizard(models.TransientModel):
     _name = 'rrhh.igss.wizard'
+    _description = 'Wizard para generar archivo de IGSS'
 
     def _default_payslip_run(self):
         if len(self.env.context.get('active_ids', [])) > 0:
@@ -84,7 +85,7 @@ class rrhh_igss_wizard(models.TransientModel):
                         fecha_baja = str(datetime.strptime(str(slip.contract_id.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if (mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla) else ''
 
                         centro_trabajo = str(slip.employee_id.codigo_centro_trabajo) if slip.employee_id.codigo_centro_trabajo else ''
-                        nit = slip.employee_id.work_contact_id.nit if slip.employee_id.work_contact_id.nit else ''
+                        nit = slip.employee_id.work_contact_id.vat if slip.employee_id.work_contact_id.vat else slip.employee_id.nit or ''
                         codigo_ocupacion = str(slip.employee_id.codigo_ocupacion) if slip.employee_id.codigo_ocupacion else ''
                         condicion_laboral = str(slip.employee_id.condicion_laboral) if slip.employee_id.condicion_laboral else ''
                         deducciones = ''
@@ -122,7 +123,7 @@ class rrhh_igss_wizard(models.TransientModel):
                     ausencias = self.env['hr.leave'].search([('employee_id','=', empleado['empleado_id']),('request_date_from','>=',self.fecha_inicial),('request_date_to','<=',self.fecha_final),('state','=','validate')])
                     if ausencias:
                         for ausencia in ausencias:
-                            if ausencia.holiday_status_id.suspension_igss:
+                            if ausencia.holiday_status_id == self.env.ref('rrhh.suspension_igss') or ausencia.holiday_status_id.suspension_igss:
                                 fecha_inicio = str(datetime.strptime(str(ausencia.date_from),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
                                 fecha_fin = str(datetime.strptime(str(ausencia.date_to),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
                                 igss = ausencia.employee_id.igss if ausencia.employee_id.igss else ""

@@ -49,7 +49,7 @@ class HrEmployeePrivate(models.Model):
     nit = fields.Char('NIT', groups="hr.group_hr_user") # usar el vat del work_contact_id
     etnia = fields.Char('Etnia', groups="hr.group_hr_user") # no parece usarse
     idioma = fields.Char('Idioma', groups="hr.group_hr_user") # no parece usarse
-    pais_origen = fields.Many2one('res.country','Pais Origen', groups="hr.group_hr_user") # usar country_of_birth
+    pais_origen = fields.Many2one('res.country', 'Pais Origen', groups="hr.group_hr_user") # usar country_of_birth
     codigo_pais_origen = fields.Char('Codigo pais', groups="hr.group_hr_user") # usar country_of_birth
     trabajado_extranjero = fields.Boolean('A trabajado en el extranjero', groups="hr.group_hr_user") # no parece usarse
     motivo_finalizacion = fields.Char('Motivo de finalizacion', groups="hr.group_hr_user") # no parece usarse
