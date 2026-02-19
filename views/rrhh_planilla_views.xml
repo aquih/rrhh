@@ -1,7 +1,7 @@
 <odoo>
 
-    <record id="view_planilla_list" model="ir.ui.view">
-        <field name="name">planilla.list</field>
+    <record id="rrhh_planilla_view_list" model="ir.ui.view">
+        <field name="name">rrhh.planilla.view.list</field>
         <field name="model">rrhh.planilla</field>
         <field name="arch" type="xml">
             <list string="Planillas">
@@ -11,8 +11,8 @@
         </field>
     </record>
 
-    <record id="view_planilla_form" model="ir.ui.view">
-        <field name="name">planilla.form</field>
+    <record id="rrhh_planilla_view_form" model="ir.ui.view">
+        <field name="name">rrhh.planilla.view.form</field>
         <field name="model">rrhh.planilla</field>
         <field name="arch" type="xml">
             <form string="Planillas">

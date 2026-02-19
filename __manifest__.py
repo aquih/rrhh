@@ -18,11 +18,11 @@
         'data/hr_leave_type_data.xml',
         'data/report_paperformat.xml',
 
+        'views/rrhh_planilla_views.xml',
+        'views/rrhh_prestamo_views.xml',
         'views/hr_employee_views.xml',
         'views/hr_payslip_run_views.xml',
         'views/hr_payslip_views.xml',
-        'views/rrhh_planilla_views.xml',
-        'views/rrhh_prestamo_views.xml',
         'views/res_company_views.xml',
 
         'report/recibo.xml',

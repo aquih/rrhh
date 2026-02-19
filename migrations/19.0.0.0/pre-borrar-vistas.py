@@ -14,4 +14,6 @@ def migrate(cr, version):
     util.records.remove_view(cr, xml_id="rrhh.rrhh_edit_holiday_status_form")
     util.records.remove_view(cr, xml_id="rrhh.rrhh_view_hr_payslip_form")
     util.records.remove_view(cr, xml_id="rrhh.rrhh_hr_work_entry_type_view_form")
+    util.records.remove_view(cr, xml_id="rrhh.view_planilla_list")
+    util.records.remove_view(cr, xml_id="rrhh.view_planilla_form")
     _logger.info("Borrar vistas viejas")
