@@ -7,27 +7,30 @@
             <t t-set="data_report_header_spacing" t-value="18"/>
             <t t-set="data_report_dpi" t-value="110"/>
             <div class="header">
-                FOLIO: <span class="page" t-esc="folio_inicial-1"></span>
+                <div class="encabezado">
+                    <div class="float-start">
+                        FOLIO: <span class="page" t-esc="folio_inicial-1"></span>
+                    </div>
+                    <div style="text-align: center">
+                        <span t-field="current_company_id.name"/>
+                    </div>
+                    <div style="text-align: center">
+                        <span t-field="current_company_id.vat"/>
+                    </div>
+                    <div style="text-align: center">
+                        LIBRO DE SALARIOS PARA TRABAJADORES PERMANENTES
+
+                    </div>
+                    <div style="text-align: center">
+                        AUTORIZADO POR EL MINISTERIO DE TRABAJO Y PREVISION SOCIAL, SEGÚN ARTÍCULO 102 DEL CODIGO DE TRABAJO
+                    </div>
+                </div>
             </div>
             <div class="article">
                 <div class="page">
                     <t t-foreach="docs" t-as="o">
                         <t t-set="empleado" t-value="_get_empleado(o)"/>
 
-                        <div class="encabezado" align="center">
-                            <div style="tex-align:center">
-                                <span t-field="empleado.company_id.name"/>
-                            </div>
-                            <div style="tex-align:center">
-                                <span t-field="empleado.company_id.vat"/>
-                            </div>
-                            <div style="tex-align:center">
-                                LIBRO DE SALARIOS PARA TRABAJADORES PERMANENTES
-                            </div>
-                            <div style="tex-align:center">
-                                AUTORIZADO POR EL MINISTERIO DE TRABAJO Y PREVISION SOCIAL, SEGÚN ARTÍCULO 102 DEL CODIGO DE TRABAJO
-                            </div>
-                        </div>
                         <table style="margin: 0px auto;" class="table table-sm table-borderless">
                             <tr>
                                 <td style="text-align:center">
