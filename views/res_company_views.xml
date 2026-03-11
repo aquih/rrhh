@@ -9,6 +9,26 @@
                 <data>
                     <notebook position="inside">
                         <page string="Guatemala">
+                            <group string="Recibos">
+                                <group>
+                                    <field name="tipo_entrada_trabajo_id"/>
+                                    <field name="monto_deduccion_fija"/>
+                                    <field name="isr_sueldo_base_extra"/>
+                                    <field name="proyectar_bonificaciones_adicionales"/>
+                                </group>
+                                <group>
+                                    <field name="ajuste_ids" widget="many2many_tags"/> 
+                                    <field name="salario_ids" widget="many2many_tags"/>
+                                    <field name="salario_total_ids" widget="many2many_tags"/>
+                                    <field name="horas_extras_ids" widget="many2many_tags"/>
+                                    <field name="extras_ids" widget="many2many_tags"/>
+                                    <field name="igss_ids" widget="many2many_tags"/>
+                                    <field name="isr_ids" widget="many2many_tags"/>
+                                    <field name="bonificacion_ids" widget="many2many_tags"/>
+                                    <field name="bonificaciones_adicionales_ids" widget="many2many_tags"/>
+                                    <field name="otro_ingreso_afecto_ids" widget="many2many_tags"/>
+                                </group>
+                            </group>                        
                             <group string="Archivo IGSS">
                                 <group>
                                     <field name="version_mensaje"/>
@@ -52,27 +72,6 @@
                                     <field name="retribucion_vacaciones_ids" widget="many2many_tags"/>
                                     <field name="bonificaciones_adicionales_ids" widget="many2many_tags"/>
                                     <field name="decreto_ids" widget="many2many_tags"/>
-                                    <!--<field name="marca"/>-->
-                                </group>
-                            </group>
-                            <group string="Recibos">
-                                <group>
-                                    <field name="tipo_entrada_trabajo_id"/>
-                                    <field name="monto_deduccion_fija"/>
-                                    <field name="isr_sueldo_base_extra"/>
-                                    <field name="proyectar_bonificaciones_adicionales"/>
-                                </group>
-                                <group>
-                                    <field name="ajuste_ids" widget="many2many_tags"/> 
-                                    <field name="salario_ids" widget="many2many_tags"/>
-                                    <field name="salario_total_ids" widget="many2many_tags"/>
-                                    <field name="horas_extras_ids" widget="many2many_tags"/>
-                                    <field name="extras_ids" widget="many2many_tags"/>
-                                    <field name="igss_ids" widget="many2many_tags"/>
-                                    <field name="isr_ids" widget="many2many_tags"/>
-                                    <field name="bonificacion_ids" widget="many2many_tags"/>
-                                    <field name="bonificaciones_adicionales_ids" widget="many2many_tags"/>
-                                    <field name="otro_ingreso_afecto_ids" widget="many2many_tags"/>
                                 </group>
                             </group>
                             <group string="Libro de salarios">
@@ -105,6 +104,7 @@
                                     <!--<field name="salario_promedio_ids" widget="many2many_tags"/>-->
                                     <!--<field name="descuentos_ids" widget="many2many_tags"/>-->
                                     <!--<field name="septimos_asuetos_ids" widget="many2many_tags"/>-->
+                                    <!--<field name="marca"/>-->
                                 </group>
                             </group>
                             <label for="centro_trabajo_ids" string="Centros de trabajo"/>

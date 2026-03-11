@@ -1,0 +1,67 @@
+<odoo>
+
+    <record id="rrhh_recibo_view_list" model="ir.ui.view">
+        <field name="name">rrhh.recibo.view.list</field>
+        <field name="model">rrhh.recibo</field>
+        <field name="arch" type="xml">
+            <list string="Recibos">
+                <field name="name"/>
+                <field name="descripcion"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="rrhh_recibo_view_form" model="ir.ui.view">
+        <field name="name">rrhh.recibo.view.form</field>
+        <field name="model">rrhh.recibo</field>
+        <field name="arch" type="xml">
+            <form string="Recibos">
+                <group>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <group>
+                        <field name="descripcion"/>
+                    </group>
+                </group>
+                <notebook colspan="4">
+                    <page string="Ingresos">
+                        <field name="linea_ingreso_id">
+                            <list editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="regla_id" widget="many2many_tags"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Deducciones">
+                        <field name="linea_deduccion_id">
+                            <list editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="regla_id" widget="many2many_tags"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Entradas">
+                        <field name="linea_entrada_id">
+                            <list editable="bottom">
+                                <field name="input_id"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </form>
+        </field>
+    </record>
+
+    <record id="rrhh_recibo_action" model="ir.actions.act_window">
+        <field name="name">Recibo</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">rrhh.recibo</field>
+        <field name="help">Configuración de recibos para generar formatos</field>
+    </record>
+
+    <menuitem action="rrhh_recibo_action" id="rrhh_recibo_menu" name="Recibo" parent="hr_payroll.menu_hr_salary_configuration" groups="hr.group_hr_manager" sequence="100"/>
+
+</odoo>

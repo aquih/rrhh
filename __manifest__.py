@@ -20,21 +20,23 @@
 
         'views/rrhh_planilla_views.xml',
         'views/rrhh_prestamo_views.xml',
+        'views/rrhh_recibo_views.xml',
         'views/hr_employee_views.xml',
         'views/hr_payslip_run_views.xml',
         'views/hr_payslip_views.xml',
         'views/res_company_views.xml',
 
-        'report/recibo.xml',
-        'report/libro_salarios.xml',
-        'report/report_views.xml',
+        'report/recibo_report_templates.xml',
+        'report/recibo_report_views.xml',
+        'report/libro_salarios_report_templates.xml',
+        'report/planilla_report_templates.xml',
 
-        'wizard/planilla_pdf.xml',
-        'wizard/planilla.xml',
-        'wizard/rrhh_libro_salarios_view.xml',
-        'wizard/rrhh_informe_empleador_view.xml',
-        'wizard/igss.xml',
-        'wizard/rrhh_informe_isr_view.xml',
+        'wizard/planilla_wizard_views.xml',
+        'wizard/libro_salarios_wizard_views.xml',
+        'wizard/informe_empleador_wizard_views.xml',
+        'wizard/archivo_igss_wizard_views.xml',
+        'wizard/informe_isr_wizard_views.xml',
+
         'security/ir.model.access.csv',
         'security/rrhh_security.xml',
 

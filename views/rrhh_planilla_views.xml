@@ -41,6 +41,7 @@
         </field>
     </record>
 
+    <!--
     <record id="view_planilla_columna_form" model="ir.ui.view">
         <field name="name">planilla_columna.form</field>
         <field name="model">rrhh.planilla.columna</field>
@@ -58,96 +59,15 @@
             </form>
         </field>
     </record>
-
-    <record id="action_planilla" model="ir.actions.act_window">
+    -->
+    
+    <record id="rrhh_planilla_action" model="ir.actions.act_window">
         <field name="name">Planilla</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">rrhh.planilla</field>
-        <field name="help">Configuración de planillas para generar reportes en Excel</field>
+        <field name="help">Configuración de planillas para generar reportes</field>
     </record>
 
-
-    <menuitem action="action_planilla" id="menu_planilla" parent="hr_payroll.menu_hr_salary_configuration" sequence="2"/>
-
-    <record id="view_recibo_list" model="ir.ui.view">
-        <field name="name">recibo.list</field>
-        <field name="model">rrhh.recibo</field>
-        <field name="arch" type="xml">
-            <list string="Recibos">
-                <field name="name"/>
-                <field name="descripcion"/>
-            </list>
-        </field>
-    </record>
-
-    <record id="view_recibo_form" model="ir.ui.view">
-        <field name="name">recibo.form</field>
-        <field name="model">rrhh.recibo</field>
-        <field name="arch" type="xml">
-            <form string="Recibos">
-                <group>
-                    <group>
-                        <field name="name"/>
-                    </group>
-                    <group>
-                        <field name="descripcion"/>
-                    </group>
-                </group>
-                <notebook colspan="4">
-                    <page string="Ingresos">
-                        <field name="linea_ingreso_id">
-                            <list editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="regla_id" widget="many2many_tags"/>
-                            </list>
-                        </field>
-                    </page>
-                    <page string="Deducciones">
-                        <field name="linea_deduccion_id">
-                            <list editable="bottom">
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <field name="regla_id" widget="many2many_tags"/>
-                            </list>
-                        </field>
-                    </page>
-                    <page string="Entradas">
-                        <field name="linea_entrada_id">
-                            <list editable="bottom">
-                                <field name="input_id"/>
-                            </list>
-                        </field>
-                    </page>
-                </notebook>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_recibo_linea_form" model="ir.ui.view">
-        <field name="name">recibo_linea.form</field>
-        <field name="model">rrhh.recibo.regla</field>
-        <field name="arch" type="xml">
-            <form string="Lineas">
-                <group>
-                    <group>
-                        <field name="name"/>
-                    </group>
-                    <group>
-                        <field name="regla_id" widget="many2many_tags"/>
-                    </group>
-                </group>
-            </form>
-        </field>
-    </record>
-
-    <record id="action_recibo" model="ir.actions.act_window">
-        <field name="name">Recibo</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">rrhh.recibo</field>
-        <field name="help">Configuración de recibos para generar formatos</field>
-    </record>
-
-    <menuitem action="action_recibo" id="menu_recibo" name="Recibo" parent="hr_payroll.menu_hr_salary_configuration" groups="hr.group_hr_manager" sequence="100"/>
+    <menuitem action="rrhh_planilla_action" id="rrhh_planilla_menu" parent="hr_payroll.menu_hr_salary_configuration" sequence="2"/>
 
 </odoo>

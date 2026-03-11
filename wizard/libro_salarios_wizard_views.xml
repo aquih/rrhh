@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_rrhh_libro_salarios" model="ir.ui.view">
-            <field name="name">Libro de salarios</field>
-            <field name="model">rrhh.libro_salarios</field>
+    <record id="libro_salarios_wizard_view_form" model="ir.ui.view">
+            <field name="name">rrhh.libro_salarios.wizard.view.form</field>
+            <field name="model">rrhh.libro_salarios.wizard</field>
             <field name="arch" type="xml">
             <form string="Libro de salarios">
                 <group string="Año">
@@ -23,20 +23,20 @@
             </field>
     </record>
 
-    <record id="action_libro_salarios" model="ir.actions.report">
+    <record id="libro_salarios_wizard_report" model="ir.actions.report">
         <field name="name">Libro de salarios</field>
-        <field name="model">rrhh.libro_salarios</field>
+        <field name="model">rrhh.libro_salarios.wizard</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">rrhh.libro_salarios</field>
-        <field name="report_file">rrhh.libro_salarios</field>
+        <field name="report_name">rrhh.libro_salarios_report</field>
+        <field name="report_file">rrhh.libro_salarios_report</field>
         <field name="paperformat_id" ref="paperformat_libro_salarios"/>
     </record>
 
-    <record id="action_rrhh_libro_salarios" model="ir.actions.act_window">
+    <record id="libro_salarios_wizard_action" model="ir.actions.act_window">
         <field name="name">Libro de salarios</field>
-        <field name="res_model">rrhh.libro_salarios</field>
+        <field name="res_model">rrhh.libro_salarios.wizard</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_rrhh_libro_salarios"/>
+        <field name="view_id" ref="libro_salarios_wizard_view_form"/>
         <field name="target">new</field>
         <field name="binding_model_id" ref="model_hr_employee"/>
     </record>

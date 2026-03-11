@@ -7,7 +7,7 @@ import datetime
 from datetime import datetime
 
 class rrhh_igss_wizard(models.TransientModel):
-    _name = 'rrhh.igss.wizard'
+    _name = 'rrhh.archivo_igss.wizard'
     _description = 'Wizard para generar archivo de IGSS'
 
     def _default_payslip_run(self):
@@ -149,7 +149,7 @@ class rrhh_igss_wizard(models.TransientModel):
         return {
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'rrhh.igss.wizard',
+            'res_model': 'rrhh.archivo_igss.wizard',
             'res_id': self.id,
             'view_id': False,
             'type': 'ir.actions.act_window',

@@ -9,7 +9,7 @@ import xlsxwriter
 
 
 class rrhh_libro_salarios(models.TransientModel):
-    _name = 'rrhh.libro_salarios'
+    _name = 'rrhh.libro_salarios.wizard'
     _description = 'Wizard para generar libro de salarios'
 
     anio = fields.Integer('Año', required=True)
@@ -89,7 +89,6 @@ class rrhh_libro_salarios(models.TransientModel):
                 decreto_total = 0
                 incentivo_decreto_total = 0
                 liquido_total = 0
-                
                 
                 hoja.write(15, 4, 'HORAS TRABAJADAS', bold)
                 hoja.write(15, 7, 'SALARIO DEVENGADO', bold)
@@ -179,7 +178,7 @@ class rrhh_libro_salarios(models.TransientModel):
         return {
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'rrhh.libro_salarios',
+            'res_model': 'rrhh.libro_salarios.wizard',
             'res_id': self.id,
             'view_id': False,
             'type': 'ir.actions.act_window',

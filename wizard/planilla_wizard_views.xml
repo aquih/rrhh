@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_planilla_wizard_form" model="ir.ui.view">
-        <field name="name">planilla_wizard.form</field>
+    <record id="planilla_wizard_view_form" model="ir.ui.view">
+        <field name="name">planilla.wizard.view.form</field>
         <field name="model">rrhh.planilla.wizard</field>
         <field name="arch" type="xml">
             <form string="Planillas">
@@ -28,20 +28,20 @@
         </field>
     </record>
 
-    <record id="action_planilla_pdf" model="ir.actions.report">
-        <field name="name">Planilla PDF</field>
+    <record id="planilla_wizard_report" model="ir.actions.report">
+        <field name="name">Planilla</field>
         <field name="model">rhh.planilla.wizard</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">rrhh.planilla_pdf</field>
-        <field name="report_file">rrhh.planilla_pdf</field>
+        <field name="report_name">rrhh.planilla_report</field>
+        <field name="report_file">rrhh.planilla_report</field>
         <field name="paperformat_id" ref="paperformat_libro_salarios"/>
     </record>
 
-    <record id="action_planilla_wizard" model="ir.actions.act_window">
+    <record id="planilla_wizard_action" model="ir.actions.act_window">
         <field name="name">Planilla</field>
         <field name="res_model">rrhh.planilla.wizard</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_planilla_wizard_form"/>
+        <field name="view_id" ref="planilla_wizard_view_form"/>
         <field name="target">new</field>
         <field name="binding_model_id" ref="model_hr_payslip_run"/>
     </record>

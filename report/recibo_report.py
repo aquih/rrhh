@@ -81,4 +81,3 @@ class ReportRecibo(models.AbstractModel):
             'lineas': self.lineas,
             'horas_extras': self.horas_extras,
         }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

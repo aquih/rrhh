@@ -17,7 +17,7 @@ from dateutil.relativedelta import relativedelta
 from odoo.addons.l10n_gt_extra import a_letras
 
 class rrhh_informe_empleador(models.TransientModel):
-    _name = 'rrhh.informe_empleador'
+    _name = 'rrhh.informe_empleador.wizard'
     _description = 'Wizard para generar informe de empleador'
 
     anio = fields.Integer('Año', required=True)
@@ -525,7 +525,7 @@ class rrhh_informe_empleador(models.TransientModel):
         return {
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'rrhh.informe_empleador',
+            'res_model': 'rrhh.informe_empleador.wizard',
             'res_id': self.id,
             'view_id': False,
             'type': 'ir.actions.act_window',

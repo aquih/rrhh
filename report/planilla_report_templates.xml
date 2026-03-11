@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="planilla_pdf">
+    <template id="planilla">
         <t t-call="web.basic_layout">
             <t t-foreach="docs" t-as="o">
                 <t t-set="reporte" t-value="reporte(data)"/>

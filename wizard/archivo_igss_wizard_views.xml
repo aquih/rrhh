@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_igss_wizard_form" model="ir.ui.view">
-        <field name="name">igss_wizard.form</field>
-        <field name="model">rrhh.igss.wizard</field>
+    <record id="archivo_igss_wizard_view_form" model="ir.ui.view">
+        <field name="name">rrhh.archivo_igss.wizard.view.form</field>
+        <field name="model">rrhh.archivo_igss.wizard</field>
         <field name="arch" type="xml">
             <form string="Planillas">
                 <group>
@@ -42,21 +42,19 @@
                 </group>
                 <footer>
                     <button name="generar" string="Generar" type="object" class="oe_highlight"/>
-                    or
-                    <button string="Cancel" class="oe_link" special="cancel"/>
+                    <button string="Cancelar" class="oe_link" special="cancel"/>
                 </footer>
             </form>
         </field>
     </record>
 
-    <record id="action_igss_wizard" model="ir.actions.act_window">
-        <field name="name">IGSS</field>
-        <field name="res_model">rrhh.igss.wizard</field>
+    <record id="archivo_igss_wizard_action" model="ir.actions.act_window">
+        <field name="name">Archivo IGSS</field>
+        <field name="res_model">rrhh.archivo_igss.wizard</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_igss_wizard_form"/>
+        <field name="view_id" ref="archivo_igss_wizard_view_form"/>
         <field name="target">new</field>
         <field name="binding_model_id" ref="model_hr_payslip_run"/>
-
     </record>
         
 </odoo>

@@ -8,7 +8,7 @@ import io
 import xlsxwriter
 
 class rrhh_informe_isr(models.TransientModel):
-    _name = 'rrhh.informe_isr'
+    _name = 'rrhh.informe_isr.wizard'
     _description = 'Wizard para generar informe de ISR'
 
     name = fields.Char('Nombre archivo')
@@ -134,7 +134,7 @@ class rrhh_informe_isr(models.TransientModel):
         return {
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'rrhh.informe_isr',
+            'res_model': 'rrhh.informe_isr.wizard',
             'res_id': self.id,
             'view_id': False,
             'type': 'ir.actions.act_window',

@@ -223,15 +223,15 @@ class ReportLibroSalarios(models.AbstractModel):
                     'otras_deducciones': otras_deducciones,
                     'total_deducciones': total_deducciones,
                     'bonificacion_id': bonificacion,
-                    # 'decreto': decreto,
                     'boni_incentivo_decreto': boni_incentivo_decreto,
-                    # 'fija': fija,
                     'variable': variable,
                     'dev_isr_otro': dev_isr_otro,
                     'bono_agui_indem': bono_agui_indem,
                     'otros_salarios': otros_salarios,
-                    # 'liquido_recibir': total_salario_devengado + boni_incentivo_decreto +dev_isr_otro
                     'liquido_recibir': total_salario_devengado + total_deducciones +bono_agui_indem+ boni_incentivo_decreto + dev_isr_otro
+                    # 'liquido_recibir': total_salario_devengado + boni_incentivo_decreto +dev_isr_otro
+                    # 'fija': fija,
+                    # 'decreto': decreto,
                     # 'liquido_recibir': total_salario_devengado + total_deducciones + bono_agui_indem + decreto + fija + variable
                 })
         return nominas_lista
@@ -253,4 +253,3 @@ class ReportLibroSalarios(models.AbstractModel):
             '_get_contrato': self._get_contrato,
             '_get_nominas': self._get_nominas,
         }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

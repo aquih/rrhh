@@ -5,7 +5,7 @@ import datetime
 import logging
 
 class report_planilla_pdf(models.AbstractModel):
-    _name = 'report.rrhh.planilla_pdf'
+    _name = 'report.rrhh.planilla'
     _description = 'Reporte de planilla'
 
     def buscar_partida_nominas(self,slip_ids):

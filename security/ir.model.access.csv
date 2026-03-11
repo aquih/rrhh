@@ -17,9 +17,8 @@ access_rrhh_res_company_centro_trabajo_usuario,rrhh.res.company.centro.trabajo.u
 access_rrhh_res_company_centro_trabajo_manager,rrhh.res.company.centro.trabajo.manager,rrhh.model_res_company_centro_trabajo,hr.group_hr_manager,1,1,1,1
 access_rrhh_historial_salario_user,rrhh.historial.salario.user,model_rrhh_historial_salario,base.group_user,1,0,0,0
 access_rrhh_historial_salario_manager,rrhh.historial.salario.manager,model_rrhh_historial_salario,hr.group_hr_manager,1,1,1,1
-access_rrhh_informe_empleador_manager,rrhh.informe.empleador.manager,rrhh.model_rrhh_informe_empleador,hr.group_hr_manager,1,1,1,1
-access_rrhh_libro_salarios_manager,rrhh.libro.salarios.manager,rrhh.model_rrhh_libro_salarios,hr.group_hr_manager,1,1,1,1
-access_rrhh_igss_wizard_manager,rrhh.igss.wizard.manager,rrhh.model_rrhh_igss_wizard,hr.group_hr_manager,1,1,1,1
+access_rrhh_informe_empleador_wizard_manager,rrhh.informe.empleador.wizard.manager,rrhh.model_rrhh_informe_empleador_wizard,hr.group_hr_manager,1,1,1,1
+access_rrhh_libro_salarios_wizard_manager,rrhh.libro.salarios.wizard.manager,rrhh.model_rrhh_libro_salarios_wizard,hr.group_hr_manager,1,1,1,1
+access_rrhh_igss_wizard_manager,rrhh.archivo_igss.wizard.manager,rrhh.model_rrhh_archivo_igss_wizard,hr.group_hr_manager,1,1,1,1
 access_rrhh_planilla_wizard_manager,rrhh.planilla.wizard.manager,rrhh.model_rrhh_planilla_wizard,hr.group_hr_manager,1,1,1,1
-access_rrhh_planilla_pdf_manager,rrhh.planilla_pdf.manager,rrhh.model_report_rrhh_planilla_pdf,hr.group_hr_manager,1,1,1,1
-access_rrhh_informe_isr_manager,rrhh.informe.isr.manager,rrhh.model_rrhh_informe_isr,hr.group_hr_manager,1,1,1,1
+access_rrhh_informe_isr_wizard_manager,rrhh.informe.isr.wizard.manager,rrhh.model_rrhh_informe_isr_wizard,hr.group_hr_manager,1,1,1,1

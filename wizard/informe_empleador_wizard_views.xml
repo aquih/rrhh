@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="informe_empleador_wizard_view_form" model="ir.ui.view">
+        <field name="name">rrhh.informe_empleador.wizard.view.form</field>
+        <field name="model">rrhh.informe_empleador.wizard</field>
+        <field name="arch" type="xml">
+        <form string="Informe del empleador">
+            <group string="Año">
+                <field name="anio"/>
+            </group>
+            <group>
+                <field name="name" invisible="1"/>
+                <field name="archivo" readonly="1" filename="name"/>
+            </group>
+            <footer>
+                <button name="print_report_excel" string="Reporte excel" type="object" class="oe_highlight"/>
+                <button string="Cancelar" class="btn-default" special="cancel" />
+            </footer>
+        </form>
+        </field>
+    </record>
+
+    <record id="informe_empleador_wizard_action" model="ir.actions.act_window">
+        <field name="name">Informe del empleador</field>
+        <field name="res_model">rrhh.informe_empleador.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="informe_empleador_wizard_view_form"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_hr_employee"/>
+    </record>
+    
+</odoo>

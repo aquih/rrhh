@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="rrhh_recibo" model="ir.actions.report">
+    <record id="recibo_report" model="ir.actions.report">
         <field name="name">Recibo</field>
         <field name="model">rrhh.recibo</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">rrhh.recibo</field>
-        <field name="report_file">rrhh.recibo</field>
+        <field name="report_name">rrhh.recibo_report</field>
+        <field name="report_file">rrhh.recibo_report</field>
         <field name="binding_model_id" ref="model_hr_payslip"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_recibo"/>
