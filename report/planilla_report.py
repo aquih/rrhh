@@ -6,7 +6,7 @@ import logging
 
 class report_planilla_pdf(models.AbstractModel):
     _name = 'report.rrhh.planilla'
-    _description = 'Reporte de planilla'
+    _description = 'Planilla de salario'
 
     def buscar_partida_nominas(self,slip_ids):
         cantidad_nominas_partida = 0

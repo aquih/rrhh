@@ -26,24 +26,19 @@
         'views/hr_payslip_views.xml',
         'views/res_company_views.xml',
 
-        'report/recibo_report_templates.xml',
         'report/recibo_report_views.xml',
-        'report/libro_salarios_report_templates.xml',
-        'report/planilla_report_templates.xml',
+        'report/recibo_templates.xml',
+        'report/libro_salarios_templates.xml',
+        'report/planilla_templates.xml',
 
-        'wizard/planilla_wizard_views.xml',
-        'wizard/libro_salarios_wizard_views.xml',
-        'wizard/informe_empleador_wizard_views.xml',
-        'wizard/archivo_igss_wizard_views.xml',
-        'wizard/informe_isr_wizard_views.xml',
+        'wizard/hr_payslip_run_planilla_views.xml',
+        'wizard/hr_employee_libro_salarios_views.xml',
+        'wizard/hr_employee_informe_empleador_views.xml',
+        'wizard/hr_payslip_archivo_igss_views.xml',
+        'wizard/hr_payslip_run_informe_isr_views.xml',
 
         'security/ir.model.access.csv',
         'security/rrhh_security.xml',
-
-        # 'views/hr_leave_type_views.xml',
-        # 'views/hr_contract_views.xml',
-        # 'views/hr_work_entry_views.xml',
-        # 'wizard/cerrar_nominas.xml',
     ],
     'license': 'Other OSI approved licence',
 }
