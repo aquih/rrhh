@@ -251,5 +251,6 @@ class ReportLibroSalarios(models.AbstractModel):
             '_get_empleado': self._get_empleado,
             '_get_contrato': self._get_contrato,
             '_get_nominas': self._get_nominas,
+            'current_company_id': self.env.company,
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
