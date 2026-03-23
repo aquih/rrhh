@@ -80,11 +80,11 @@ class rrhh_planilla_wizard(models.TransientModel):
 
                         linea += 1
                         for linea_reporte in reporte['lineas'][cuenta][puesto]['datos']:
-                            hoja.write(linea, 0, linea_reporte['estatico']['numero'])
-                            hoja.write(linea, 1, linea_reporte['estatico']['codigo_empleado'])
-                            hoja.write(linea, 2, linea_reporte['estatico']['nombre_empleado'])
-                            hoja.write(linea, 3, linea_reporte['estatico']['fecha_ingreso'], formato_fecha)
-                            hoja.write(linea, 4, linea_reporte['estatico']['dias'])
+                            hoja.write(linea, 0, linea_reporte['estatico']['numero'] or '')
+                            hoja.write(linea, 1, linea_reporte['estatico']['codigo_empleado'] or '')
+                            hoja.write(linea, 2, linea_reporte['estatico']['nombre_empleado'] or '')
+                            hoja.write(linea, 3, linea_reporte['estatico']['fecha_ingreso'] or '', formato_fecha)
+                            hoja.write(linea, 4, linea_reporte['estatico']['dias'] or '')
 
                             columna = 4
                             for l in linea_reporte['dinamico']:
@@ -146,12 +146,12 @@ class rrhh_planilla_wizard(models.TransientModel):
 
                 linea += 1
                 for empleado in reporte['no_agrupado']:
-                    hoja.write(linea, 0, empleado['numero'])
-                    hoja.write(linea, 1, empleado['codigo_empleado'])
-                    hoja.write(linea, 2, empleado['nombre_empleado'])
-                    hoja.write(linea, 3, empleado['fecha_ingreso'], formato_fecha)
-                    hoja.write(linea, 4, empleado['puesto'])
-                    hoja.write(linea, 5, empleado['dias'])
+                    hoja.write(linea, 0, empleado['numero'] or '')
+                    hoja.write(linea, 1, empleado['codigo_empleado'] or '')
+                    hoja.write(linea, 2, empleado['nombre_empleado'] or '')
+                    hoja.write(linea, 3, empleado['fecha_ingreso'] or '', formato_fecha)
+                    hoja.write(linea, 4, empleado['puesto'] or '')
+                    hoja.write(linea, 5, empleado['dias'] or '')
 
                     columna = 5
                     for l in empleado['columnas']:
