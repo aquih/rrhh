@@ -89,7 +89,7 @@ class rrhh_planilla_wizard(models.TransientModel):
                             columna = 4
                             for l in linea_reporte['dinamico']:
                                 columna += 1
-                                hoja.write(linea, columna, l or '')
+                                hoja.write(linea, columna, l)
         
                             hoja.write(linea, columna+1, linea_reporte['estatico']['banco_depositar'] or '')
                             hoja.write(linea, columna+2, linea_reporte['estatico']['cuenta_depositar'] or '')
@@ -156,7 +156,7 @@ class rrhh_planilla_wizard(models.TransientModel):
                     columna = 5
                     for l in empleado['columnas']:
                         columna += 1
-                        hoja.write(linea, columna, l or '')
+                        hoja.write(linea, columna, l)
 
                     hoja.write(linea, columna+1, empleado['banco_depositar'] or '')
                     hoja.write(linea, columna+2, empleado['cuenta_depositar'] or '')
