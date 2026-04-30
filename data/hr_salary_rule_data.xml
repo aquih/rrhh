@@ -10,7 +10,7 @@
             <field name="condition_select">none</field>
             <field name="amount_select">percentage</field>
             <field name="amount_percentage_base">contract.wage/2</field>
-            <field name="quantity">1.1</field>
+            <field name="quantity">1</field>
             <field name="amount_percentage">100.00</field>
             <field name="struct_id" ref="EstructuraBase"/>
         </record>

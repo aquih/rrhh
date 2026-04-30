@@ -60,7 +60,7 @@ class res_company(models.Model):
     sueldo_igss_ids = fields.Many2many('hr.salary.rule', 'rrhh_sueldo_igss_rel', string='Sueldo IGSS')
     ajuste_ids = fields.Many2many('hr.salary.rule', 'rrhh_ajustes_rel', string='Ajustes ISR')
 
-    # TODO: Quitar en la siguiente versión
+    # TODO: Quitar todos los siguientes en la siguiente versión
     telefonos = fields.Char('Telefonos (separados por guiones o diagonales)') # no parece usarse
     fax = fields.Char('Fax') # no parece usarse
     nombre_contacto = fields.Char('Nombre del contacto en centro de trabajo') # no parece usarse

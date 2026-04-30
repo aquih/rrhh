@@ -10,7 +10,7 @@ import calendar
 
 class rrhh_prestamo(models.Model):
     _name = 'rrhh.prestamo'
-    _description = 'Prestamo'
+    _description = 'Prestamo. Deprecado, usar hr.salary.attachment'
     _rec_name = 'descripcion'
 
     employee_id = fields.Many2one('hr.employee', 'Empleado')

@@ -29,9 +29,9 @@ class HrEmployeePrivate(models.Model):
     segundo_apellido = fields.Char('Segundo apellido', groups="hr.group_hr_user")
     apellido_casada = fields.Char('Apellido casada', groups="hr.group_hr_user")
     centro_trabajo_id = fields.Many2one('res.company.centro_trabajo',string='Centro de trabajo', groups="hr.group_hr_user")
-    tipo_salario = fields.Char('Tipo salario', default="1")
-    tiempo_contrato = fields.Char('Tiempo de contrato', default="TC")
-    nacionalidad = fields.Char('Nacionalidad')
+    tipo_salario = fields.Char('Tipo salario', default="1", groups="hr.group_hr_user")
+    tiempo_contrato = fields.Char('Tiempo de contrato', default="TC", groups="hr.group_hr_user")
+    nacionalidad = fields.Char('Nacionalidad', groups="hr.group_hr_user")
     tipo_discapacidad = fields.Char('Tipo de discapacidad', groups="hr.group_hr_user")
     comunidad_linguistica = fields.Char('Comunidad Linguística', groups="hr.group_hr_user")
     sucursal = fields.Char("Sucursal",  groups="hr.group_hr_user")
@@ -79,9 +79,3 @@ class HrEmployeePrivate(models.Model):
         prestamos = self.env['rrhh.prestamo'].search([('employee_id', 'in', self.ids)]).grouped('employee_id')
         for employee in self:
             employee.cantidad_prestamos = len(prestamos.get(employee)) if prestamos.get(employee) else 0
-
-    #def _get_marital_status_selection(self):
-    #    result = super()._get_marital_status_selection()
-    #    otros = ('separado', _('Separado(a)')),('unido', _('Unido(a)')),
-    #    result.append(otros)
-    #    return result

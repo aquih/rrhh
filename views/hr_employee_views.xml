@@ -43,7 +43,8 @@
                             <field name="company_id" column_invisible="1"/>
                             <field name="currency_id" column_invisible="1"/>
                             <field name="salario"/>
-                            <field name="fecha"/>
+                            <field name="anio"/>
+                            <field name="mes"/>
                         </list>
                     </field>
                 </group>
