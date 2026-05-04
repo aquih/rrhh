@@ -15,12 +15,12 @@ from odoo.exceptions import ValidationError
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    porcentaje_prestamo = fields.Float(related="payslip_run_id.porcentaje_prestamo",string='Prestamo (%)',store=True)
-    cuenta_analitica_id = fields.Many2one('account.analytic.account','Cuenta analítica')
-    descuento_isr = fields.Boolean(related="payslip_run_id.descuento_isr",string='Descuento ISR',store=True)
+    porcentaje_prestamo = fields.Float(related="payslip_run_id.porcentaje_prestamo", string='Prestamo (%)', store=True)
+    cuenta_analitica_id = fields.Many2one('account.analytic.account', 'Cuenta analítica')
+    descuento_isr = fields.Boolean(related="payslip_run_id.descuento_isr", string='Descuento ISR', store=True)
     
     # TODO: Quitar en la siguiente versión
-    etiqueta_empleado_ids = fields.Many2many('hr.employee.category',string='Etiqueta empleado', related='employee_id.category_ids') # no parece usarse
+    etiqueta_empleado_ids = fields.Many2many('hr.employee.category', string='Etiqueta empleado', related='employee_id.category_ids') # no parece usarse
 
     def dias_trabajados_rango(self, empleado_id, fecha_desde, fecha_hasta):
         if empleado_id.date_start:
@@ -392,27 +392,25 @@ class HrPayslip(models.Model):
         
         return salario_promedio_total
 
-    def horas_sumar(self, lineas):
+    def dias_horas_sumar(self, lineas):
         horas = 0
         dias = 0
         for linea in lineas:
-            tipo_id = self.env['hr.work.entry.type'].search([('id','=',linea['work_entry_type_id'])])
+            tipo_id = self.env['hr.work.entry.type'].browse(linea['work_entry_type_id'])
             if tipo_id and tipo_id.is_leave and tipo_id.descontar_nomina == False:
                 horas += linea['number_of_hours']
                 dias += linea['number_of_days']
 
         return {'dias': dias, 'horas': horas}
 
+    # TODO: dejar de usar, odoo 19.0 ya debería de poder funcionar sin necesidad de estos cálculos
     def _get_worked_day_lines(self, domain=None, check_out_of_version=True):
         res = super()._get_worked_day_lines(domain=None, check_out_of_version=True)
         tipos_ausencias_ids = self.env['hr.leave.type'].search([])
-        datos = self.horas_sumar(res)
+        datos = self.dias_horas_sumar(res)
         ausencias_restar = []
 
         dias_ausentados_restar = 0
-        contracts = False
-        if self.employee_id.contract_id:
-            contracts = self.employee_id.contract_id
 
         for ausencia in tipos_ausencias_ids:
             if ausencia.work_entry_type_id and ausencia.work_entry_type_id.descontar_nomina:
@@ -420,116 +418,110 @@ class HrPayslip(models.Model):
 
         trabajo_id = self.env['hr.work.entry.type'].search([('code','=','TRABAJO100')])
         for r in res:
-            tipo_id = self.env['hr.work.entry.type'].search([('id','=',r['work_entry_type_id'])])
-            if tipo_id and tipo_id.is_leave == False:
+            tipo_id = self.env['hr.work.entry.type'].browse(r['work_entry_type_id'])
+            if tipo_id and not tipo_id.is_leave:
                 r['number_of_hours'] += datos['horas']
                 r['number_of_days'] += datos['dias']
 
-            if len(ausencias_restar)>0:
+            if len(ausencias_restar) > 0:
                 if r['work_entry_type_id'] in ausencias_restar:
                     dias_ausentados_restar += r['number_of_days']
 
-        if contracts:
-            dias_laborados = 0
-            if self.struct_id:
-                if self.struct_id.schedule_pay == 'monthly':
-                    dias_laborados = 30
-                if self.struct_id.schedule_pay == 'semi-monthly':
-                    dias_laborados = 15
+        dias_laborados = 0
+        if self.struct_id:
+            if self.struct_id.schedule_pay == 'monthly':
+                dias_laborados = 30
+            if self.struct_id.schedule_pay == 'semi-monthly':
+                dias_laborados = 15
 
-            reference_calendar = contracts.resource_calendar_id
+        reference_calendar = self.employee_id.resource_calendar_id
 
-            # Para determinar si la planilla es mensual o de aguinaldo o bono 14
-            dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False, domain=[])
+        # Para determinar si la planilla es normal o anual (de aguinaldo o bono 14)
+        dias_bonificacion = reference_calendar.get_work_duration_data(self.date_from, self.date_to, compute_leaves=False, domain=[])
 
-            # Cuando es una planilla mensual y de un empleado que ingresó después de la fecha de inicio la planilla
-            if contracts.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_laborados = dias_laborados - ((contracts.date_start - self.date_from).days)
+        # Cuando es una planilla normal y de un empleado que ingresó después de la fecha de inicio la planilla
+        if self.employee_id.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= self.employee_id.date_start <= self.date_to:
+            dias_laborados = dias_laborados - ((self.employee_id.date_start - self.date_from).days)
 
-                #Cuando es una planilla mensual, y el empleado entra y sale el mismo mes
-                if contracts.date_end and (self.date_from <= contracts.date_end <= self.date_to):
-                    dias_laborados = ((contracts.date_end - contracts.date_start).days) +1
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
+            # Cuando es una planilla normal, y el empleado entra y sale el mismo mes
+            if self.employee_id.date_end and (self.date_from <= self.employee_id.date_end <= self.date_to):
+                dias_laborados = ((self.employee_id.date_end - self.employee_id.date_start).days) + 1
 
-            # Cuando es una planilla mensual y de un empleado que salió antes de la fecha de fin de la planilla
-            elif contracts.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= contracts.date_end <= self.date_to:
-                dias_laborados =  ((contracts.date_end - self.date_from).days) +1
-                #Cuando el contrato finaliza dentro del rango en el que se genera la planilla, es necesario verificar si el pago es quincenal o mensual
-                #por que necesitamos parametrizar que los dias trabajados no sea mayor que a los días dentro del rango de la planilla
-                if contracts.schedule_pay == 'semi-monthly':
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,15) - dias_ausentados_restar})
-                else:
-                    res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados,30) - dias_ausentados_restar})
+            res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_laborados - dias_ausentados_restar})
 
-            # Cuando es una planilla anual y de un empleado que ingresó antes de la fecha de inicio de la planilla
-            elif dias_bonificacion['days'] > 150 and self.date_from >= contracts.date_start:
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
+        # Cuando es una planilla normal y de un empleado que salió antes de la fecha de fin de la planilla
+        elif self.employee_id.date_end and dias_bonificacion['days'] <= 31 and self.date_from <= self.employee_id.date_end <= self.date_to:
+            dias_laborados =  ((self.employee_id.date_end - self.date_from).days) + 1
 
-            # Cuando es una planilla anual y de un empleado que ingresó después de la fecha de inicio de la planilla
-            elif dias_bonificacion['days'] > 150 and self.date_from <= contracts.date_start <= self.date_to:
-                dias_bonificacion = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(self.date_to), compute_leaves=False, domain=[])
-                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
-
-            # Cuando el empleado ingreso antes de la fecha de la planilla y no ha salido
+            # Cuando el contrato finaliza dentro del rango en el que se genera la planilla, es necesario verificar si el pago es quincenal o mensual
+            # por que necesitamos parametrizar que los dias trabajados no sea mayor que a los días dentro del rango de la planilla
+            if self.employee_id.schedule_pay == 'semi-monthly':
+                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados, 15) - dias_ausentados_restar})
             else:
-                # Cálculo para mensualidad
-                if self.struct_id.schedule_pay == 'monthly' or contracts.structure_type_id.default_schedule_pay == 'monthly':
-                    total_dias = 30 - dias_ausentados_restar
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
+                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': min(dias_laborados, 30) - dias_ausentados_restar})
 
-                # Cálculo para quincena
-                if self.struct_id.schedule_pay == 'semi-monthly' or contracts.structure_type_id.default_schedule_pay == 'semi-monthly':
-                    # Dentro del bloque semi-monthly...
-                    dias_periodo = min((self.date_to - self.date_from).days + 1, 15)
+        # Cuando es una planilla anual y de un empleado que ingresó antes de la fecha de inicio de la planilla
+        elif dias_bonificacion['days'] > 150 and self.date_from >= self.employee_id.date_start:
+            res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
 
-                    # Calcular días de ausencia solo dentro del período de la nómina
-                    dias_ausencia_en_periodo = 0
-                    ausencias = self.env['hr.leave'].search([
-                        ('employee_id', '=', self.employee_id.id),
-                        ('state', '=', 'validate'),
-                        ('request_date_from', '<=', self.date_to),
-                        ('request_date_to', '>=', self.date_from),
-                    ])
+        # Cuando es una planilla anual y de un empleado que ingresó después de la fecha de inicio de la planilla
+        elif dias_bonificacion['days'] > 150 and self.date_from <= self.employee_id.date_start <= self.date_to:
+            res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_bonificacion['days']+1})
 
-                    for ausencia in ausencias:
-                        if ausencia.holiday_status_id.work_entry_type_id.descontar_nomina == True:
-                            # determinar el rango de intersección de la ausencia
-                            inicio = max(ausencia.request_date_from, self.date_from)
-                            fin = min(ausencia.request_date_to, self.date_to)
-                            if inicio <= fin:
-                                dias_ausencia_en_periodo += (fin - inicio).days + 1
+        # Cuando el empleado ingreso antes de la fecha de la planilla y no ha salido
+        else:
+            # Cálculo para mensualidad
+            if self.struct_id.schedule_pay == 'monthly' or self.employee_id.structure_type_id.default_schedule_pay == 'monthly':
+                total_dias = 30 - dias_ausentados_restar
+                res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': 0 if total_dias < 0 else total_dias})
 
-                    # Ahora calcular los días trabajados
-                    if dias_ausencia_en_periodo == 0:
-                        dias_trabajados = 15
-                    elif dias_ausencia_en_periodo >= dias_periodo:
-                        dias_trabajados = 0
-                    else:
-                        dias_trabajados = dias_periodo - dias_ausencia_en_periodo
+            # Cálculo para quincena
+            if self.struct_id.schedule_pay == 'semi-monthly' or self.employee_id.structure_type_id.default_schedule_pay == 'semi-monthly':
+                dias_periodo = min((self.date_to - self.date_from).days + 1, 15)
 
-                    res.append({
-                        'work_entry_type_id': trabajo_id.id,
-                        'sequence': 10,
-                        'number_of_days': dias_trabajados
-                    })
+                # Calcular días de ausencia solo dentro del período de la nómina
+                dias_ausencia_en_periodo = 0
+                ausencias = self.env['hr.leave'].search([
+                    ('employee_id', '=', self.employee_id.id),
+                    ('state', '=', 'validate'),
+                    ('request_date_from', '<=', self.date_to),
+                    ('request_date_to', '>=', self.date_from),
+                ])
 
-                # Cálculo de días para catorcena
-                if self.struct_id.schedule_pay == 'weekly' or contracts.structure_type_id.default_schedule_pay == 'weekly':
-                    dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(self.date_from), Datetime.from_string(self.date_to), compute_leaves=False,domain = [])
-                    res.append({'work_entry_type_id': trabajo_id.id,'sequence': 10,'number_of_days': (dias_laborados['days']+1 - dias_ausentados_restar)})
+                for ausencia in ausencias:
+                    if ausencia.holiday_status_id.work_entry_type_id.descontar_nomina == True:
+                        # Determinar el rango de intersección de la ausencia
+                        inicio = max(ausencia.request_date_from, self.date_from)
+                        fin = min(ausencia.request_date_to, self.date_to)
+                        if inicio <= fin:
+                            dias_ausencia_en_periodo += (fin - inicio).days + 1
 
-            self.calculo_entradas_anuales(self)
+                # Ahora calcular los días trabajados
+                if dias_ausencia_en_periodo == 0:
+                    dias_trabajados = 15
+                elif dias_ausencia_en_periodo >= dias_periodo:
+                    dias_trabajados = 0
+                else:
+                    dias_trabajados = dias_periodo - dias_ausencia_en_periodo
+
+                res.append({ 'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': dias_trabajados })
+
+            # Cálculo de días para catorcena
+            if self.struct_id.schedule_pay == 'weekly' or self.employee_id.structure_type_id.default_schedule_pay == 'weekly':
+                dias_laborados = reference_calendar.get_work_duration_data(self.date_from, self.date_to, compute_leaves=False,domain = [])
+                res.append({'work_entry_type_id': trabajo_id.id, 'sequence': 10, 'number_of_days': (dias_laborados['days'] + 1 - dias_ausentados_restar)})
+
+        self.calculo_entradas_anuales(self)
+        
         return res
 
+    # TODO: dejar de usar: las entradas se pueden poner en el empleado y los
+    # prestamos se pueden hacer con ajustes de salario
     @api.depends('employee_id', 'version_id', 'struct_id', 'date_from', 'date_to', 'struct_id')
     def _compute_input_line_ids(self):
-        res = super(HrPayslip, self)._compute_input_line_ids()
+        res = super()._compute_input_line_ids()
         for slip in self:
             if slip.employee_id and slip.struct_id and slip.struct_id.input_line_type_ids:
-
-                if slip.contract_id and slip.contract_id.analytic_account_id:
-                    slip.cuenta_analitica_id = slip.contract_id.analytic_account_id.id
-
                 input_line_vals = []
                 if slip.input_line_ids:
                     slip.input_line_ids.unlink()
@@ -558,6 +550,8 @@ class HrPayslip(models.Model):
                                 entrada.amount = valor_entrada
         return res
 
+    # TODO: dejar de usar: las entradas se pueden poner en el empleado y los
+    # prestamos se pueden hacer con ajustes de salario
     def compute_sheet(self):
         for nomina in self:
             mes_nomina = int(nomina.date_from.month)
@@ -586,7 +580,7 @@ class HrPayslip(models.Model):
                             prestamo.estado = "proceso"
                         if prestamo.pendiente_pagar_prestamo == 0:
                             prestamo.estado = "pagado"
-        res =  super(HrPayslip, self).compute_sheet()
+        res =  super().compute_sheet()
         for nomina in self:
             if nomina.descuento_isr:
                 calculos_isr = self.calculo_isr(nomina)
