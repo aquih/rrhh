@@ -3,13 +3,24 @@
 
     <record id="recibo_report" model="ir.actions.report">
         <field name="name">Recibo</field>
-        <field name="model">rrhh.recibo</field>
+        <field name="model">hr.payslip</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">rrhh.recibo_report</field>
-        <field name="report_file">rrhh.recibo_report</field>
-        <field name="binding_model_id" ref="model_hr_payslip"/>
+        <field name="report_name">rrhh.recibo</field>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_recibo"/>
+    </record>
+
+    <record id="hr_payslip_action_imprimir" model="ir.actions.server">
+        <field name="name">Imprimir Recibo</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+action = env.ref('rrhh.recibo_report').report_action(records)
+        </field>
     </record>
 
 </odoo>

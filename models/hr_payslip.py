@@ -437,7 +437,7 @@ class HrPayslip(models.Model):
         reference_calendar = self.employee_id.resource_calendar_id
 
         # Para determinar si la planilla es normal o anual (de aguinaldo o bono 14)
-        dias_bonificacion = reference_calendar.get_work_duration_data(self.date_from, self.date_to, compute_leaves=False, domain=[])
+        dias_bonificacion = reference_calendar.get_work_duration_data(datetime.datetime.combine(self.date_from, datetime.datetime.min.time()), datetime.datetime.combine(self.date_to, datetime.datetime.max.time()), compute_leaves=False, domain=[])
 
         # Cuando es una planilla normal y de un empleado que ingresó después de la fecha de inicio la planilla
         if self.employee_id.date_start and dias_bonificacion['days'] <= 31 and self.date_from <= self.employee_id.date_start <= self.date_to:

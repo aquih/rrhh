@@ -28,7 +28,6 @@
         <field name="model">rrhh.libro_salarios.wizard</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">rrhh.libro_salarios_report</field>
-        <field name="report_file">rrhh.libro_salarios_report</field>
         <field name="paperformat_id" ref="paperformat_libro_salarios"/>
     </record>
 

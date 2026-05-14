@@ -8,7 +8,7 @@
     'author': "aquíH",
     'website': "http://www.aquih.com",
     'category': 'Uncategorized',
-    'version': '3.4',
+    'version': '3.5',
     'depends': ['base', 'hr_payroll_account', 'l10n_gt_extra', 'account_followup', 'hr_holidays', 'hr_work_entry'],
     'data': [
         'data/hr_payslip_input_type_data.xml',
@@ -26,8 +26,8 @@
         'views/hr_payslip_views.xml',
         'views/res_company_views.xml',
 
-        'report/recibo_report_views.xml',
         'report/recibo_templates.xml',
+        'report/recibo_report_views.xml',
         'report/libro_salarios_templates.xml',
         'report/planilla_templates.xml',
 

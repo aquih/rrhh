@@ -11,7 +11,7 @@ class ReportRecibo(models.AbstractModel):
         horas_extras = 0
         if o.employee_id.recibo_id:
             entradas = []
-            for entrada in o.employee_id.recibo_id.entrada_id:
+            for entrada in o.employee_id.recibo_id.linea_entrada_id:
                 entradas.append(entrada.input_id.name)
             for entrada in o.input_line_ids:
                 if entrada.name in entradas:
@@ -54,7 +54,7 @@ class ReportRecibo(models.AbstractModel):
                 lineas_deducciones.append(datos)
 
             lineas_entradas = []
-            for entrada in recibo.entrada_id:
+            for entrada in recibo.linea_entrada_id:
                 datos = {'nombre': entrada.input_id.name, 'total': 0}
                 datos['total'] = entradas.get(entrada.input_id.code, 0)
                 result['totales'][2] += entradas.get(entrada.input_id.code, 0)
