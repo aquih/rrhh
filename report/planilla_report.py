@@ -8,20 +8,21 @@ class report_planilla_pdf(models.AbstractModel):
     _name = 'report.rrhh.planilla'
     _description = 'Planilla de salario'
 
-    def buscar_partida_nominas(self,slip_ids):
+    def buscar_partida_nominas(self, payslips):
         cantidad_nominas_partida = 0
         partidas = {}
-        for slip in slip_ids:
-            if slip.move_id:
-                if slip.id not in partidas:
-                    partidas[slip.move_id.id] = 0
+        for payslip in payslips:
+            if payslip.move_id:
+                if payslip.id not in partidas:
+                    partidas[payslip.move_id.id] = 0
         return partidas
 
-    def obtener_dias(self, slip):
+    # Usar mismo algoritmo que en libro de salarios
+    def obtener_dias(self, payslip):
         dias = 0
         work = -1
         trabajo = -1
-        for d in slip.worked_days_line_ids:
+        for d in payslip.worked_days_line_ids:
             if d.code == 'TRABAJO100':
                 trabajo = d.number_of_days
             elif d.code == 'WORK100':
@@ -106,7 +107,6 @@ class report_planilla_pdf(models.AbstractModel):
                 linea['estatico']['codigo_empleado'] = slip.employee_id.registration_number or slip.employee_id.codigo_empleado
                 linea['estatico']['nombre_empleado'] = slip.employee_id.name
                 linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
-    #            linea['estatico']['fecha_ingreso'] = slip.contract_id.date_start
                 linea['estatico']['puesto'] = slip.employee_id.job_id.name
 
                 dias = self.obtener_dias(slip)

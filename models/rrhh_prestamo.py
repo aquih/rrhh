@@ -8,6 +8,7 @@ import logging
 from dateutil.relativedelta import *
 import calendar
 
+# Ya no usar, usar hr.salary.attachment
 class rrhh_prestamo(models.Model):
     _name = 'rrhh.prestamo'
     _description = 'Prestamo. Deprecado, usar hr.salary.attachment'

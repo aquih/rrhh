@@ -28,9 +28,8 @@
             <div class="article">
                 <div class="page">
                     <t t-foreach="docs" t-as="o">
-                        <t t-set="empleado" t-value="_get_empleado(o)"/>
-
-                        <t t-set="nominas" t-value="_get_nominas(o,anio)"/>
+                        <t t-set="empleado" t-value="empleado(o)"/>
+                        <t t-set="nominas" t-value="payslips(o, anio)"/>
                         <t t-set="ordinario_total" t-value="0"/>
                         <t t-set="extra_ordinario_total" t-value="0"/>
                         <t t-set="otros_salarios_total" t-value="0"/>
@@ -49,7 +48,6 @@
                         <t t-set="moneda" t-value="user.company_id.currency_id"/>
                         <t t-set="incentivo_decreto_total" t-value="0"/>
                         <t t-set="liquido_total" t-value="0"/>
-                        <t t-set="fecha" t-value="_get_contrato(o)"/>
 
                         <table class="table table-sm">
                             <thead>
@@ -92,20 +90,20 @@
                                         <div style="border-top: 1px solid black">No. DPI ó permiso de trabajo</div>
                                     </th>
                                     <th colspan="5"  style="text-align: center">
-                                        <div t-esc="fecha['fecha_ingreso']" t-options="{'widget': 'date'}"/>
+                                        <div t-esc="empleado.date_start" t-options="{'widget': 'date'}"/>
                                         <div style="border-top: 1px solid black">Fecha de ingreso</div>
                                     </th>
                                     <th colspan="5"  style="text-align: center">
-                                        <div t-esc="fecha['fecha_finalizacion']" t-options="{'widget': 'date'}"/>
+                                        <div t-esc="empleado.date_end" t-options="{'widget': 'date'}"/>
                                         <div style="border-top: 1px solid black">Fecha finalizac. de relación laboral</div>
                                     </th>
                                 </tr>
                                 <tr>
                                     <th colspan="4"/>
-                                    <th colspan="2" style="text-align: center">HORAS TRABAJADAS</th>
-                                    <th colspan="4" style="text-align: center">SALARIO DEVENGADO</th>
+                                    <th colspan="2" style="text-align: center">Horas trabajadas</th>
+                                    <th colspan="4" style="text-align: center">Salario devengado</th>
                                     <th colspan="1"/>
-                                    <th colspan="3" style="text-align: center">DEDUCCIONES LEGALES</th>
+                                    <th colspan="3" style="text-align: center">Deducciones legales</th>
                                     <th colspan="1"/>
                                     <th colspan="3" style="text-align: center"/>
                                 </tr>
@@ -126,7 +124,7 @@
                                     <th>Descuentos ISR</th>
                                     <th>Otras deducciones</th>
                                     <th>Total</th>
-                                    <th>Bonificación anual 42-92,Aguinaldo Decreto 76-78</th>
+                                    <th>Bonificación anual 42-92, Aguinaldo Decreto 76-78</th>
                                     <th>Bonificación Incentivo Decreto 37-2001</th>
                                     <th>Devoluciones I.S.R. y otras</th>
                                     <th>Liquido a recibir</th>
@@ -135,7 +133,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr t-foreach="nominas" t-as="nomina">
+                                <tr t-foreach="payslips" t-as="nomina">
                                     <td><span t-esc="nomina['orden']"/></td>
                                     <td><span t-esc="nomina['fecha_inicio']" t-options="{'widget': 'date'}"/>-<span t-esc="nomina['fecha_fin']" t-options="{'widget': 'date'}"/></td>
                                     <td><span t-esc="nomina['salario']"  t-options="{'widget': 'monetary', 'display_currency': nomina['moneda_id']}"/></td>

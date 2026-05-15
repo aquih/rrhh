@@ -12,91 +12,45 @@ class ReportLibroSalarios(models.AbstractModel):
     _name = 'report.rrhh.libro_salarios'
     _description = 'Libro de salarios (para el MTPS)'
 
-    def _get_contrato(self,id):
-        contract = False
-        contrato_id = self.env['hr.contract'].search([['employee_id', '=', id]])
-        if len(contrato_id) > 1:
-            for contrato in contrato_id:
-                if contrato.state == 'open':
-                    contract = contrato
-        else:
-            contract = contrato_id
-        return {'fecha_ingreso':contract.date_start,'fecha_finalizacion': contract.date_end}
+    def obtener_empleado(self, id):
+        return self.env['hr.employee'].browse([('id', '=', id), '|', ('active', '=', True), ('active', '=', False)])
 
-    def _get_empleado(self,id):
-        empleado_id = self.env['hr.employee'].search([['id', '=', id]])
-        empleado = 0
-        if empleado_id:
-            empleado = empleado_id
-        else:
-            empleado_id = self.env['hr.employee'].search([['id', '=', id],['active', '=', False]])
-            empleado = empleado_id
-        return empleado
-
-    def dias_trabajados(self,employee_id,nomina_id):
-        contracts = False
+    # Usar mismo algoritmo que en planilla
+    def obtener_dias(self, payslip):
         dias = 0
-        if employee_id.contract_id:
-            contracts = employee_id.contract_id
-        tipos_ausencias_ids = self.env['hr.leave.type'].search([])
-        ausencias_restar = []
-        dias_ausentados_restar = 0
-        for ausencia in tipos_ausencias_ids:
-            if ausencia.work_entry_type_id and ausencia.work_entry_type_id.descontar_nomina:
-                ausencias_restar.append(ausencia.name)
-        for dias in nomina_id.worked_days_line_ids:
-            if dias.code in ausencias_restar:
-                dias_ausentados_restar += dias.number_of_days
-
-        reference_calendar = nomina_id._get_out_of_contract_calendar()
-        if contracts.date_start and nomina_id.date_from <= contracts.date_start <= nomina_id.date_to:
-            dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(contracts.date_start), Datetime.from_string(nomina_id.date_to), compute_leaves=False,domain = [])
-            dias = (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) >= 30 else 30
-        elif contracts.date_end and nomina_id.date_from <= contracts.date_end <= nomina_id.date_to:
-            dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(nomina_id.date_from), Datetime.from_string(contracts.date_end), compute_leaves=False,domain = [])
-            dias = (dias_laborados['days'] + 1 - dias_ausentados_restar) if (dias_laborados['days'] + 1 - dias_ausentados_restar) <= 30 else 30
+        work = -1
+        trabajo = -1
+        for d in payslip.worked_days_line_ids:
+            if d.code == 'TRABAJO100':
+                trabajo = d.number_of_days
+            elif d.code == 'WORK100':
+                work = d.number_of_days
+        if trabajo >= 0:
+            dias += trabajo
         else:
-            if contracts.schedule_pay == 'monthly':
-                dias = 30 - dias_ausentados_restar
-            if contracts.schedule_pay == 'bi-weekly':
-                dias = 15 - dias_ausentados_restar
+            dias += work
+
         return dias
 
-    def _get_dias_laborados_netos(self,empleado,fecha_inicio,fecha_fin):
-        dias_trabajados = 0
-        nominas = self.env['hr.payslip'].search([['employee_id','=',empleado.id],['date_from', '>=', fecha_inicio],['date_to','<=',fecha_fin]])
-        for nomina in nominas:
-            for linea in nomina.worked_days_line_ids:
-                if linea.work_entry_type_id.code == empleado.company_id.tipo_entrada_trabajo_id.code:
-                    dias_trabajados = linea.number_of_days
-        return dias_trabajados
-
-    def _get_domingos_trabajados(self,fecha_inicio,fecha_fin):
+    def domingos_trabajados(self, fecha_inicio, fecha_fin):
+        cantidad_dias = (fecha_inicio - fecha_fin).days
         cantidad_domingos = 0
-        contador = 0
-        fecha_desde =  datetime.strptime(str(fecha_inicio),"%Y-%m-%d")
-        fecha_hasta = datetime.strptime(str(fecha_fin),"%Y-%m-%d")
-        now = datetime.now()
-        cantidad_dias = fecha_hasta - fecha_desde
-        cantidad_dias = cantidad_dias.days
-        dias_a_trabajar = 0
-        while (contador <= cantidad_dias):
-            otro_tiempo  = fecha_desde + timedelta(days = contador)
-            if (otro_tiempo.strftime("%A") == 'Sunday'):
+
+        for incr in range(dias):
+            dia = fecha_inicio + timedelta(days=incr)
+            if dia.weekday() == 6:
                 cantidad_domingos += 1
-            contador +=1
+
         return cantidad_domingos
 
-    def _get_nominas(self,id,anio):
-        nomina_id = self.env['hr.payslip'].search([['employee_id', '=', id]],order="date_to asc")
+    def obtener_payslips(self, id, anio):
+        payslips = self.env['hr.payslip'].search([['employee_id', '=', id]], order="date_to asc")
         nominas_lista = []
-        numero_orden = 0
-        for nomina in nomina_id:
-            nomina_anio = int(datetime.strptime(str(nomina.date_to),'%Y-%m-%d').date().strftime('%Y'))
-            contiene_bono = False
+        for payslip in payslips:
+            nomina_anio = payslip.date_to.year()
             if anio == nomina_anio:
                 salario = 0
-                dias_trabajados = 0
+                dias_trabajados = self.obtener_dias(payslip)
                 ordinarias = 0
                 extra_ordinarias = 0
                 ordinario = 0
@@ -119,84 +73,55 @@ class ReportLibroSalarios(models.AbstractModel):
                 dev_isr_otro = 0
                 work = -1
                 trabajo = -1
-                dias_calculados = self.dias_trabajados(nomina.employee_id,nomina)
-                reference_calendar = nomina._get_out_of_contract_calendar()
+                dias_calculados = self.obtener_dias(payslip)
 
-                dias_laborados = reference_calendar.get_work_duration_data(Datetime.from_string(nomina.date_from), Datetime.from_string(nomina.date_to), compute_leaves=False,domain = [])
-                dias_laborados_netos = 0
-                # Si tiene mas de 150 dias de trabajo entre la fecha de la nomina, es por que se paga bono14 o aguinaldo
-                if dias_laborados['days'] > 150:
-                    if nomina.date_from >= nomina.contract_id.date_start:
-                        dias_laborados_netos =  dias_laborados['days'] +1
-                        # Si la fecha de contrato esta entre la fecha de la planilla no se le pagan los 365 dias, entonces se calculan los días entre el contrato y fecha final de planilla
-                    if nomina.date_from <= nomina.contract_id.date_start <= nomina.date_to:
-                        dias_laborados_netos = reference_calendar.get_work_duration_data(Datetime.from_string(nomina.contract_id.date_start), Datetime.from_string(nomina.date_to),compute_leaves=False,domain = [])['days']+1
-
-                for linea in nomina.worked_days_line_ids:
-                    if linea.number_of_days > 31:
-                        contiene_bono = True
-                    if linea.work_entry_type_id.code == 'TRABAJO100':
-                        trabajo = linea.number_of_days
-                    elif linea.work_entry_type_id.code == 'WORK100':
-                        work = linea.number_of_days
-                if trabajo >= 0:
-                    dias_trabajados += trabajo
-                else:
-                    dias_trabajados += work
-                for linea in nomina.line_ids:
-                    if linea.salary_rule_id.id in nomina.company_id.salario_ids.ids:
+                for linea in payslip.line_ids:
+                    if linea.salary_rule_id.id in payslip.company_id.salario_ids.ids:
                         salario += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.extras_ordinarias_ids.ids:
-                        for entrada in nomina.input_line_ids:
-                            if linea.code == entrada.code:
-                                extra_ordinarias += entrada.amount
-                    if linea.salary_rule_id.id in nomina.company_id.ordinario_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.extras_ordinarias_ids.ids:
+                        extra_ordinarias = sum([entrada.amount for entrada in payslip.input_line_ids if linea.code == entrada.code])
+                    if linea.salary_rule_id.id in payslip.company_id.ordinario_ids.ids:
                         ordinario += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.extra_ordinario_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.extra_ordinario_ids.ids:
                         extra_ordinario += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.igss_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.igss_ids.ids:
                         igss += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.isr_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.isr_ids.ids:
                         isr += linea.total
-                        # otras_deducciones += isr
-                    if linea.salary_rule_id.id in nomina.company_id.anticipos_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.anticipos_ids.ids:
                         anticipos += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.bonificacion_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.bonificacion_ids.ids:
                         bonificacion += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.bono_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.bono_ids.ids:
                         bono += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.aguinaldo_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.aguinaldo_ids.ids:
                         aguinaldo += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.indemnizacion_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.indemnizacion_ids.ids:
                         indemnizacion += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.vacaciones_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.vacaciones_ids.ids:
                         vacaciones += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.decreto_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.decreto_ids.ids:
                         decreto += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.fija_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.fija_ids.ids:
                         fija += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.variable_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.variable_ids.ids:
                         variable += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.otro_salario_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.otro_salario_ids.ids:
                         otros_salarios += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.boni_incentivo_decreto_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.boni_incentivo_decreto_ids.ids:
                         boni_incentivo_decreto += linea.total
-                    if linea.salary_rule_id.id in nomina.company_id.devolucion_isr_otro_ids.ids:
+                    if linea.salary_rule_id.id in payslip.company_id.devolucion_isr_otro_ids.ids:
                         dev_isr_otro += linea.total
 
-                dias_trabajados = int(dias_laborados_netos) if dias_laborados_netos > 0 else int(dias_trabajados)
-                ordinarias = dias_trabajados*8 if dias_trabajados <= 31 else 0
-                domingos = self._get_domingos_trabajados(nomina.date_from,nomina.date_to)
+                ordinarias = dias_trabajados * 8 if dias_trabajados <= 31 else 0
+                domingos = self.domingos_trabajados(payslip.date_from, payslip.date_to)
                 sueldo_diario = 0
                 if dias_trabajados > 0:
-                    sueldo_diario = salario/30
-                else:
-                    sueldo_diario = 0
+                    sueldo_diario = salario / 30
 
                 septimos_asuetos = sueldo_diario * domingos
                 ordinario_final = ordinario - septimos_asuetos
                 ordinario = ordinario_final
-                # total_descuentos = igss + isr + anticipos
                 otras_deducciones = anticipos
                 total_deducciones = igss + otras_deducciones + isr
                 bono_agui_indem = bono + aguinaldo + indemnizacion
@@ -204,12 +129,11 @@ class ReportLibroSalarios(models.AbstractModel):
                 total_salario_devengado =  ordinario + extra_ordinario + septimos_asuetos + vacaciones + otros_salarios
                 nominas_lista.append({
                     'orden': numero_orden,
-                    'fecha_inicio': nomina.date_from,
-                    'fecha_fin': nomina.date_to,
-                    'moneda_id': nomina.company_id.currency_id,
+                    'fecha_inicio': payslip.date_from,
+                    'fecha_fin': payslip.date_to,
+                    'moneda_id': payslip.company_id.currency_id,
                     'salario': salario,
                     'dias_trabajados': dias_trabajados,
-                    'dias_calculados': int(dias_calculados),
                     'ordinarias': ordinarias,
                     'extra_ordinarias': extra_ordinarias,
                     'ordinario': ordinario,
@@ -229,11 +153,8 @@ class ReportLibroSalarios(models.AbstractModel):
                     'bono_agui_indem': bono_agui_indem,
                     'otros_salarios': otros_salarios,
                     'liquido_recibir': total_salario_devengado + total_deducciones +bono_agui_indem+ boni_incentivo_decreto + dev_isr_otro
-                    # 'liquido_recibir': total_salario_devengado + boni_incentivo_decreto +dev_isr_otro
-                    # 'fija': fija,
-                    # 'decreto': decreto,
-                    # 'liquido_recibir': total_salario_devengado + total_deducciones + bono_agui_indem + decreto + fija + variable
                 })
+                
         return nominas_lista
 
     @api.model
@@ -249,8 +170,7 @@ class ReportLibroSalarios(models.AbstractModel):
             'docs': docs,
             'anio': anio,
             'folio_inicial': folio_inicial,
-            '_get_empleado': self._get_empleado,
-            '_get_contrato': self._get_contrato,
-            '_get_nominas': self._get_nominas,
+            'empleado': self.obtener_empleado,
+            'payslips': self.obtener_payslips,
             'current_company_id': self.env.company,
         }
