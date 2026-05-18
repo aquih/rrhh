@@ -41,7 +41,7 @@
                                         <td><strong>No. afiliación del IGSS:</strong><span t-field="o.employee_id.igss"/></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Sueldo base mensual:</strong> <span t-field="o.wage"/></td>
+                                        <td><strong>Sueldo base mensual:</strong> <span t-field="o.employee_id.wage"/></td>
                                         <t t-set="horas" t-value="horas_extras(o)"/>
                                         <td><strong>DPI: </strong><span t-field="o.employee_id.identification_id"/>
                                             <t t-if="o.employee_id.work_contact_id.vat or o.employee_id.nit">

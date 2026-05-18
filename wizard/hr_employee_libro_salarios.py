@@ -22,7 +22,7 @@ class rrhh_libro_salarios(models.TransientModel):
         res = self.read()
         res = res and res[0] or {}
         datas['form'] = res
-        return self.env.ref('rrhh.action_libro_salarios').report_action([], data=datas)
+        return self.env.ref('rrhh.libro_salarios_wizard_report').report_action([], data=datas)
 
     def print_report_excel(self):
         for w in self:
@@ -41,8 +41,8 @@ class rrhh_libro_salarios(models.TransientModel):
             
             ids = self.env.context.get('active_ids', [])
             for id_employee in ids:
-                empleado = self.env['report.rrhh.libro_salarios']._get_empleado(id_employee)
-                nominas = self.env['report.rrhh.libro_salarios']._get_nominas(id_employee,dic['anio'])
+                empleado = self.env['report.rrhh.libro_salarios'].obtener_empleado(id_employee)
+                nominas = self.env['report.rrhh.libro_salarios'].obtener_payslips(id_employee, dic['anio'])
                 fecha = self.env['report.rrhh.libro_salarios']._get_contrato(id_employee)
                 hoja = libro.add_worksheet(empleado.name)
                 
@@ -64,11 +64,11 @@ class rrhh_libro_salarios(models.TransientModel):
                 
                 hoja.write(11, 4, empleado.igss, center)
                 hoja.write(11, 7, empleado.identification_id, center)
-                hoja.write(11, 10, fecha['fecha_ingreso'], date_format)
-                hoja.write(11, 13, fecha['fecha_finalizacion'], date_format)
+                hoja.write(11, 10, empleado.date_start, date_format)
+                hoja.write(11, 13, empleado.date_end, date_format)
                 hoja.write(12, 4, 'No. de afiliación al IGSS', center_border_top)
-                hoja.write(12, 7, 'No. DPI ó permiso de Trabajo', center_border_top)
-                hoja.write(12, 10, 'Fecha de Ingreso', center_border_top)
+                hoja.write(12, 7, 'No. DPI ó permiso de trabajo', center_border_top)
+                hoja.write(12, 10, 'Fecha de ingreso', center_border_top)
                 hoja.write(12, 13, 'Fecha finalizac. de relación laboral', center_border_top)
                 hoja.write(12, 16, 'Folio No.', bold)
                 
@@ -90,9 +90,9 @@ class rrhh_libro_salarios(models.TransientModel):
                 incentivo_decreto_total = 0
                 liquido_total = 0
                 
-                hoja.write(15, 4, 'HORAS TRABAJADAS', bold)
-                hoja.write(15, 7, 'SALARIO DEVENGADO', bold)
-                hoja.write(15, 12, 'DEDUCCIONES LEGALES', bold)
+                hoja.write(15, 4, 'Horas trabajadas', bold)
+                hoja.write(15, 7, 'Salario devengado', bold)
+                hoja.write(15, 12, 'Deducciones legales', bold)
 
                 hoja.write(16, 0, 'No. de orden', text_wrap_bold)
                 hoja.write(16, 1, 'Periodo de trabajo', text_wrap_bold)
@@ -105,15 +105,15 @@ class rrhh_libro_salarios(models.TransientModel):
                 hoja.write(16, 8, 'Otros salarios', text_wrap_bold)
                 hoja.write(16, 9, 'Septimos y asuetos', text_wrap_bold)
                 hoja.write(16, 10, 'Vacaciones', text_wrap_bold)
-                hoja.write(16, 11, 'SALARIO TOTAL', text_wrap_bold)
+                hoja.write(16, 11, 'Salario total', text_wrap_bold)
                 hoja.write(16, 12, 'Cuota laboral IGSS', text_wrap_bold)
                 hoja.write(16, 13, 'Descuentos ISR', text_wrap_bold)
                 hoja.write(16, 14, 'Otras deducciones', text_wrap_bold)
                 hoja.write(16, 15, 'Total', text_wrap_bold)
-                hoja.write(16, 16, 'Bonificación anual 42-92,Aguinaldo Decreto 76-78', text_wrap_bold)
-                hoja.write(16, 17, 'Bonificación Incentivo Decreto 37-2001', text_wrap_bold)
+                hoja.write(16, 16, 'Bonificación anual 42-92, Aguinaldo Decreto 76-78', text_wrap_bold)
+                hoja.write(16, 17, 'Bonificación incentivo decreto 37-2001', text_wrap_bold)
                 hoja.write(16, 18, 'Devoluciones I.S.R. y otras', text_wrap_bold)
-                hoja.write(16, 19, 'Liquido a Recibir', text_wrap_bold)
+                hoja.write(16, 19, 'Liquido a recibir', text_wrap_bold)
                 hoja.write(16, 20, 'Firma', text_wrap_bold)
                 hoja.write(16, 21, 'Observaciones', text_wrap_bold)
                 
