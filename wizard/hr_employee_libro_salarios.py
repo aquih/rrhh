@@ -39,11 +39,10 @@ class rrhh_libro_salarios(models.TransientModel):
             num_format_top = libro.add_format({'num_format': 'Q#,##0.00', 'top': 1,})
             date_format = libro.add_format({'num_format': 'dd/mm/yy', 'align': 'center'})
             
-            ids = self.env.context.get('active_ids', [])
-            for id_employee in ids:
+            active_ids = self.env.context.get('active_ids', [])
+            for id_employee in active_ids:
                 empleado = self.env['report.rrhh.libro_salarios'].obtener_empleado(id_employee)
                 nominas = self.env['report.rrhh.libro_salarios'].obtener_payslips(id_employee, dic['anio'])
-                fecha = self.env['report.rrhh.libro_salarios']._get_contrato(id_employee)
                 hoja = libro.add_worksheet(empleado.name)
                 
                 hoja.write(1, 10, empleado.company_id.name)
@@ -53,7 +52,7 @@ class rrhh_libro_salarios(models.TransientModel):
                 
                 hoja.write(8, 4, empleado.name, center)
                 hoja.write(8, 7, empleado.edad, center)
-                hoja.write(8, 10, 'Hombre' if empleado.gender == 'male' else 'Mujer', center)
+                hoja.write(8, 10, 'Hombre' if empleado.sex == 'male' else 'Mujer', center)
                 hoja.write(8, 13, empleado.country_id.name, center)
                 hoja.write(8, 16, empleado.job_id.name, center)
                 hoja.write(9, 4, 'Nombre del trabajador', center_border_top)

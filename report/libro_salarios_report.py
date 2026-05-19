@@ -13,7 +13,7 @@ class ReportLibroSalarios(models.AbstractModel):
     _description = 'Libro de salarios (para el MTPS)'
 
     def obtener_empleado(self, id):
-        return self.env['hr.employee'].browse([('id', '=', id), '|', ('active', '=', True), ('active', '=', False)])
+        return self.env['hr.employee'].search([('id', '=', id), '|', ('active', '=', True), ('active', '=', False)])
 
     # Usar mismo algoritmo que en planilla
     def obtener_dias(self, payslip):
@@ -36,7 +36,7 @@ class ReportLibroSalarios(models.AbstractModel):
         cantidad_dias = (fecha_inicio - fecha_fin).days
         cantidad_domingos = 0
 
-        for incr in range(dias):
+        for incr in range(cantidad_dias):
             dia = fecha_inicio + timedelta(days=incr)
             if dia.weekday() == 6:
                 cantidad_domingos += 1
@@ -46,8 +46,9 @@ class ReportLibroSalarios(models.AbstractModel):
     def obtener_payslips(self, id, anio):
         payslips = self.env['hr.payslip'].search([['employee_id', '=', id]], order="date_to asc")
         nominas_lista = []
+        numero_orden = 0
         for payslip in payslips:
-            nomina_anio = payslip.date_to.year()
+            nomina_anio = payslip.date_to.year
             if anio == nomina_anio:
                 salario = 0
                 dias_trabajados = self.obtener_dias(payslip)

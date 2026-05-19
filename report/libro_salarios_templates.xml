@@ -29,7 +29,7 @@
                 <div class="page">
                     <t t-foreach="docs" t-as="o">
                         <t t-set="empleado" t-value="empleado(o)"/>
-                        <t t-set="nominas" t-value="payslips(o, anio)"/>
+                        <t t-set="payslips" t-value="payslips(o, anio)"/>
                         <t t-set="ordinario_total" t-value="0"/>
                         <t t-set="extra_ordinario_total" t-value="0"/>
                         <t t-set="otros_salarios_total" t-value="0"/>
@@ -62,7 +62,7 @@
                                     </th>
                                     <th colspan="2" style="text-align: center">
                                         <div>
-                                            <t t-if="empleado.gender == 'male'">
+                                            <t t-if="empleado.sex == 'male'">
                                                 Hombre
                                             </t>
                                             <t t-else="">
