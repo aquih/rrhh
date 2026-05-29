@@ -1,17 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="salario_promedio_entrada" model="hr.payslip.input.type">
+
+    <record id="entrada_salario_promedio" model="hr.payslip.input.type">
         <field name="name">Salario promedio</field>
         <field name="code">SalarioPromedio</field>
     </record>
 
-    <record id="dias_trabajados_entrada" model="hr.payslip.input.type">
+    <record id="entrada_dias_trabajados" model="hr.payslip.input.type">
         <field name="name">Dias trabajados 12 meses</field>
         <field name="code">DiasTrabajados12Meses</field>
     </record>
 
-    <record id="dias_calendario_entrada" model="hr.payslip.input.type">
+    <record id="entrada_dias_calendario" model="hr.payslip.input.type">
         <field name="name">Dias calendario</field>
         <field name="code">DiasCalendario</field>
     </record>
+
+    <record id="entrada_bono_productividad" model="hr.payslip.input.type">
+        <field name="name">Bonificación por Productividad</field>
+        <field name="code">BonoProductividad</field>
+    </record>
+
+    <record id="entrada_retencion_isr" model="hr.payslip.input.type">
+        <field name="name">Retención ISR</field>
+        <field name="code">RetencionISR</field>
+    </record>
+
+    <record id="entrada_anticipo_salarial" model="hr.payslip.input.type">
+        <field name="name">Anticipo Salarial</field>
+        <field name="code">AnticipoSalarial</field>
+    </record>
+
+    <record id="entrada_descuentos_judiciales" model="hr.payslip.input.type">
+        <field name="name">Descuentos Judiciales</field>
+        <field name="code">DescuentosJudiciales</field>
+    </record>
+
+    <record id="entrada_descuentos_varios" model="hr.payslip.input.type">
+        <field name="name">Descuentos Varios</field>
+        <field name="code">DescuentosVarios</field>
+    </record>
+
 </odoo>
