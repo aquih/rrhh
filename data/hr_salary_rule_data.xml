@@ -16,7 +16,7 @@ if payslip.version_id.schedule_pay == 'semi-monthly':
 
 result = dias_totales
             </field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_dias_laborados" model="hr.salary.rule">
@@ -34,7 +34,7 @@ dias_restar = sum([entrada.number_of_days for entrada in entradas_restar])
 
 result = dias_totales - dias_restar
             </field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_sueldo_base" model="hr.salary.rule">
@@ -47,7 +47,7 @@ result = dias_totales - dias_restar
             <field name="amount_python_compute">
 result = (employee.wage / result_rules['DiasTotales']['amount']) * result_rules['DiasLaborados']['amount']
             </field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_bonificacion_incentivo" model="hr.salary.rule">
@@ -60,7 +60,7 @@ result = (employee.wage / result_rules['DiasTotales']['amount']) * result_rules[
             <field name="amount_python_compute">
 result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_rules['DiasLaborados']['amount']
             </field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_bonificacion_productividad" model="hr.salary.rule">
@@ -71,7 +71,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="condition_select">none</field>
             <field name="amount_select">input</field>
             <field name="amount_other_input_id" ref="entrada_bono_productividad"/>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_bono_14" model="hr.salary.rule">
@@ -84,7 +84,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="amount_percentage_base">Base</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">8.3330</field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_aguinaldo" model="hr.salary.rule">
@@ -97,7 +97,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="amount_percentage_base">Base</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">8.3330</field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_vacaciones" model="hr.salary.rule">
@@ -110,7 +110,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="amount_percentage_base">Base</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">4.1700</field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_indemnizacion" model="hr.salary.rule">
@@ -123,7 +123,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="amount_percentage_base">Base</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">8.3300</field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_igss_patronal" model="hr.salary.rule">
@@ -136,7 +136,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="amount_percentage_base">Base</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">12.6700</field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_igss_laboral" model="hr.salary.rule">
@@ -149,7 +149,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="amount_percentage_base">Base</field>
             <field name="quantity">1</field>
             <field name="amount_percentage">-4.8300</field>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_retencion_isr" model="hr.salary.rule">
@@ -160,7 +160,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="condition_select">none</field>
             <field name="amount_select">input</field>
             <field name="amount_other_input_id" ref="entrada_retencion_isr"/>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_anticipo_salarial" model="hr.salary.rule">
@@ -171,7 +171,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="condition_select">none</field>
             <field name="amount_select">input</field>
             <field name="amount_other_input_id" ref="entrada_anticipo_salarial"/>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_descuentos_judiciales" model="hr.salary.rule">
@@ -182,7 +182,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="condition_select">none</field>
             <field name="amount_select">input</field>
             <field name="amount_other_input_id" ref="entrada_descuentos_judiciales"/>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
         <record id="regla_descuentos_varios" model="hr.salary.rule">
@@ -193,7 +193,7 @@ result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_
             <field name="condition_select">none</field>
             <field name="amount_select">input</field>
             <field name="amount_other_input_id" ref="entrada_descuentos_varios"/>
-            <field name="struct_id" ref="EstructuraBase"/>
+            <field name="struct_id" ref="estructura_base"/>
         </record>
 
     </data>
