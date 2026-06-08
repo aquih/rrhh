@@ -47,6 +47,8 @@ def migrate(cr, version):
     util.records.rename_xmlid(cr, "rrhh.salario_promedio_entrada", "rrhh.entrada_salario_promedio")
     util.records.rename_xmlid(cr, "rrhh.dias_trabajados_entrada", "rrhh.entrada_dias_trabajados")
     util.records.rename_xmlid(cr, "rrhh.dias_calendario_entrada", "rrhh.entrada_dias_calendario")
+    util.records.rename_xmlid(cr, "rrhh.TipoEntradaTrabjo", "rrhh.entrada_trabajo_100")
+    util.records.rename_xmlid(cr, "rrhh.EstructuraBase", "rrhh.estructura_base")
     util.records.rename_xmlid(cr, "rrhh.HrSalaryRule_01", "rrhh.regla_sueldo_base")
     util.records.rename_xmlid(cr, "rrhh.HrSalaryRule_02", "rrhh.regla_bonificacion_incentivo")
     util.records.rename_xmlid(cr, "rrhh.HrSalaryRule_03", "rrhh.regla_bono_14")
