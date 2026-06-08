@@ -22,8 +22,6 @@ def migrate(cr, version):
     util.records.remove_record(cr, "rrhh.action_rrhh_libro_salarios")
     util.records.remove_record(cr, "rrhh.action_planilla")
     util.records.remove_record(cr, "rrhh.action_planilla_wizard")
-    util.records.remove_record(cr, "rrhh.HrSalaryRule_08")
-    util.records.remove_record(cr, "rrhh.HrSalaryRule_13")
 
     util.records.remove_view(cr, xml_id="rrhh.rrhh_view_employee_prestamo_form")
     util.records.remove_view(cr, xml_id="rrhh.rrhh_view_employee_prestamo_linea_form")
