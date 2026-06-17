@@ -17,7 +17,7 @@ class rrhh_igss_wizard(models.TransientModel):
         else:
             return None
 
-    payslip_run_id = fields.Many2many('hr.payslip.run', string='Payslip run',default=_default_payslip_run)
+    payslip_run_id = fields.Many2many('hr.payslip.run', string='Payslip run', default=_default_payslip_run)
     archivo = fields.Binary('Archivo')
     name =  fields.Char('File Name', size=32)
     identificacion_tipo_planilla = fields.Char('Identificación tipo de planilla')
@@ -35,7 +35,7 @@ class rrhh_igss_wizard(models.TransientModel):
     numero_nota_cargo = fields.Char('Número nota de cargo')
     tiempo_contrato = fields.Char('Tiempo de contrato')
 
-    def generar(self):
+    def print_report_excel(self):
         datos = ''
         for w in self:
             datos += str(w.payslip_run_id[0].slip_ids[0].company_id.version_mensaje) + '|' + str(datetime.today().strftime('%d/%m/%Y')) + '|' + str(w.payslip_run_id[0].slip_ids[0].company_id.numero_patronal) + '|'+ str(datetime.strptime(str(w.payslip_run_id[0].date_start),'%Y-%m-%d').date().strftime('%m')).lstrip('0')+ '|' + str(datetime.strptime(str(w.payslip_run_id[0].date_start),'%Y-%m-%d').date().strftime('%Y')).lstrip('0') + '|' + str(w.payslip_run_id[0].slip_ids[0].company_id.name) + '|' +str(w.payslip_run_id[0].slip_ids[0].company_id.vat) + '|'+ str(w.payslip_run_id[0].slip_ids[0].company_id.email) + '|' + str(w.payslip_run_id[0].slip_ids[0].company_id.tipo_planilla) + '\r\n'
@@ -51,64 +51,64 @@ class rrhh_igss_wizard(models.TransientModel):
             suspensiones = []
             for payslip_run in w.payslip_run_id:
                 for slip in payslip_run.slip_ids:
-                    if slip.contract_id:
-                        if slip.employee_id.id not in empleados:
-                            empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id.id,'informacion': [0] * 19,'suspension': ''}
+                    if slip.employee_id.id not in empleados:
+                        empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id.id,'informacion': [0] * 19, 'suspension': ''}
 
-                        contrato_ids = self.env['hr.contract'].search( [['employee_id', '=', slip.employee_id.id]],offset=0,limit=1,order='date_start desc')
-                        numero_liquidacion = str(slip.employee_id.numero_liquidacion) if slip.employee_id.numero_liquidacion else ''
-                        numero_afiliado = str(slip.employee_id.igss) if slip.employee_id.igss else ''
-                        primer_nombre = str(slip.employee_id.primer_nombre) if slip.employee_id.primer_nombre else ''
-                        segundo_nombre = str(slip.employee_id.segundo_nombre) if slip.employee_id.segundo_nombre else ''
-                        primer_apellido = str(slip.employee_id.primer_apellido) if slip.employee_id.primer_apellido else ''
-                        segundo_apellido = str(slip.employee_id.segundo_apellido) if slip.employee_id.segundo_apellido else ''
-                        apellido_casada = str(slip.employee_id.apellido_casada) if slip.employee_id.apellido_casada else ''
-                        tipo_salario = slip.employee_id.tipo_salario if slip.employee_id.tipo_salario else ''
-                        horas_laboradas = ''
-                        tiempo_contrato = slip.employee_id.tiempo_contrato if slip.employee_id.tiempo_contrato else ''
-                        dias_laborados = 0
-                        for linea in slip.worked_days_line_ids:
-                            if linea.work_entry_type_id in slip.employee_id.company_id.igss_dias_trabajo:
-                                dias_laborados = linea.number_of_days
-                        sueldo = 0
-                        for linea in slip.line_ids:
-                            if linea.salary_rule_id.id in slip.employee_id.company_id.sueldo_igss_ids.ids:
-                                sueldo += linea.total
+                    numero_liquidacion = slip.employee_id.numero_liquidacion if slip.employee_id.numero_liquidacion else ''
+                    numero_afiliado = slip.employee_id.igss if slip.employee_id.igss else ''
+                    primer_nombre = slip.employee_id.primer_nombre if slip.employee_id.primer_nombre else ''
+                    segundo_nombre = slip.employee_id.segundo_nombre if slip.employee_id.segundo_nombre else ''
+                    primer_apellido = slip.employee_id.primer_apellido if slip.employee_id.primer_apellido else ''
+                    segundo_apellido = slip.employee_id.segundo_apellido if slip.employee_id.segundo_apellido else ''
+                    apellido_casada = slip.employee_id.apellido_casada if slip.employee_id.apellido_casada else ''
+                    tipo_salario = slip.employee_id.tipo_salario if slip.employee_id.tipo_salario else ''
+                    tiempo_contrato = slip.employee_id.tiempo_contrato if slip.employee_id.tiempo_contrato else ''
 
-                        mes_inicio_contrato = datetime.strptime(str(slip.contract_id.date_start), '%Y-%m-%d').month
-                        anio_inicio_contrato = datetime.strptime(str(slip.contract_id.date_start), '%Y-%m-%d').year
-                        mes_final_contrato = datetime.strptime(str(slip.contract_id.date_end), '%Y-%m-%d').month if slip.contract_id.date_end else ''
-                        anio_final_contrato = datetime.strptime(str(slip.contract_id.date_end), '%Y-%m-%d').year if slip.contract_id.date_end else ''
-                        mes_planilla = datetime.strptime(str(payslip_run.date_start), '%Y-%m-%d').month
-                        anio_planilla = datetime.strptime(str(payslip_run.date_start), '%Y-%m-%d').year
-                        fecha_alta = str(datetime.strptime(str(slip.contract_id.date_start),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if (mes_inicio_contrato == mes_planilla and anio_inicio_contrato == anio_planilla) else ''
-                        fecha_baja = str(datetime.strptime(str(slip.contract_id.date_end),'%Y-%m-%d').date().strftime('%d/%m/%Y')) if (mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla) else ''
+                    horas_laboradas = ''
+                    dias_laborados = 0
+                    for linea in slip.worked_days_line_ids:
+                        if linea.work_entry_type_id in slip.employee_id.company_id.igss_dias_trabajo:
+                            dias_laborados = linea.number_of_days
 
-                        centro_trabajo = str(slip.employee_id.codigo_centro_trabajo) if slip.employee_id.codigo_centro_trabajo else ''
-                        nit = slip.employee_id.work_contact_id.vat if slip.employee_id.work_contact_id.vat else slip.employee_id.nit or ''
-                        codigo_ocupacion = str(slip.employee_id.codigo_ocupacion) if slip.employee_id.codigo_ocupacion else ''
-                        condicion_laboral = str(slip.employee_id.condicion_laboral) if slip.employee_id.condicion_laboral else ''
-                        deducciones = ''
+                    sueldo = 0
+                    for linea in slip.line_ids:
+                        if linea.salary_rule_id.id in slip.employee_id.company_id.sueldo_igss_ids.ids:
+                            sueldo += linea.total
 
-                        empleados[slip.employee_id.id]['informacion'][0] = (numero_liquidacion)
-                        empleados[slip.employee_id.id]['informacion'][1] = (numero_afiliado)
-                        empleados[slip.employee_id.id]['informacion'][2] = (primer_nombre)
-                        empleados[slip.employee_id.id]['informacion'][3] = (segundo_nombre)
-                        empleados[slip.employee_id.id]['informacion'][4] = (primer_apellido)
-                        empleados[slip.employee_id.id]['informacion'][5] = (segundo_apellido)
-                        empleados[slip.employee_id.id]['informacion'][6] = (apellido_casada)
-                        empleados[slip.employee_id.id]['informacion'][7] += round(sueldo,2)
-                        empleados[slip.employee_id.id]['informacion'][8] = (fecha_alta)
-                        empleados[slip.employee_id.id]['informacion'][9] = (fecha_baja)
-                        empleados[slip.employee_id.id]['informacion'][10] = (centro_trabajo)
-                        empleados[slip.employee_id.id]['informacion'][11] = (nit)
-                        empleados[slip.employee_id.id]['informacion'][12] = (codigo_ocupacion)
-                        empleados[slip.employee_id.id]['informacion'][13] = (condicion_laboral)
-                        empleados[slip.employee_id.id]['informacion'][14] = (deducciones)
-                        empleados[slip.employee_id.id]['informacion'][15] = (tipo_salario)
-                        empleados[slip.employee_id.id]['informacion'][16] = (horas_laboradas)
-                        empleados[slip.employee_id.id]['informacion'][17] = (tiempo_contrato)
-                        empleados[slip.employee_id.id]['informacion'][18] = int(dias_laborados)
+                    mes_inicio_contrato = employee_id.date_start.month
+                    anio_inicio_contrato = employee_id.date_start.year
+                    mes_final_contrato = employee_id.date_end.month if employee_id.date_end else ''
+                    anio_final_contrato = employee_id.date_end.year if employee_id.date_end else ''
+                    mes_planilla = payslip_run.date_start.month
+                    anio_planilla = payslip_run.date_start.year
+                    fecha_alta = employee_id.date_start.strftime('%d/%m/%Y') if (mes_inicio_contrato == mes_planilla and anio_inicio_contrato == anio_planilla) else ''
+                    fecha_baja = employee_id.date_end.strftime('%d/%m/%Y') if (mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla) else ''
+
+                    centro_trabajo = slip.employee_id.codigo_centro_trabajo if slip.employee_id.codigo_centro_trabajo else ''
+                    nit = slip.employee_id.work_contact_id.vat if slip.employee_id.work_contact_id.vat else slip.employee_id.nit or ''
+                    codigo_ocupacion = slip.employee_id.codigo_ocupacion if slip.employee_id.codigo_ocupacion else ''
+                    condicion_laboral = slip.employee_id.condicion_laboral if slip.employee_id.condicion_laboral else ''
+                    deducciones = ''
+
+                    empleados[slip.employee_id.id]['informacion'][0] = (numero_liquidacion)
+                    empleados[slip.employee_id.id]['informacion'][1] = (numero_afiliado)
+                    empleados[slip.employee_id.id]['informacion'][2] = (primer_nombre)
+                    empleados[slip.employee_id.id]['informacion'][3] = (segundo_nombre)
+                    empleados[slip.employee_id.id]['informacion'][4] = (primer_apellido)
+                    empleados[slip.employee_id.id]['informacion'][5] = (segundo_apellido)
+                    empleados[slip.employee_id.id]['informacion'][6] = (apellido_casada)
+                    empleados[slip.employee_id.id]['informacion'][7] += round(sueldo,2)
+                    empleados[slip.employee_id.id]['informacion'][8] = (fecha_alta)
+                    empleados[slip.employee_id.id]['informacion'][9] = (fecha_baja)
+                    empleados[slip.employee_id.id]['informacion'][10] = (centro_trabajo)
+                    empleados[slip.employee_id.id]['informacion'][11] = (nit)
+                    empleados[slip.employee_id.id]['informacion'][12] = (codigo_ocupacion)
+                    empleados[slip.employee_id.id]['informacion'][13] = (condicion_laboral)
+                    empleados[slip.employee_id.id]['informacion'][14] = (deducciones)
+                    empleados[slip.employee_id.id]['informacion'][15] = (tipo_salario)
+                    empleados[slip.employee_id.id]['informacion'][16] = (horas_laboradas)
+                    empleados[slip.employee_id.id]['informacion'][17] = (tiempo_contrato)
+                    empleados[slip.employee_id.id]['informacion'][18] = int(dias_laborados)
 
             if empleados:
                 for empleado in empleados.values():

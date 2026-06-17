@@ -18,10 +18,8 @@
                     </group>
                 </group>
                 <footer>
-                    <button name="generar_excel" string="Generar excel" type="object" class="oe_highlight"/>
-                    or
-                    <button name="print_report" string="Generar PDF" type="object" class="oe_highlight"/>
-                    or
+                    <button name="print_report" string="Reporte" type="object" class="btn-primary"/>
+                    <button name="print_report_excel" string="Reporte Excel" type="object" class="btn-primary"/>
                     <button string="Cancel" class="oe_link" special="cancel"/>
                 </footer>
             </form>

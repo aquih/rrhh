@@ -41,7 +41,7 @@
                     </group>
                 </group>
                 <footer>
-                    <button name="generar" string="Generar" type="object" class="oe_highlight"/>
+                    <button name="print_report_excel" string="Reporte Excel" type="object" class="oe_highlight"/>
                     <button string="Cancelar" class="oe_link" special="cancel"/>
                 </footer>
             </form>

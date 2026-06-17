@@ -5,19 +5,21 @@
         <field name="name">rrhh.informe_empleador.wizard.view.form</field>
         <field name="model">rrhh.informe_empleador.wizard</field>
         <field name="arch" type="xml">
-        <form string="Informe del empleador">
-            <group string="Año">
-                <field name="anio"/>
-            </group>
-            <group>
-                <field name="name" invisible="1"/>
-                <field name="archivo" readonly="1" filename="name"/>
-            </group>
-            <footer>
-                <button name="print_report_excel" string="Reporte excel" type="object" class="oe_highlight"/>
-                <button string="Cancelar" class="btn-default" special="cancel" />
-            </footer>
-        </form>
+            <form string="Informe del empleador">
+                <group>
+                    <group>
+                        <field name="anio"/>
+                    </group>
+                    <group>
+                        <field name="name" invisible="1"/>
+                        <field name="archivo" readonly="1" filename="name"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="print_report_excel" string="Reporte Excel" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="btn-default" special="cancel" />
+                </footer>
+            </form>
         </field>
     </record>
 

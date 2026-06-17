@@ -5,16 +5,16 @@
         <field name="name">rrhh.informe_isr.wizard.view.form</field>
         <field name="model">rrhh.informe_isr.wizard</field>
         <field name="arch" type="xml">
-        <form string="Informe ISR">
-            <group>
-                <field name="name" invisible="1"/>
-                <field name="archivo" readonly="1" filename="name"/>
-            </group>
-            <footer>
-                <button name="print_report_excel" string="Generar Excel"  type="object" class="btn-primary"/>
-                <button string="Cancelar" class="btn-default" special="cancel" />
-            </footer>
-        </form>
+            <form string="Informe ISR">
+                <group>
+                    <field name="name" invisible="1"/>
+                    <field name="archivo" readonly="1" filename="name"/>
+                </group>
+                <footer>
+                    <button name="print_report_excel" string="Reporte Excel" type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-default" special="cancel" />
+                </footer>
+            </form>
         </field>
     </record>
 

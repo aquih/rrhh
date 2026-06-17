@@ -24,11 +24,11 @@ class HrPayslip(models.Model):
 
     def dias_trabajados_rango(self, empleado_id, fecha_desde, fecha_hasta):
         if empleado_id.date_start:
-            diferencia_meses = (fecha_hasta - fecha_desde)
+            diferencia = (fecha_hasta - fecha_desde)
             if fecha_desde <= empleado_id.date_start <= fecha_hasta:
-                diferencia_meses = fecha_hasta - empleado_id.date_start
+                diferencia = fecha_hasta - empleado_id.date_start
 
-        return diferencia_meses.days + 1
+        return diferencia.days + 1
 
     def calcular_sueldo_devengado(self, nomina):
         fecha_inicio = nomina.date_to.replace(month=1, day=1)
@@ -360,7 +360,7 @@ class HrPayslip(models.Model):
                     contador_mes += 1
                     salario_sumatoria += salario
 
-            salario_promedio_total =  salario_sumatoria / len(salario_meses)
+            salario_promedio_total = salario_sumatoria / len(salario_meses)
         else:
             salario_promedio_total = empleado_id.wage
 

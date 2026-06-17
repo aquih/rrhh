@@ -18,16 +18,15 @@ class rrhh_libro_salarios(models.TransientModel):
     archivo = fields.Binary('Archivo')
 
     def print_report(self):
-        datas = {'ids': self.env.context.get('active_ids', [])}
-        res = self.read()
-        res = res and res[0] or {}
-        datas['form'] = res
-        return self.env.ref('rrhh.libro_salarios_wizard_report').report_action([], data=datas)
+        data = {
+            'ids': self.env.context.get('active_ids', []),
+            'model': 'rrhh.libro_salarios.wizard',
+            'form': self.read()[0]
+        }
+        return self.env.ref('rrhh.libro_salarios_wizard_report').report_action([], data=data)
 
     def print_report_excel(self):
         for w in self:
-            dic = {}
-            dic['anio'] = w['anio']
             f = io.BytesIO()
             libro = xlsxwriter.Workbook(f)
             
@@ -42,7 +41,7 @@ class rrhh_libro_salarios(models.TransientModel):
             active_ids = self.env.context.get('active_ids', [])
             for id_employee in active_ids:
                 empleado = self.env['report.rrhh.libro_salarios'].obtener_empleado(id_employee)
-                nominas = self.env['report.rrhh.libro_salarios'].obtener_payslips(id_employee, dic['anio'])
+                nominas = self.env['report.rrhh.libro_salarios'].obtener_payslips(id_employee, w['anio'])
                 hoja = libro.add_worksheet(empleado.name)
                 
                 hoja.write(1, 10, empleado.company_id.name)

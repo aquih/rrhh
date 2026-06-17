@@ -18,26 +18,26 @@ class rrhh_informe_isr(models.TransientModel):
         lote_id = self.env["hr.payslip.run"].search([("id","in",id)])
         return lote_id
 
-    def _obtener_fecha_alta(self, nomina):
+    def obtener_fecha_alta(self, nomina):
         mes = nomina.date_to.month
         anio = nomina.date_to.year
         fecha_alta = ""
-        if nomina.contract_id.date_start:
-            mes_contrato_inicio = nomina.contract_id.date_start.month
-            anio_contrato_inicio = nomina.contract_id.date_start.year
+        if nomina.employee_id.date_start:
+            mes_contrato_inicio = nomina.employee_id.date_start.month
+            anio_contrato_inicio = nomina.employee_id.date_start.year
             if anio == anio_contrato_inicio and mes == mes_contrato_inicio:
-                fecha_alta = str(nomina.contract_id.date_start)
+                fecha_alta = str(nomina.employee_id.date_start)
         return fecha_alta
 
-    def _obtener_fecha_baja(self, nomina):
+    def obtener_fecha_baja(self, nomina):
         mes = nomina.date_to.month
         anio = nomina.date_to.year
         fecha_baja = ""
-        if nomina.contract_id.date_end:
-            mes_contrato_fin = nomina.contract_id.date_end.month
-            anio_contrato_fin = nomina.contract_id.date_end.year
+        if nomina.employee_id.date_end:
+            mes_contrato_fin = nomina.employee_id.date_end.month
+            anio_contrato_fin = nomina.employee_id.date_end.year
             if anio == anio_contrato_fin and mes == mes_contrato_fin:
-                fecha_baja = str(nomina.contract_id.date_end)
+                fecha_baja = str(nomina.employee_id.date_end)
         return fecha_baja
 
     def print_report_excel(self):
@@ -96,8 +96,8 @@ class rrhh_informe_isr(models.TransientModel):
             if lote_id.slip_ids:
                 correlativo = 1
                 for nomina in lote_id.slip_ids:
-                    fecha_alta = self._obtener_fecha_alta(nomina)
-                    fecha_baja = self._obtener_fecha_baja(nomina)
+                    fecha_alta = self.obtener_fecha_alta(nomina)
+                    fecha_baja = self.obtener_fecha_baja(nomina)
                     calculo_isr = self.env["hr.payslip"].calculo_isr(nomina)
                     hoja.write(fila, 0, correlativo)
                     hoja.write(fila, 1, nomina.employee_id.registration_number or nomina.employee_id.codigo_empleado)

@@ -7,6 +7,9 @@
         <field name="arch" type="xml">
             <button name="action_validate" position="after">
                 <button string="Generar pagos" name="generar_pagos" type="object"/>
+                <button string="Archivo IGSS" name="rrhh.archivo_igss_wizard_action" type="action"/>
+                <button string="Informe ISR" name="rrhh.informe_isr_wizard_action" type="action"/>
+                <button string="Planilla" name="rrhh.planilla_wizard_action" type="action"/>
             </button>
         </field>
     </record>

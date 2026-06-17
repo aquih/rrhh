@@ -7,332 +7,183 @@ import xlsxwriter
 import base64
 import io
 import logging
-import time
-import datetime
-from datetime import date
 from datetime import datetime, date, time
-from odoo.fields import Date, Datetime
-import itertools
-from dateutil.relativedelta import relativedelta
-from odoo.addons.l10n_gt_extra import a_letras
 
 class rrhh_informe_empleador(models.TransientModel):
     _name = 'rrhh.informe_empleador.wizard'
     _description = 'Wizard para generar informe de empleador'
 
     anio = fields.Integer('Año', required=True)
-    name = fields.Char('Nombre archivo', size=32)
+    name = fields.Char('Nombre archivo')
     archivo = fields.Binary('Archivo')
 
-    def _get_empleado(self,id):
-        empleado_id = self.env['hr.employee'].search([('id', '=', id)])
-        return empleado_id
-
-    def empleados_inicio_anio(self,company_id,anio):
+    def empleados_inicio_anio(self, company_id, anio):
         empleados = 0
-        empleado_ids = self.env['hr.employee'].search([['company_id', '=', company_id]])
-        for empleado in empleado_ids:
-            if empleado.contract_ids:
-                for contrato in empleado.contract_ids:
-                    if contrato.state == 'open':
-                        anio_fin_contrato = 0
-                        anio_inicio_contrato = contrato.date_start.year
-                        if contrato.date_end:
-                            anio_fin_contrato = contrato.date_end.year
-                        if anio_inicio_contrato < anio and (contrato.date_end == False or anio_fin_contrato < anio) :
-                            empleados += 1
+        for empleado in self.env['hr.employee'].search([('company_id', '=', company_id)]):
+            anio_fin = 0
+            anio_inicio = empleado.date_start.year
+            if empleado.date_end:
+                anio_fin = empleado.date_end.year
+            if anio_inicio < anio and (empleado.date_end == False or anio_fin < anio) :
+                empleados += 1
+
         return empleados
 
-    def empleados_fin_anio(self,company_id,anio):
+    def empleados_fin_anio(self, company_id, anio):
         empleados = 0
-        empleado_ids = self.env['hr.employee'].search([['company_id', '=', company_id]])
-        for empleado in empleado_ids:
-            if empleado.contract_ids:
-                for contrato in empleado.contract_ids:
-                    if contrato.state == 'open':
-                        anio_fin_contrato = 0
-                        anio_inicio_contrato = contrato.date_start.year
-                        if contrato.date_end:
-                            anio_fin_contrato = contrato.date_end.year
-                        if anio_inicio_contrato <= anio and (contrato.date_end == False or anio_fin_contrato <= anio) :
-                            empleados += 1
+        for empleado in self.env['hr.employee'].search([['company_id', '=', company_id]]):
+            anio_fin = 0
+            anio_inicio = empleado.date_start.year
+            if empleado.date_end:
+                anio_fin = empleado.date_end.year
+            if anio_inicio <= anio and (empleado.date_end == False or anio_fin <= anio) :
+                empleados += 1
+
         return empleados
 
-    def _get_salario_promedio(self,id):
-        extra_ordinario_total = 0
-        historial_salario = []
-        salario_meses = {}
-        salario_total = 0
-        salarios = {'salario_promedio': 0,'totales': 0, 'mes': {}}
-        empleado_id = self._get_empleado(id)
-        if empleado_id.contract_ids[0].historial_salario_ids:
-            for linea in empleado_id.contract_ids[0].historial_salario_ids:
-                historial_salario.append({'salario': linea.salario, 'fecha':linea.fecha})
-
-            historial_salario_ordenado = sorted(historial_salario, key=lambda k: k['fecha'],reverse=True)
-            meses_laborados = (empleado_id.contract_id.date_end.year - empleado_id.contract_ids[0].date_start.year) * 12 + (empleado_id.contract_id.date_end.month - empleado_id.contract_ids[0].date_start.month)
-            contador_mes = 0
-            if meses_laborados >= 6:
-                while contador_mes < 6:
-                    mes = relativedelta(months=contador_mes)
-                    resta_mes = empleado_id.contract_id.date_end - mes
-                    mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
-                    llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'mes_numero':resta_mes.month-1,'extra':0,'total':0}
-                    contador_mes += 1
-            else:
-                while contador_mes <= meses_laborados:
-                    mes = relativedelta(months=contador_mes)
-                    resta_mes = empleado_id.contract_id.date_end - mes
-                    mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
-                    llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    salario_meses[llave] = {'nombre':mes_letras.upper(),'salario': 0,'anio':resta_mes.year,'mes_numero':resta_mes.month-1,'extra':0,'total':0}
-                    contador_mes += 1
-
-            contador_mes = 0
-            fecha_inicio_diferencia = datetime.strptime(str(historial_salario_ordenado[0]['fecha']), '%Y-%m-%d')
-            diferencia_meses = (empleado_id.contract_id.date_end.year - fecha_inicio_diferencia.year) * 12 + (empleado_id.contract_id.date_end.month - fecha_inicio_diferencia.month)
-
-            posicion_siguiente = 0
-            for linea in historial_salario_ordenado:
-                contador = 0
-                condicion = False
-                if posicion_siguiente == 0:
-                    diferencia_meses += 1
-                while contador < (diferencia_meses):
-
-                    mes = relativedelta(months=contador_mes)
-                    resta_mes = empleado_id.contract_id.date_end - mes
-                    mes_letras = a_letras.mes_a_letras(resta_mes.month-1)
-                    llave = '01-'+str(resta_mes.month)+'-'+str(resta_mes.year)
-                    if llave in salario_meses:
-                        salario_meses[llave]['salario'] = linea['salario']
-                        salario_meses[llave]['total'] +=  linea['salario']
-                        salario_total += linea['salario']
-                    contador += 1
-                    contador_mes += 1
-
-                if len(historial_salario_ordenado) > 1:
-                    fecha_cambio_salario = datetime.strptime(str(linea['fecha']), '%Y-%m-%d')
-
-                    posicion_siguiente = historial_salario_ordenado.index(linea) + 1
-                    if posicion_siguiente < len(historial_salario_ordenado):
-                        fecha_inicio_diferencia = datetime.strptime(str(historial_salario_ordenado[posicion_siguiente]['fecha']), '%Y-%m-%d')
-                        diferencia_meses = (fecha_cambio_salario.year - fecha_inicio_diferencia.year) * 12 + (fecha_cambio_salario.month - fecha_inicio_diferencia.month)
-
-            nomina_ids = self.env['hr.payslip'].search([('employee_id', '=', empleado_id.id)], order='date_to asc')
-            if nomina_ids:
-                for nomina in nomina_ids:
-                    mes_nomina = nomina.date_to.month
-                    anio_nomina = nomina.date_to.year
-                    llave = '01-'+str(mes_nomina)+'-'+str(anio_nomina)
-                    extra_ordinario_ids = nomina.company_id.extra_ordinario_ids
-                    if llave in salario_meses:
-                        for linea in nomina.line_ids:
-                            if linea.salary_rule_id.id in extra_ordinario_ids.ids:
-                                salario_meses[llave]['extra'] += linea.total
-                                salario_meses[llave]['total'] += linea.total
-                                extra_ordinario_total += linea.total
-
-        salario_meses = sorted(salario_meses.items(), key = lambda x:datetime.strptime(x[0], '%d-%m-%Y'))
-
-        salarios['totales'] = salario_total
-        salarios['extra_ordinario_total'] = extra_ordinario_total
-        salarios['total_total'] =  (salario_total + extra_ordinario_total)
-
-        salarios['total_promedio'] = salario_total / len(salario_meses)
-        salarios['extra_ordinario_promedio'] = extra_ordinario_total / len(salario_meses)
-        salarios['total_salario_promedio'] = salarios['total_total'] / len(salario_meses)
-        return {'salarios': salarios,'meses_salarios': salario_meses}
-
-    def _get_dias_laborados(self,id):
-        empleado_id = self._get_empleado(id)
-        dias = datetime.strptime( str(empleado_id.contract_ids[0].date_end),"%Y-%m-%d") - datetime.strptime(str(empleado_id.contract_ids[0].date_start),"%Y-%m-%d")
-        return dias.days+1
-
-    def _get_indemnizacion(self,id):
+    def calcular_indemnizacion(self, empleado_id, anio):
         dias_laborados = 0
         salario_promedio = 0
         indemnizacion = 0
         regla_76_78 = 0
         regla_42_92 = 0
         indemnizacion = 0
-        empleado_id = self._get_empleado(id)
-        if empleado_id.contract_id.calcula_indemnizacion:
-            dias_laborados = self._get_dias_laborados(id)
-            salario_promedio = self._get_salario_promedio(id)
-            salario_diario = salario_promedio['salarios']['total_salario_promedio'] / 365
-            regla_76_78 = ((salario_promedio['salarios']['total_salario_promedio'] /12) / 365) * dias_laborados
-            regla_42_92 = ((salario_promedio['salarios']['total_salario_promedio'] /12) / 365) * dias_laborados
+        anio_fin = date(anio, 12, 31)
+        if empleado_id.calcula_indemnizacion:
+            dias_laborados = self.env['hr.payslip'].dias_trabajados_rango(empleado_id.date_start, empleado_id.date_end or anio_fin)
+            salario_promedio = self.env['hr.payslip'].salario_promedio(empleado_id, empleado_id.date_end or anio_fin)
+            salario_diario = salario_promedio / 365
+            regla_76_78 = ((salario_promedio / 12) / 365) * dias_laborados
+            regla_42_92 = ((salario_promedio / 12) / 365) * dias_laborados
             indemnizacion = (salario_diario * dias_laborados) + regla_76_78 + regla_42_92
+
         return indemnizacion
 
-    def print_report(self):
-        datas = {'ids': self.env.context.get('active_ids', [])}
-        res = self.read(['anio'])
-        res = res and res[0] or {}
-        res['anio'] = res['anio']
-        datas['form'] = res
-        return self.env.ref('rrhh.action_informe_empleador').report_action([], data=datas)
+    def dias_trabajados_anual(self, empleado_id, anio):
+        anio_inicio_contrato = empleado_id.date_start.year
 
-    def dias_trabajados_anual(self,empleado_id,anio):
-        anio_inicio_contrato = int(empleado_id.contract_id.date_start.year)
-        anio_inicio = datetime.strptime(str(anio)+'-01'+'-01', '%Y-%m-%d').date().strftime('%Y-%m-%d')
-        anio_fin = datetime.strptime(str(anio)+'-12'+'-31', '%Y-%m-%d').date().strftime('%Y-%m-%d')
-        dias_laborados = 0
-        empleado = self.env['hr.employee'].browse(empleado_id.id)
-        if empleado_id.contract_id.date_start and empleado_id.contract_id.date_end:
-            anio_fin_contrato = int(empleado_id.contract_id.date_end.year)
-            if anio_inicio_contrato == anio and anio_fin_contrato == anio:
-                dias = empleado._get_work_days_data_batch(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
-                if dias:
-                    for dato in dias:
-                        if 'days' in dias[dato]:
-                            dias_laborados = dias[dato]['days']
-            if anio_inicio_contrato != anio and anio_fin_contrato == anio:
-                dias = empleado._get_work_days_data_batch(Datetime.from_string(anio_inicio), Datetime.from_string(empleado_id.contract_id.date_end), calendar=empleado_id.contract_id.resource_calendar_id)
-                if dias:
-                    for dato in dias:
-                        if 'days' in dias[dato]:
-                            dias_laborados = dias[dato]['days']
-        if empleado_id.contract_id.date_start and empleado_id.contract_id.date_end == False:
-            if anio_inicio_contrato == anio:
-                dias = empleado._get_work_days_data_batch(Datetime.from_string(empleado_id.contract_id.date_start), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
-                if dias:
-                    for dato in dias:
-                        if 'days' in dias[dato]:
-                            dias_laborados = dias[dato]['days']
-            else:
-                # dias = empleado.get_work_days_data(Datetime.from_string(anio_inicio), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
-                dias = empleado_id._get_work_days_data_batch(Datetime.from_string(anio_inicio), Datetime.from_string(anio_fin), calendar=empleado_id.contract_id.resource_calendar_id)
-                if dias:
-                    for dato in dias:
-                        if 'days' in dias[dato]:
-                            dias_laborados = dias[dato]['days']
-        return dias_laborados
+        fecha_inicio = max(date(anio, 1, 1), empleado_id.date_start)
+        fecha_fin = min(date(anio, 12, 31), empleado_id.date_end)
+
+        dias = empleado._get_work_days_data_batch(fecha_inicio, fecha_fin, calendar=empleado_id.resource_calendar_id)
+        return dias[empleado_id.id]['days']
 
     def print_report_excel(self):
         for w in self:
-            dict = {}
             empleados_id = self.env.context.get('active_ids', [])
+
             f = io.BytesIO()
             libro = xlsxwriter.Workbook(f)
-            dict['anio'] = w['anio']
             empleados_archivados = self.env['hr.employee'].sudo().search([('active','=',False),('id', 'in', empleados_id)])
             empleados_activos = self.env['hr.employee'].sudo().search([('active','=',True),('id', 'in', empleados_id)])
             empleados = empleados_archivados + empleados_activos
             responsable_id = self.env['hr.employee'].sudo().search([['id', '=', self.env.user.id]])
-            datos_compania = empleados[0].company_id
-
+            datos_compania = self.env.company
 
             hoja_patrono = libro.add_worksheet('Patrono')
-            empleados_inicio_anio = self.empleados_inicio_anio(datos_compania.id,w['anio'])
-            empleados_fin_anio = self.empleados_fin_anio(datos_compania.id,w['anio'])
-            col_width = 100 * 75
-            row_height = 35 * 30
+            empleados_inicio_anio = self.empleados_inicio_anio(datos_compania.id, w['anio'])
+            empleados_fin_anio = self.empleados_fin_anio(datos_compania.id, w['anio'])
 
-            hoja_patrono.write(6,0,'Datos De Identificación')
-            hoja_patrono.write(7,0,'NIT')
-            hoja_patrono.write(7,1,datos_compania.vat)
-            hoja_patrono.write(8,0,'NOMBRE DE LA EMPRESA')
-            hoja_patrono.write(8,1,datos_compania.company_registry)
-            hoja_patrono.write(9,0,'NACIONALIDAD DEL EMPLEADOR')
-            hoja_patrono.write(9,1,datos_compania.country_id.name)
-            hoja_patrono.write(10,0,'DENOMINACION O RAZON SOCIAL DEL PATRONO')
-            hoja_patrono.write(10,1,datos_compania.name)
-            hoja_patrono.write(11,0,'NUMERO PATRONAL IGSS')
-            hoja_patrono.write(11,1,datos_compania.numero_patronal)
+            hoja_patrono.write(6, 0, 'Datos De Identificación')
+            hoja_patrono.write(7, 0, 'Nit')
+            hoja_patrono.write(7, 1, datos_compania.vat)
+            hoja_patrono.write(8, 0, 'Nombre de la empresa')
+            hoja_patrono.write(8, 1, datos_compania.company_registry)
+            hoja_patrono.write(9, 0, 'Nacionalidad del empleador')
+            hoja_patrono.write(9, 1, datos_compania.country_id.name)
+            hoja_patrono.write(10, 0, 'Denominación o razón social de patrono')
+            hoja_patrono.write(10, 1, datos_compania.name)
+            hoja_patrono.write(11, 0, 'Numero patronal IGSS')
+            hoja_patrono.write(11, 1, datos_compania.numero_patronal)
 
-            hoja_patrono.write(12,0,'Datos General')
-            hoja_patrono.write(13,0,'Barrio o Colonia')
-            hoja_patrono.write(13,1,datos_compania.barrio_colonia)
-            hoja_patrono.write(13,2,'Zona')
-            hoja_patrono.write(13,3,datos_compania.zona)
-            hoja_patrono.write(14,0,'Calle')
-            hoja_patrono.write(14,1,datos_compania.street2)
-            hoja_patrono.write(14,2,'Avenida')
-            hoja_patrono.write(14,3,datos_compania.street)
-            hoja_patrono.write(15,0,'Teléfono')
-            hoja_patrono.write(15,1,datos_compania.phone)
-            hoja_patrono.write(15,2,'Nomenclatura')
-            hoja_patrono.write(15,3,datos_compania.nomenclatura)
-            hoja_patrono.write(16,0,'Sitio Web')
-            hoja_patrono.write(16,1,datos_compania.website)
-            hoja_patrono.write(16,2,'E-Mail')
-            hoja_patrono.write(16,3,datos_compania.email)
-            hoja_patrono.write(17,0,'Existe Sindicato (SI) O (NO)')
-            hoja_patrono.write(17,1,datos_compania.sindicato)
+            hoja_patrono.write(12, 0, 'Datos General')
+            hoja_patrono.write(13, 0, 'Barrio o Colonia')
+            hoja_patrono.write(13, 1, datos_compania.barrio_colonia)
+            hoja_patrono.write(13, 2, 'Zona')
+            hoja_patrono.write(13, 3, datos_compania.zona)
+            hoja_patrono.write(14, 0, 'Calle')
+            hoja_patrono.write(14, 1, datos_compania.street2)
+            hoja_patrono.write(14, 2, 'Avenida')
+            hoja_patrono.write(14, 3, datos_compania.street)
+            hoja_patrono.write(15, 0, 'Teléfono')
+            hoja_patrono.write(15, 1, datos_compania.phone)
+            hoja_patrono.write(15, 2, 'Nomenclatura')
+            hoja_patrono.write(15, 3, datos_compania.nomenclatura)
+            hoja_patrono.write(16, 0, 'Sitio Web')
+            hoja_patrono.write(16, 1, datos_compania.website)
+            hoja_patrono.write(16, 2, 'E-Mail')
+            hoja_patrono.write(16, 3, datos_compania.email)
+            hoja_patrono.write(17, 0, 'Existe Sindicato (SI) O (NO)')
+            hoja_patrono.write(17, 1, datos_compania.sindicato)
 
-            hoja_patrono.write(19,0,'Ubicación Geográfica')
-            hoja_patrono.write(20,0,'País')
-            hoja_patrono.write(20,1,datos_compania.country_id.name)
-            hoja_patrono.write(20,2,'Región')
-            hoja_patrono.write(20,3,datos_compania.state_id.name)
-            hoja_patrono.write(21,0,'Departamento')
-            hoja_patrono.write(21,1,datos_compania.state_id.name)
-            hoja_patrono.write(21,2,'Municipio')
-            hoja_patrono.write(21,3,datos_compania.city)
-            hoja_patrono.write(22,0,'Datos Económicos')
-            hoja_patrono.write(23,0,'Año de Inicio de Operaciones')
-            hoja_patrono.write(23,1,datos_compania.anio_inicio_operaciones)
-            hoja_patrono.write(24,0,'Cantidad Total de Empleados Inicio de Año ')
-            hoja_patrono.write(24,1, empleados_inicio_anio)
-            hoja_patrono.write(25,0,'Cantidad Total de Empleados fin de Año')
-            hoja_patrono.write(25,1, empleados_fin_anio)
-            hoja_patrono.write(26,0,'Tamaño de la empresa por ventas anuales en salarios minimos')
-            hoja_patrono.write(26,1, datos_compania.tamanio_empresa_ventas)
-            hoja_patrono.write(27,0,'Tamaño de empresa según cantidad de Trabajadores')
-            hoja_patrono.write(27,1,datos_compania.tamanio_empresa_trabajadores)
-            hoja_patrono.write(28,0,'Tiene planificado contratar nuevo personal (SI) (NO)')
-            hoja_patrono.write(28,1,datos_compania.contratar_personal)
-            hoja_patrono.write(29,0,'Contabilidad Completa')
-            hoja_patrono.write(29,1,datos_compania.contabilidad_completa)
+            hoja_patrono.write(19, 0, 'Ubicación Geográfica')
+            hoja_patrono.write(20, 0, 'País')
+            hoja_patrono.write(20, 1, datos_compania.country_id.name)
+            hoja_patrono.write(20, 2, 'Región')
+            hoja_patrono.write(20, 3, datos_compania.state_id.name)
+            hoja_patrono.write(21, 0, 'Departamento')
+            hoja_patrono.write(21, 1, datos_compania.state_id.name)
+            hoja_patrono.write(21, 2, 'Municipio')
+            hoja_patrono.write(21, 3, datos_compania.city)
+            hoja_patrono.write(22, 0, 'Datos Económicos')
+            hoja_patrono.write(23, 0, 'Año de Inicio de Operaciones')
+            hoja_patrono.write(23, 1, datos_compania.anio_inicio_operaciones)
+            hoja_patrono.write(24, 0, 'Cantidad Total de Empleados Inicio de Año ')
+            hoja_patrono.write(24, 1, empleados_inicio_anio)
+            hoja_patrono.write(25, 0, 'Cantidad Total de Empleados fin de Año')
+            hoja_patrono.write(25, 1, empleados_fin_anio)
+            hoja_patrono.write(26, 0, 'Tamaño de la empresa por ventas anuales en salarios minimos')
+            hoja_patrono.write(26, 1, datos_compania.tamanio_empresa_ventas)
+            hoja_patrono.write(27, 0, 'Tamaño de empresa según cantidad de Trabajadores')
+            hoja_patrono.write(27, 1, datos_compania.tamanio_empresa_trabajadores)
+            hoja_patrono.write(28, 0, 'Tiene planificado contratar nuevo personal (SI) (NO)')
+            hoja_patrono.write(28, 1, datos_compania.contratar_personal)
+            hoja_patrono.write(29, 0, 'Contabilidad Completa')
+            hoja_patrono.write(29, 1, datos_compania.contabilidad_completa)
 
-            hoja_patrono.write(31,0,'Actividad Económica Principal')
-            hoja_patrono.write(32,0,'Actividad Gran Grupo')
-            hoja_patrono.write(32,1,datos_compania.actividad_gran_grupo)
-            hoja_patrono.write(33,0,'Actividad Económica')
-            hoja_patrono.write(33,1,datos_compania.actividad_economica)
-            hoja_patrono.write(34,0,'Sub Actividad Económica')
-            hoja_patrono.write(34,1,datos_compania.sub_actividad_economica)
-            hoja_patrono.write(35,0,'Ocupación Grupo')
-            hoja_patrono.write(35,1,datos_compania.ocupacion_grupo)
+            hoja_patrono.write(31, 0, 'Actividad Económica Principal')
+            hoja_patrono.write(32, 0, 'Actividad Gran Grupo')
+            hoja_patrono.write(32, 1, datos_compania.actividad_gran_grupo)
+            hoja_patrono.write(33, 0, 'Actividad Económica')
+            hoja_patrono.write(33, 1, datos_compania.actividad_economica)
+            hoja_patrono.write(34, 0, 'Sub Actividad Económica')
+            hoja_patrono.write(34, 1, datos_compania.sub_actividad_economica)
+            hoja_patrono.write(35, 0, 'Ocupación Grupo')
+            hoja_patrono.write(35, 1, datos_compania.ocupacion_grupo)
 
-            hoja_patrono.write(37,0,'Datos Del Contacto')
-            hoja_patrono.write(38,0,'Nombre Del Represéntate. Legal')
-            hoja_patrono.write(38,1,datos_compania.representante_legal_id.name)
-            hoja_patrono.write(39,0,'Tipo De Documento Del Represéntate. Legal ')
-            hoja_patrono.write(39,1,'DPI')
-            hoja_patrono.write(40,0,'Nombre Jefe De Recursos Humanos')
-            hoja_patrono.write(40,1,datos_compania.jefe_recursos_humanos_id.name)
-            hoja_patrono.write(41,0,'No. De Identificación De  Jefe De RR.HH.')
-            hoja_patrono.write(41,1,datos_compania.jefe_recursos_humanos_id.identification_id)
-            hoja_patrono.write(42,0,'E-Mail Del Jefe RR.HH.')
-            hoja_patrono.write(42,1,datos_compania.jefe_recursos_humanos_id.work_email)
-            hoja_patrono.write(43,0,'E-Mail Del Responsable Del Informe ')
-            hoja_patrono.write(43,1,responsable_id.work_email)
-            hoja_patrono.write(44,0,'Teléfono Del Represéntate Del Informe')
-            hoja_patrono.write(44,1,responsable_id.work_phone)
-            hoja_patrono.write(45,0,'Nacionalidad Del Representante Legal')
-            hoja_patrono.write(45,1, datos_compania.representante_legal_id.country_id.name)
-            hoja_patrono.write(46,0,'No. De Identificación Del Represéntate Legal')
-            hoja_patrono.write(46,1, datos_compania.representante_legal_id.identification_id)
-            hoja_patrono.write(47,0,'Tipo De Documentación Del Jefe De RR.HH.')
-            hoja_patrono.write(47,1, 'DPI')
-            hoja_patrono.write(48,0,'Teléfono Jefe RR.HH.')
-            hoja_patrono.write(48,1, datos_compania.jefe_recursos_humanos_id.work_phone)
-            hoja_patrono.write(49,0,'Nombre Del Represéntate de Elaborar el Informe Del Empleador')
-            hoja_patrono.write(49,1, responsable_id.name)
-            hoja_patrono.write(50,0,'Documento Identificación Responsable')
-            hoja_patrono.write(50,1, responsable_id.identification_id)
-            hoja_patrono.write(51,0,'Nacionalidad Del Responsable')
-            hoja_patrono.write(51,1, responsable_id.country_id.name)
-            hoja_patrono.write(52,0,'Año Del Informe ')
-            hoja_patrono.write(52,1,dict['anio'])
+            hoja_patrono.write(37, 0, 'Datos Del Contacto')
+            hoja_patrono.write(38, 0, 'Nombre Del Represéntate. Legal')
+            hoja_patrono.write(38, 1, datos_compania.representante_legal_id.name)
+            hoja_patrono.write(39, 0, 'Tipo De Documento Del Represéntate. Legal ')
+            hoja_patrono.write(39, 1, 'DPI')
+            hoja_patrono.write(40, 0, 'Nombre Jefe De Recursos Humanos')
+            hoja_patrono.write(40, 1, datos_compania.jefe_recursos_humanos_id.name)
+            hoja_patrono.write(41, 0, 'No. De Identificación De  Jefe De RR.HH.')
+            hoja_patrono.write(41, 1, datos_compania.jefe_recursos_humanos_id.identification_id)
+            hoja_patrono.write(42, 0, 'E-Mail Del Jefe RR.HH.')
+            hoja_patrono.write(42, 1, datos_compania.jefe_recursos_humanos_id.work_email)
+            hoja_patrono.write(43, 0, 'E-Mail Del Responsable Del Informe ')
+            hoja_patrono.write(43, 1, responsable_id.work_email)
+            hoja_patrono.write(44, 0, 'Teléfono Del Represéntate Del Informe')
+            hoja_patrono.write(44, 1, responsable_id.work_phone)
+            hoja_patrono.write(45, 0, 'Nacionalidad Del Representante Legal')
+            hoja_patrono.write(45, 1, datos_compania.representante_legal_id.country_id.name)
+            hoja_patrono.write(46, 0, 'No. De Identificación Del Represéntate Legal')
+            hoja_patrono.write(46, 1, datos_compania.representante_legal_id.identification_id)
+            hoja_patrono.write(47, 0, 'Tipo De Documentación Del Jefe De RR.HH.')
+            hoja_patrono.write(47, 1, 'DPI')
+            hoja_patrono.write(48, 0, 'Teléfono Jefe RR.HH.')
+            hoja_patrono.write(48, 1, datos_compania.jefe_recursos_humanos_id.work_phone)
+            hoja_patrono.write(49, 0, 'Nombre Del Represéntate de Elaborar el Informe Del Empleador')
+            hoja_patrono.write(49, 1, responsable_id.name)
+            hoja_patrono.write(50, 0, 'Documento Identificación Responsable')
+            hoja_patrono.write(50, 1, responsable_id.identification_id)
+            hoja_patrono.write(51, 0, 'Nacionalidad Del Responsable')
+            hoja_patrono.write(51, 1, responsable_id.country_id.name)
+            hoja_patrono.write(52, 0, 'Año Del Informe ')
+            hoja_patrono.write(52, 1, w['anio'])
 
             hoja_empleado = libro.add_worksheet('Empleado')
-            datos = libro.add_worksheet('Hoja2')
-
             hoja_empleado.write(0, 0, 'Numero de empleado')
             hoja_empleado.write(0, 1, 'Primer Nombre')
             hoja_empleado.write(0, 2, 'Segundo Nombre')
@@ -381,12 +232,9 @@ class rrhh_informe_empleador(models.TransientModel):
 
             fila = 1
             empleado_numero = 1
-            numero = 1
             for empleado in empleados:
-                nombre_empleado = empleado.name.split( )
                 if empleado.primer_nombre:
                     nominas_lista = []
-                    contrato = self.env['hr.contract'].search([('employee_id', '=', empleado.id),('state','=','open')])
                     nomina_id = self.env['hr.payslip'].search([['employee_id', '=', empleado.id]])
                     dias_trabajados = 0
                     salario_anual_nominal = 0
@@ -402,7 +250,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     retribucion_vacaciones = 0
                     bonificacion_decreto = 0
                     precision_currency = empleado.company_id.currency_id
-                    indemnizacion = precision_currency.round(self._get_indemnizacion(empleado.id)) if empleado.contract_ids[0].date_end else 0
+                    indemnizacion = precision_currency.round(self.calcular_indemnizacion(empleado.id, w['anio'])) if empleado.date_end else 0
                     salario_anual_nominal_promedio = 0
                     nominas = {}
                     numero_horas_extra = 0
@@ -464,9 +312,9 @@ class rrhh_informe_empleador(models.TransientModel):
                         estado_civil = 4
                     if empleado.marital == 'separado':
                         estado_civil = 5
-                    if empleado.marital == 'unido':
+                    if empleado.marital == 'cohabitant':
                         estado_civil = 6
-                    dias_trabajados_anual = self.dias_trabajados_anual(empleado,w['anio'])
+                    dias_trabajados_anual = self.dias_trabajados_anual(empleado, w['anio'])
                     hoja_empleado.write(fila, 0, empleado_numero)
                     hoja_empleado.write(fila, 1, empleado.primer_nombre if empleado.primer_nombre else '')
                     hoja_empleado.write(fila, 2, empleado.segundo_nombre if empleado.segundo_nombre else '')
@@ -491,12 +339,12 @@ class rrhh_informe_empleador(models.TransientModel):
                     hoja_empleado.write(fila, 21, empleado.pueblo_pertenencia)
                     hoja_empleado.write(fila, 22, empleado.comunidad_linguistica)
                     hoja_empleado.write(fila, 23, empleado.children)
-                    hoja_empleado.write(fila, 24, contrato.temporalidad_contrato)
+                    hoja_empleado.write(fila, 24, empleado.temporalidad_contrato)
                     hoja_empleado.write(fila, 25, empleado.tipo_contrato)
-                    hoja_empleado.write(fila, 26, contrato.date_start)
-                    hoja_empleado.write(fila, 27, contrato.fecha_reinicio_labores)
-                    hoja_empleado.write(fila, 28, contrato.date_end)
-                    hoja_empleado.write(fila, 29, contrato.job_id.name)
+                    hoja_empleado.write(fila, 26, empleado.date_start)
+                    hoja_empleado.write(fila, 27, empleado.fecha_reinicio_labores)
+                    hoja_empleado.write(fila, 28, empleado.date_end)
+                    hoja_empleado.write(fila, 29, empleado.job_id.name)
                     hoja_empleado.write(fila, 30, empleado.jornada_trabajo)
                     hoja_empleado.write(fila, 31, dias_trabajados_anual)
                     hoja_empleado.write(fila, 32, salario_anual_nominal_promedio)
@@ -516,11 +364,10 @@ class rrhh_informe_empleador(models.TransientModel):
                     empleado_numero +=1
 
                     fila += 1
-                    numero += 1
 
             libro.close()
             datos = base64.b64encode(f.getvalue())
-            self.write({'archivo':datos, 'name':'informe_del_empleador.xls'})
+            self.write({'archivo': datos, 'name': 'informe_del_empleador.xls'})
 
         return {
             'view_type': 'form',
