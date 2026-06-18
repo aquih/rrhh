@@ -139,9 +139,9 @@ class rrhh_informe_empleador(models.TransientModel):
         salarios['extra_ordinario_total'] = extra_ordinario_total
         salarios['total_total'] =  (salario_total + extra_ordinario_total)
 
-        salarios['total_promedio'] = salario_total / len(salario_meses)
-        salarios['extra_ordinario_promedio'] = extra_ordinario_total / len(salario_meses)
-        salarios['total_salario_promedio'] = salarios['total_total'] / len(salario_meses)
+        salarios['total_promedio'] = salario_total / (len(salario_meses) or 1)
+        salarios['extra_ordinario_promedio'] = extra_ordinario_total / (len(salario_meses) or 1)
+        salarios['total_salario_promedio'] = salarios['total_total'] / (len(salario_meses) or 1)
         return {'salarios': salarios,'meses_salarios': salario_meses}
 
     def _get_dias_laborados(self,id):
