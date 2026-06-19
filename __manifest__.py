@@ -18,14 +18,6 @@
         'data/hr_leave_type_data.xml',
         'data/report_paperformat.xml',
 
-        'views/rrhh_planilla_views.xml',
-        'views/rrhh_prestamo_views.xml',
-        'views/rrhh_recibo_views.xml',
-        'views/hr_employee_views.xml',
-        'views/hr_payslip_run_views.xml',
-        'views/hr_payslip_views.xml',
-        'views/res_company_views.xml',
-
         'report/recibo_templates.xml',
         'report/recibo_report_views.xml',
         'report/libro_salarios_templates.xml',
@@ -36,6 +28,14 @@
         'wizard/hr_employee_informe_empleador_views.xml',
         'wizard/hr_payslip_archivo_igss_views.xml',
         'wizard/hr_payslip_run_informe_isr_views.xml',
+
+        'views/rrhh_planilla_views.xml',
+        'views/rrhh_prestamo_views.xml',
+        'views/rrhh_recibo_views.xml',
+        'views/hr_employee_views.xml',
+        'views/hr_payslip_run_views.xml',
+        'views/hr_payslip_views.xml',
+        'views/res_company_views.xml',
 
         'security/ir.model.access.csv',
         'security/rrhh_security.xml',

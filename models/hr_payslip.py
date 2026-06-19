@@ -386,7 +386,7 @@ class HrPayslip(models.Model):
                     
                     salario_por_mes.append({'mes': f'{anio}-{mes}', 'salario': salario})
     
-        salario_promedio_total = 0
+        salario_promedio_total = empleado_id.wage
         if len(salario_por_mes) > 0:
             salario_promedio_total = sum([s['salario'] for s in salario_por_mes])/len(salario_por_mes)
         
