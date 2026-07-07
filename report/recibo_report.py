@@ -7,16 +7,13 @@ class ReportRecibo(models.AbstractModel):
     _name = 'report.rrhh.recibo'
     _description = 'Recibo de pago'
 
-    def horas_extras(self,o):
-        horas_extras = 0
-        if o.employee_id.recibo_id:
-            entradas = []
-            for entrada in o.employee_id.recibo_id.linea_entrada_id:
-                entradas.append(entrada.input_id.name)
-            for entrada in o.input_line_ids:
-                if entrada.name in entradas:
-                    horas_extras += entrada.amount
-        return horas_extras
+    def dias_laborados(self, o):
+        dias = 0
+        for linea in o.worked_days_line_ids:
+            if linea.id == o.company_id.tipo_entrada_trabajo_id.id:
+                dias += linea.number_of_days
+                
+        return dias
 
     def lineas(self, o):
         result = {'lineas': [], 'totales': [0, 0, 0]}
@@ -79,5 +76,5 @@ class ReportRecibo(models.AbstractModel):
             'doc_model': model,
             'docs': docs,
             'lineas': self.lineas,
-            'horas_extras': self.horas_extras,
+            'dias_laborados': self.dias_laborados,
         }

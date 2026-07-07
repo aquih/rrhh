@@ -26,7 +26,7 @@ class res_company(models.Model):
     proyectar_bonificaciones_adicionales = fields.Boolean('Proyectar bonificaciones adicionales')
 
     numero_horas_extras_ids = fields.Many2many('hr.payslip.input.type', 'rrhh_num_horas_extras_rel', string='Numero horas extras')
-    tipo_entrada_trabajo_id = fields.Many2one('hr.work.entry.type', 'Tipo de entrada de trabajo')
+    tipo_entrada_trabajo_id = fields.Many2one('hr.work.entry.type', 'Entrada de trabajo para días trabajados')
     igss_dias_trabajo = fields.Many2one('hr.work.entry.type', 'IGSS dias de trabajo')
     centro_trabajo_ids = fields.One2many('res.company.centro_trabajo', 'company_id', string="Centros de trabajo")
 
