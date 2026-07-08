@@ -62,10 +62,10 @@ class rrhh_informe_empleador(models.TransientModel):
     def dias_trabajados_anual(self, empleado_id, anio):
         anio_inicio_contrato = empleado_id.date_start.year
 
-        fecha_inicio = max(date(anio, 1, 1), empleado_id.date_start)
-        fecha_fin = min(date(anio, 12, 31), empleado_id.date_end)
+        fecha_inicio = max(date(anio, 1, 1), empleado_id.date_start) if empleado_id.date_start else date(anio, 1, 1)
+        fecha_fin = min(date(anio, 12, 31), empleado_id.date_end) if empleado_id.date_end else date(anio, 12, 31)
 
-        dias = empleado._get_work_days_data_batch(fecha_inicio, fecha_fin, calendar=empleado_id.resource_calendar_id)
+        dias = empleado_id._get_work_days_data_batch(datetime.combine(fecha_inicio, datetime.min.time()), datetime.combine(fecha_fin, datetime.max.time()), calendar=empleado_id.resource_calendar_id)
         return dias[empleado_id.id]['days']
 
     def print_report_excel(self):
@@ -298,9 +298,9 @@ class rrhh_informe_empleador(models.TransientModel):
                                     nominas[nomina_mes]['bonificacion'] += bonificacion_decreto
 
                     salario_anual_nominal_promedio = salario_anual_nominal / len(nominas) if salario_anual_nominal > 0 else 0
-                    if empleado.gender == 'male':
+                    if empleado.sex == 'male':
                         genero = '1'
-                    if empleado.gender == 'female':
+                    if empleado.sex == 'female':
                         genero = '2'
                     if empleado.marital == 'single':
                         estado_civil = 1
@@ -367,7 +367,7 @@ class rrhh_informe_empleador(models.TransientModel):
 
             libro.close()
             datos = base64.b64encode(f.getvalue())
-            self.write({'archivo': datos, 'name': 'informe_del_empleador.xls'})
+            self.write({'archivo': datos, 'name': 'informe_del_empleador.xlsx'})
 
         return {
             'view_type': 'form',

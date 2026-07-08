@@ -171,7 +171,7 @@ class rrhh_libro_salarios(models.TransientModel):
             
             libro.close()
             datos = base64.b64encode(f.getvalue())
-            self.write({'archivo':datos, 'name':'Libro_salarios.xlsx'})
+            self.write({'archivo':datos, 'name':'libro_salarios.xlsx'})
 
         return {
             'view_type': 'form',

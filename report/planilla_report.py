@@ -172,8 +172,8 @@ class report_planilla_pdf(models.AbstractModel):
                     'puesto': slip.employee_id.job_id.name,
                     'dias': dias,
                     'columnas': [],
-                    'banco_depositar': slip.employee_id.bank_account_id.bank_id.name,
-                    'cuenta_depositar': slip.employee_id.bank_account_id.acc_number,
+                    'banco_depositar': slip.employee_id.bank_account_ids[0].bank_id.name if slip.employee_id.bank_account_ids and slip.employee_id.bank_account_ids[0].bank_id else '',
+                    'cuenta_depositar': slip.employee_id.bank_account_ids[0].acc_number if slip.employee_id.bank_account_ids and slip.employee_id.bank_account_ids[0].bank_id else '',
                     'observaciones': slip.note
                 }
 

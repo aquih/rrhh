@@ -21,13 +21,13 @@ class res_company(models.Model):
     actividad_gran_grupo = fields.Char('Actividad gran grupo')
     sub_actividad_economica = fields.Char('Sub actividad económica')
     ocupacion_grupo = fields.Char('Ocupación grupo')
-    monto_deduccion_fija = fields.Float("Deducion fija")
+    monto_deduccion_fija = fields.Float("Deducción fija")
     isr_sueldo_base_extra = fields.Boolean('ISR sueldo base extra')
     proyectar_bonificaciones_adicionales = fields.Boolean('Proyectar bonificaciones adicionales')
 
     numero_horas_extras_ids = fields.Many2many('hr.payslip.input.type', 'rrhh_num_horas_extras_rel', string='Numero horas extras')
     tipo_entrada_trabajo_id = fields.Many2one('hr.work.entry.type', 'Entrada de trabajo para días trabajados')
-    igss_dias_trabajo = fields.Many2one('hr.work.entry.type', 'IGSS dias de trabajo')
+    igss_dias_trabajo = fields.Many2one('hr.work.entry.type', 'IGSS días de trabajo')
     centro_trabajo_ids = fields.One2many('res.company.centro_trabajo', 'company_id', string="Centros de trabajo")
 
     ordinarias_ids = fields.Many2many('hr.salary.rule', 'rrhh_ordinarias_rel', string='Ordinarias')
@@ -37,15 +37,15 @@ class res_company(models.Model):
     igss_ids = fields.Many2many('hr.salary.rule', 'rrhh_igss_rel', string='IGSS')
     isr_ids = fields.Many2many('hr.salary.rule', 'rrhh_isr_rel', string='ISR')
     anticipos_ids = fields.Many2many('hr.salary.rule', 'rrhh_anticipos_rel', string='Anticipos')
-    bonificacion_ids = fields.Many2many('hr.salary.rule', 'rrhh_bonificacion_rel', string='Bonificacion incentivo')
+    bonificacion_ids = fields.Many2many('hr.salary.rule', 'rrhh_bonificacion_rel', string='Bonificación incentivo')
     bono_ids = fields.Many2many('hr.salary.rule', 'bono_company_rel', string='Bono 14')
     aguinaldo_ids = fields.Many2many('hr.salary.rule', 'rrhh_aguinaldo_rel', string='Aguinaldo')
     indemnizacion_ids= fields.Many2many('hr.salary.rule', 'rrhh_indemnizacion_rel', string='Retribución por indemnización')
     salario_ids = fields.Many2many('hr.salary.rule', 'rrhh_salario_rel', string='Salario')
     horas_extras_ids = fields.Many2many('hr.salary.rule', 'rrhh_horas_extras_rel', string='Horas extras')
-    retribucion_comisiones_ids = fields.Many2many('hr.salary.rule', 'rrhh_retribucion_comisiones_rel', string='Redistribucion de comisiones')
+    retribucion_comisiones_ids = fields.Many2many('hr.salary.rule', 'rrhh_retribucion_comisiones_rel', string='Redistribución de comisiones')
     viaticos_ids= fields.Many2many('hr.salary.rule', string='Viaticos')
-    retribucion_vacaciones_ids = fields.Many2many('hr.salary.rule', 'rrhh_redistribucion_vacaiones_rel', string='Retribucion por vacaciones')
+    retribucion_vacaciones_ids = fields.Many2many('hr.salary.rule', 'rrhh_redistribucion_vacaiones_rel', string='Retribución por vacaciones')
     bonificaciones_adicionales_ids = fields.Many2many('hr.salary.rule', 'rrhh_bonificaciones_adicionales_rel', string='Bonificaciones adicionales')
     extras_ids = fields.Many2many('hr.salary.rule', 'rrhh_extras_rel', string='extras')
     vacaciones_ids = fields.Many2many('hr.salary.rule', 'rrhh_vacaiones_rel', string="Vacaciones")
@@ -53,7 +53,7 @@ class res_company(models.Model):
     fija_ids = fields.Many2many('hr.salary.rule', 'rrhh_fija_rel', string="Fija")
     variable_ids = fields.Many2many('hr.salary.rule', 'rrhh_variable_rel', string="Variable")
     otro_salario_ids = fields.Many2many('hr.salary.rule', 'rrhh_otro_salario_rel', string='Otros salarios')
-    boni_incentivo_decreto_ids = fields.Many2many('hr.salary.rule', 'rrhh_boni_incentivo_decreto_rel', string='Bonificacion incentivo decreto')
+    boni_incentivo_decreto_ids = fields.Many2many('hr.salary.rule', 'rrhh_boni_incentivo_decreto_rel', string='Bonificación incentivo decreto')
     devolucion_isr_otro_ids = fields.Many2many('hr.salary.rule', 'rrhh_dev_isr_otro_rel', string='Devolución ISR')
     salario_total_ids = fields.Many2many('hr.salary.rule', 'rrhh_salario_total_rel', string='Salario total')
     otro_ingreso_afecto_ids = fields.Many2many('hr.salary.rule', 'rrhh_otro_ingresoa_rel', string='Otro ingreso afecto')
@@ -61,26 +61,26 @@ class res_company(models.Model):
     ajuste_ids = fields.Many2many('hr.salary.rule', 'rrhh_ajustes_rel', string='Ajustes ISR')
 
     # TODO: Quitar todos los siguientes en la siguiente versión
-    telefonos = fields.Char('Telefonos (separados por guiones o diagonales)') # no parece usarse
+    telefonos = fields.Char('Teléfonos (separados por guiones o diagonales)') # no parece usarse
     fax = fields.Char('Fax') # no parece usarse
     nombre_contacto = fields.Char('Nombre del contacto en centro de trabajo') # no parece usarse
     correo_electronico = fields.Char('correo_electronico') # no parece usarse
-    codigo_departamento = fields.Char('Codigo departamento de la Republica') # no parece usarse
-    codigo_municipio = fields.Char('Codigo municipio de la Republica') # no parece usarse
-    codigo_actividad_economica = fields.Char('Codigo actividad economica') # no parece usarse
-    identificacion_tipo_planilla = fields.Char('Identificacion de tipo de planilla') # no parece usarse
+    codigo_departamento = fields.Char('Código departamento de la República') # no parece usarse
+    codigo_municipio = fields.Char('Código municipio de la República') # no parece usarse
+    codigo_actividad_economica = fields.Char('Código actividad económica') # no parece usarse
+    identificacion_tipo_planilla = fields.Char('Identificación de tipo de planilla') # no parece usarse
     nombre_tipo_planilla = fields.Char('Nombre del tipo de planilla') # no parece usarse
     tipo_afiliados = fields.Selection([('S', 'Sin IVS'), ('C', 'Con IVS')], 'Tipo de afiliados') # no parece usarse
     periodo_planilla = fields.Selection([('M', 'Mensual'), ('C', 'Catorcenal'), ('S', 'Semanal')], 'Periodo de planilla') # no parece usarse
     departamento_republica = fields.Char('Depto. de la Rep. donde laboran los empleados') # no parece usarse
-    actividad_economica = fields.Char('Actividad economica') # no parece usarse
+    actividad_economica = fields.Char('Actividad económica') # no parece usarse
     clase_planilla = fields.Selection([('N', 'Normal'), ('V', 'Sin movimiento')], 'Clase de planilla') # no parece usarse
-    codigo_centro_trabajo = fields.Char('Codigo del centro de trabajo') # no parece usarse
+    codigo_centro_trabajo = fields.Char('Código del centro de trabajo') # no parece usarse
     nombre_centro_trabajo = fields.Char('Nombre del centro de trabajo') # no parece usarse
-    direccion_centro_trabajo = fields.Char('Direccion del centro de trabajo') # no parece usarse
-    salario_promedio_ids = fields.Many2many('hr.salary.rule','rrhh_salario_promedio_rel', string="salario promedio") # no parece usarse
+    direccion_centro_trabajo = fields.Char('Dirección del centro de trabajo') # no parece usarse
+    salario_promedio_ids = fields.Many2many('hr.salary.rule','rrhh_salario_promedio_rel', string="Salario promedio") # no parece usarse
     descuentos_ids = fields.Many2many('hr.salary.rule','rrhh_descuentos_rel', string='sescuentos') # no parece usarse
-    septimos_asuetos_ids = fields.Many2many('hr.salary.rule','rrhh_septimos_asuetos_rel', string="septimos y asuetos") # no parece usarse
+    septimos_asuetos_ids = fields.Many2many('hr.salary.rule','rrhh_septimos_asuetos_rel', string="Séptimos y asuetos") # no parece usarse
     marca = fields.Char('Marca') # no parece usarse
     rango_ingresos = fields.Selection([('si', 'Si'), ('no', 'No')], 'Rango ingresos anual') # no parece usarse
     origen_compania = fields.Selection([('nacional', 'Nacional'), ('extranjero', 'Extranjero')], 'Nacional o Extranjero') # no parece usarse
@@ -98,7 +98,7 @@ class res_company_centro_trabajo(models.Model):
     telefono = fields.Char('Teléfono')
     fax = fields.Char('Fax')
     nombre_contacto = fields.Char('Nombre contacto')
-    correo_electronico = fields.Char('Correo electronico')
-    codigo_departamento = fields.Char('Codigo departamento')
+    correo_electronico = fields.Char('Correo electrónico')
+    codigo_departamento = fields.Char('Código departamento')
     codigo_municipio = fields.Char('Código municipio')
-    codigo_actividad_economica = fields.Char('Codigo actividad economica')
+    codigo_actividad_economica = fields.Char('Código actividad economica')

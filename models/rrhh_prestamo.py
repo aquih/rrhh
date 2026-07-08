@@ -11,7 +11,7 @@ import calendar
 # Ya no usar, usar hr.salary.attachment
 class rrhh_prestamo(models.Model):
     _name = 'rrhh.prestamo'
-    _description = 'Prestamo. Deprecado, usar hr.salary.attachment'
+    _description = 'Préstamo. Deprecado, usar hr.salary.attachment'
     _rec_name = 'descripcion'
 
     employee_id = fields.Many2one('hr.employee', 'Empleado')
@@ -19,14 +19,14 @@ class rrhh_prestamo(models.Model):
     numero_descuentos = fields.Integer('Numero de descuentos')
     total = fields.Monetary('Total')
     mensualidad = fields.Monetary('Mensualidad')
-    prestamo_ids = fields.One2many('rrhh.prestamo.linea', 'prestamo_id', string='Lineas de prestamo')
+    prestamo_ids = fields.One2many('rrhh.prestamo.linea', 'prestamo_id', string='Lineas de préstamo')
     descripcion = fields.Char(string='Descripción', required=True)
     codigo = fields.Char(string='Código', required=True)
     estado = fields.Selection([
         ('nuevo', 'Nuevo'),
         ('proceso','Proceso'),
         ('pagado', 'Pagado')
-    ], string='Status', help='Estado del prestamo', readonly=True, default='nuevo')
+    ], string='Status', help='Estado del préstamo', readonly=True, default='nuevo')
     pendiente_pagar_prestamo = fields.Monetary(compute='_compute_prestamo', string='Pendiente a pagar del prestamos')
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id = fields.Many2one(string="Currency", related='company_id.currency_id', readonly=True)
@@ -98,7 +98,7 @@ class rrhh_prestamo(models.Model):
                 self.prestamo_ids.unlink()
                 self.generar_mensualidades()
             else:
-                raise ValidationError(_('No puede volver a generar mensualidades, por que ya existen nominas asociadas a este prestamo.'))
+                raise ValidationError(_('No puede volver a generar mensualidades, por que ya existen nominas asociadas a este préstamo.'))
         else:
             self.generar_mensualidades()
         return True
@@ -111,12 +111,12 @@ class rrhh_prestamo(models.Model):
     def unlink(self):
         for prestamo in self:
             if not prestamo.estado == 'nuevo':
-                raise UserError(_('No puede eliminar prestamo, por que ya existen nominas asociadas'))
+                raise UserError(_('No puede eliminar préstamo, por que ya existen nominas asociadas'))
         return super(rrhh_prestamo, self).unlink()
 
 class rrhh_prestamo_linea(models.Model):
     _name = 'rrhh.prestamo.linea'
-    _description = 'Prestamo linea'
+    _description = 'Préstamo linea'
 
     mes = fields.Selection([
         ('1', 'Enero'),

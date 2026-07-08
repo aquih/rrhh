@@ -31,7 +31,7 @@ class rrhh_planilla_wizard(models.TransientModel):
             dict['planilla_id'] = [w.planilla_id.id, w.planilla_id.name]
             dict['nomina_id'] = [w.nomina_id.id, w.nomina_id.name]
             dict['agrupado'] = w['agrupado']
-            reporte = self.env['report.rrhh.planilla_pdf'].reporte(dict)
+            reporte = self.env['report.rrhh.planilla'].reporte(dict)
 
             f = io.BytesIO()
             libro = xlsxwriter.Workbook(f)

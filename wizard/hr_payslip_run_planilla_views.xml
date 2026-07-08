@@ -28,9 +28,9 @@
 
     <record id="planilla_wizard_report" model="ir.actions.report">
         <field name="name">Planilla</field>
-        <field name="model">rhh.planilla.wizard</field>
+        <field name="model">rrhh.planilla.wizard</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">rrhh.planilla_report</field>
+        <field name="report_name">rrhh.planilla</field>
         <field name="paperformat_id" ref="paperformat_libro_salarios"/>
     </record>
 

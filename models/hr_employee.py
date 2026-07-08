@@ -9,18 +9,18 @@ class HrEmployeePrivate(models.Model):
     recibo_id = fields.Many2one('rrhh.recibo', 'Formato de recibo', groups="hr.group_hr_user")
     prestamo_ids = fields.One2many('rrhh.prestamo','employee_id','Prestamo', groups="hr.group_hr_user")
     cantidad_prestamos = fields.Integer(compute='_compute_cantidad_prestamos', string='Prestamos', groups="hr.group_hr_user")
-    numero_liquidacion = fields.Char('Numero o identificacion de liquidacion', groups="hr.group_hr_user")
-    codigo_centro_trabajo = fields.Char('Codigo de centro de trabajo asignado', groups="hr.group_hr_user")
-    codigo_ocupacion = fields.Char('Codigo ocupacion', groups="hr.group_hr_user")
-    condicion_laboral = fields.Selection([('P', 'Permanente'), ('T', 'Temporal')], 'Condicion laboral', groups="hr.group_hr_user")
+    numero_liquidacion = fields.Char('Numero o identificación de liquidación', groups="hr.group_hr_user")
+    codigo_centro_trabajo = fields.Char('Código de centro de trabajo asignado', groups="hr.group_hr_user")
+    codigo_ocupacion = fields.Char('Coding ocupación', groups="hr.group_hr_user")
+    condicion_laboral = fields.Selection([('P', 'Permanente'), ('T', 'Temporal')], 'Condición laboral', groups="hr.group_hr_user")
     igss = fields.Char('IGSS', groups="hr.group_hr_user")
     irtra = fields.Char('IRTRA', groups="hr.group_hr_user")
-    nivel_academico = fields.Char('Nivel Academico', groups="hr.group_hr_user")
+    nivel_academico = fields.Char('Nivel Académico', groups="hr.group_hr_user")
     profesion = fields.Char('Profesion', groups="hr.group_hr_user")
     jornada_trabajo = fields.Char('Jornada de Trabajo', groups="hr.group_hr_user")
     permiso_trabajo = fields.Char('Permiso de Trabajo', groups="hr.group_hr_user")
     edad = fields.Integer(string='Edad', compute="_get_edad", groups="hr.group_hr_user")
-    documento_identificacion = fields.Char('Tipo documento identificacion', groups="hr.group_hr_user")
+    documento_identificacion = fields.Char('Tipo documento identificación', groups="hr.group_hr_user")
     pueblo_pertenencia = fields.Char('Pueblo de pertenencia', groups="hr.group_hr_user")
     primer_nombre = fields.Char('Primer nombre', groups="hr.group_hr_user")
     segundo_nombre = fields.Char('Segundo nombre', groups="hr.group_hr_user")
@@ -50,9 +50,9 @@ class HrEmployeePrivate(models.Model):
     etnia = fields.Char('Etnia', groups="hr.group_hr_user") # no parece usarse
     idioma = fields.Char('Idioma', groups="hr.group_hr_user") # no parece usarse
     pais_origen = fields.Many2one('res.country', 'Pais Origen', groups="hr.group_hr_user") # usar country_of_birth
-    codigo_pais_origen = fields.Char('Codigo pais', groups="hr.group_hr_user") # usar country_of_birth
+    codigo_pais_origen = fields.Char('Código país', groups="hr.group_hr_user") # usar country_of_birth
     trabajado_extranjero = fields.Boolean('A trabajado en el extranjero', groups="hr.group_hr_user") # no parece usarse
-    motivo_finalizacion = fields.Char('Motivo de finalizacion', groups="hr.group_hr_user") # no parece usarse
+    motivo_finalizacion = fields.Char('Motivo de finalización', groups="hr.group_hr_user") # no parece usarse
     contacto_emergencia = fields.Many2one('res.partner','Contacto de Emergencia', groups="hr.group_hr_user") # usar emergency_contact
     vecindad_dpi = fields.Char('Vecindad DPI', groups="hr.group_hr_user") # no parece usarse
     tarjeta_salud = fields.Boolean('Tarjeta de salud', groups="hr.group_hr_user") # no parece usarse
