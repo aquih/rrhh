@@ -73,9 +73,10 @@
                             <field name="segundo_apellido"/>
                             <field name="apellido_casada"/>
                             <field name="documento_identificacion"/>
+                            <field name="nacionalidad"/>
+                            <field name="codigo_municipio_nacimiento"/>
                             <field name="pueblo_pertenencia"/>
-                            <field name="irtra"/>
-                            <field name="nivel_academico"/>
+                            <field name="comunidad_linguistica"/>
                         </group>
                         <group>
                             <field name="profesion"/>
@@ -83,11 +84,11 @@
                             <field name="permiso_trabajo"/>
                             <field name="tipo_salario"/>
                             <field name="tiempo_contrato"/>
-                            <field name="nacionalidad"/>
                             <field name="tipo_discapacidad"/>
-                            <field name="comunidad_linguistica"/>
                             <field name="sucursal"/>
                             <field name="tipo_contrato"/>
+                            <field name="irtra"/>
+                            <field name="nivel_academico"/>
                             <!--<field name="codigo_empleado"/>-->
                             <!--<field name="nit"/>-->
                             <!--<field name="etnia"/>-->
