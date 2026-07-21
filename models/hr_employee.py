@@ -15,6 +15,7 @@ class HrEmployeePrivate(models.Model):
     numero_liquidacion = fields.Char('Numero o identificacion de liquidacion',groups="hr.group_hr_user")
     codigo_centro_trabajo = fields.Char('Codigo de centro de trabajo asignado',groups="hr.group_hr_user")
     codigo_ocupacion = fields.Char('Codigo ocupacion',groups="hr.group_hr_user")
+    codigo_municipio_nacimiento = fields.Char('Codigo municipio nacimiento', groups="hr.group_hr_user")
     condicion_laboral = fields.Selection([('P', 'Permanente'), ('T', 'Temporal')], 'Condicion laboral',groups="hr.group_hr_user")
     diario_pago_id = fields.Many2one('account.journal', 'Diario de Pago',groups="hr.group_hr_user")
     igss = fields.Char('IGSS',groups="hr.group_hr_user")

@@ -78,6 +78,7 @@
                                 <field name="tipo_salario"/>
                                 <field name="tiempo_contrato"/>
                                 <field name="nacionalidad"/>
+                                <field name="codigo_municipio_nacimiento"/>
                                 <field name="tipo_discapacidad"/>
                                 <field name="comunidad_linguistica"/>
                                 <field name="sucursal"/>
