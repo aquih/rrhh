@@ -385,7 +385,7 @@ class rrhh_informe_empleador(models.TransientModel):
                 nombre_empleado = empleado.name.split( )
                 if empleado.primer_nombre:
                     nominas_lista = []
-                    contrato = self.env['hr.contract'].search([('employee_id', '=', empleado.id) ('active','in',[True, False])], order='date_start', limit=1)
+                    contrato = self.env['hr.contract'].search([('employee_id', '=', empleado.id), ('active','in',[True, False])], order='date_start', limit=1)
                     nomina_id = self.env['hr.payslip'].search([['employee_id', '=', empleado.id]])
                     dias_trabajados = 0
                     salario_anual_nominal = 0
@@ -495,7 +495,7 @@ class rrhh_informe_empleador(models.TransientModel):
                     hoja_empleado.write(fila, 26, contrato.date_start or '')
                     hoja_empleado.write(fila, 27, contrato.fecha_reinicio_labores or '')
                     hoja_empleado.write(fila, 28, contrato.date_end or '')
-                    hoja_empleado.write(fila, 29, contrato.codigo_ocupacion or '')
+                    hoja_empleado.write(fila, 29, empleado.codigo_ocupacion or '')
                     hoja_empleado.write(fila, 30, empleado.jornada_trabajo or '')
                     hoja_empleado.write(fila, 31, dias_trabajados_anual)
                     hoja_empleado.write(fila, 32, salario_anual_nominal_promedio)
@@ -519,7 +519,7 @@ class rrhh_informe_empleador(models.TransientModel):
 
             libro.close()
             datos = base64.b64encode(f.getvalue())
-            self.write({'archivo':datos, 'name':'informe_del_empleador.xls'})
+            self.write({'archivo':datos, 'name':'informe_del_empleador.xlsx'})
 
         return {
             'view_type': 'form',
