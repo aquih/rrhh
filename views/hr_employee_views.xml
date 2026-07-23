@@ -89,7 +89,7 @@
                             <field name="tipo_contrato"/>
                             <field name="irtra"/>
                             <field name="nivel_academico"/>
-                            <!--<field name="codigo_empleado"/>-->
+                            <field name="codigo_empleado"/>
                             <!--<field name="nit"/>-->
                             <!--<field name="etnia"/>-->
                             <!--<field name="idioma"/>-->

@@ -5,7 +5,6 @@
         <field name="model">rrhh.prestamo</field>
         <field name="arch" type="xml">
             <form string="Prestamo">
-                <field name="company_id" invisible="1"/>
                 <header>
                     <button string="Procesar" name="prestamos" type="object" class="oe_highlight" invisible="estado != 'nuevo'"/>
                     <button string="Pasar a Proceso" name="cancelar" type="object" groups="hr.group_hr_manager" invisible="estado != 'pagado'"/>
@@ -35,6 +34,7 @@
                             <field name="mensualidad" readonly="estado != 'nuevo'"/>
                             <field name="descripcion"/>
                             <field name="codigo"/>
+                            <field name="company_id" readonly="estado != 'nuevo'"/>
                         </group>
                     </group>
                     <field name="prestamo_ids">
