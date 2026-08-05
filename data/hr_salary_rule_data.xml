@@ -13,6 +13,8 @@
 dias_totales = 30
 if payslip.version_id.schedule_pay == 'semi-monthly':
     dias_totales = 15
+if payslip.version_id.schedule_pay == 'bi-weekly':
+    dias_totales = 14
 
 result = dias_totales
             </field>
@@ -32,7 +34,7 @@ entradas_restar = [entrada for entrada in worked_days.values() if not entrada.wo
 dias_totales = result_rules['DiasTotales']['amount']
 dias_restar = sum([entrada.number_of_days for entrada in entradas_restar])
 
-result = dias_totales - dias_restar
+result = dias_totales - dias_restar if dias_totales >= dias_restar else 0
             </field>
             <field name="struct_id" ref="estructura_base"/>
         </record>
@@ -45,7 +47,7 @@ result = dias_totales - dias_restar
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-result = (employee.wage / result_rules['DiasTotales']['amount']) * result_rules['DiasLaborados']['amount']
+result = (employee.wage / result_rules['DiasTotales']['amount']) * result_rules['DiasLaborados']['amount'] if result_rules['DiasTotales']['amount'] > 0 else 0
             </field>
             <field name="struct_id" ref="estructura_base"/>
         </record>
@@ -58,7 +60,7 @@ result = (employee.wage / result_rules['DiasTotales']['amount']) * result_rules[
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_rules['DiasLaborados']['amount']
+result = (employee.base_extra / result_rules['DiasTotales']['amount']) * result_rules['DiasLaborados']['amount'] if result_rules['DiasTotales']['amount'] > 0 else 0
             </field>
             <field name="struct_id" ref="estructura_base"/>
         </record>
