@@ -408,8 +408,8 @@ class rrhh_informe_empleador(models.TransientModel):
                     numero_nominas_salario = 0
                     genero = ''
                     for nomina in nomina_id:
-                        nomina_anio = nomina.date_from.year
-                        nomina_mes = nomina.date_from.month
+                        nomina_anio = nomina.date_to.year
+                        nomina_mes = nomina.date_to.month
                         if w['anio'] == nomina_anio:
                             if nomina.input_line_ids:
                                 for entrada in nomina.input_line_ids:
@@ -492,9 +492,9 @@ class rrhh_informe_empleador(models.TransientModel):
                     hoja_empleado.write(fila, 23, empleado.children or '')
                     hoja_empleado.write(fila, 24, contrato.temporalidad_contrato or '')
                     hoja_empleado.write(fila, 25, empleado.tipo_contrato or '')
-                    hoja_empleado.write(fila, 26, contrato.date_start or '')
-                    hoja_empleado.write(fila, 27, contrato.fecha_reinicio_labores or '')
-                    hoja_empleado.write(fila, 28, contrato.date_end or '')
+                    hoja_empleado.write(fila, 26, contrato.date_start or '', formato_fecha)
+                    hoja_empleado.write(fila, 27, contrato.fecha_reinicio_labores or '', formato_fecha)
+                    hoja_empleado.write(fila, 28, contrato.date_end or '', formato_fecha)
                     hoja_empleado.write(fila, 29, empleado.codigo_ocupacion or '')
                     hoja_empleado.write(fila, 30, empleado.jornada_trabajo or '')
                     hoja_empleado.write(fila, 31, dias_trabajados_anual)
