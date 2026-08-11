@@ -10,7 +10,7 @@ class ReportRecibo(models.AbstractModel):
     def dias_laborados(self, o):
         dias = 0
         for linea in o.worked_days_line_ids:
-            if linea.id == o.company_id.tipo_entrada_trabajo_id.id:
+            if linea.work_entry_type_id.id == o.company_id.tipo_entrada_trabajo_id.id:
                 dias += linea.number_of_days
                 
         return dias
