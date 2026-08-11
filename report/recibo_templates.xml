@@ -118,13 +118,11 @@
                         </div>
 
                         <div class="row">
-                            <div class="col text-right" t-if="o.move_id">
+                            <div class="col text-center">
                                 Fecha: <span t-field="o.move_id.date"/>
                             </div>
-                            <div class="col">
-                                <div class="border-top text-center">
-                                    <strong t-field="o.employee_id.name"/>
-                                </div>
+                            <div class="col border-top text-center">
+                                <span t-field="o.employee_id.name"/>
                             </div>
                         </div>
                     </div>
