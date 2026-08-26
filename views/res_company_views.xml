@@ -106,30 +106,89 @@
                                     <field name="boni_incentivo_decreto_ids" widget="many2many_tags"/>
                                     <field name="devolucion_isr_otro_ids" widget="many2many_tags"/>
                                     <field name="otro_ingreso_afecto_ids" widget="many2many_tags"/>
-
                                 </group>
                             </group>
-                            <label for="centro_trabajo_ids" string="Centros de trabajo"/>
-                            <field name="centro_trabajo_ids">
-                                <list string="Centros" editable="bottom">
-                                    <field name="codigo"/>
-                                    <field name="nombre"/>
-                                    <field name="direccion"/>
-                                    <field name="zona"/>
-                                    <field name="telefono"/>
-                                    <field name="fax"/>
-                                    <field name="nombre_contacto"/>
-                                    <field name="correo_electronico"/>
-                                    <field name="codigo_departamento"/>
-                                    <field name="codigo_municipio"/>
-                                    <field name="codigo_actividad_economica"/>
-                                </list>
-                            </field>
+                            <group>
+                                <group string="Centros de trabajos">
+                                    <field name="centro_trabajo_ids" nolabel="1">
+                                        <list>
+                                            <field name="codigo"/>
+                                            <field name="nombre"/>
+                                        </list>
+                                    </field>
+                                </group>
+                                <group string="Tipo de planilla">
+                                    <field name="tipo_planilla_ids" nolabel="1">
+                                        <list>
+                                            <field name="codigo"/>
+                                            <field name="name"/>
+                                        </list>
+                                    </field>
+                                </group>
+                            </group>
                         </page>
                     </notebook>
                 </data>
 	        </field>
 	    </record>
+
+        <record id="view_centro_trabajo_form" model="ir.ui.view">
+            <field name="name">centro_trabajo.form</field>
+            <field name="model">res.company.centro_trabajo</field>
+            <field name="arch" type="xml">
+                <form string="Centro de trabajo">
+                    <group>
+                        <group>
+                            <field name="codigo"/>
+                            <field name="nombre"/>
+                            <field name="direccion"/>
+                            <field name="zona"/>
+                            <field name="telefono"/>
+                            <field name="fax"/>
+                        </group>
+                        <group>
+                            <field name="nombre_contacto"/>
+                            <field name="correo_electronico"/>
+                            <field name="codigo_departamento"/>
+                            <field name="codigo_municipio"/>
+                            <field name="codigo_actividad_economica"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tipo_planilla_form" model="ir.ui.view">
+            <field name="name">tipo_planilla.form</field>
+            <field name="model">res.company.tipo_planilla</field>
+            <field name="arch" type="xml">
+                <form string="Centro de trabajo">
+                    <group>
+                        <group>
+                            <field name="codigo"/>
+                            <field name="name"/>
+                            <field name="tipo_afiliado"/>
+                            <field name="periodo_planilla"/>
+                            <field name="codigo_departamento"/>
+                        </group>
+                        <group>
+                            <field name="codigo_actividad_economica"/>
+                            <field name="clase_planilla"/>
+                            <field name="tiempo_contrato"/>
+                        </group>
+                        <field name="liquidaciones_ids" nolabel="1">
+                            <list editable="bottom">
+                                <field name="numero"/>
+                                <field name="fecha_inicial"/>
+                                <field name="fecha_final"/>
+                                <field name="complementaria_original"/>
+                                <field name="numero_nota_cargo"/>
+                            </list>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
 
   </data>
 </odoo>

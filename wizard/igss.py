@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.tools.misc import format_date
 import time
 import base64
 import io
@@ -21,20 +22,8 @@ class rrhh_igss_wizard(models.TransientModel):
     payslip_run_id = fields.Many2many('hr.payslip.run', string='Payslip run',default=_default_payslip_run)
     archivo = fields.Binary('Archivo')
     name =  fields.Char('File Name', size=32)
-    identificacion_tipo_planilla = fields.Char('Identificación tipo de planilla')
-    nombre_tipo_planilla = fields.Char('Nombre tipo de planilla')
-    tipo_afiliados = fields.Char('Tipo de afiliado')
-    periodo_planilla = fields.Char('Periodo de planilla')
-    departamento_republica = fields.Char('Departamento de la república donde laboran los empleados ')
-    actividad_economica = fields.Char('Actividad económica')
-    clase_planilla = fields.Char('Clase de planilla')
-    numero_liquidacion = fields.Char('Numero de liquidacion')
-    tipo_planilla_liquidacion = fields.Char('Tipo de planilla de liquidación')
     fecha_inicial = fields.Date('Fecha inicial liquidación')
     fecha_final = fields.Date('Fecha final de liquidación')
-    tipo_liquidacion = fields.Char('Tipo de liquidación')
-    numero_nota_cargo = fields.Char('Número nota de cargo')
-    tiempo_contrato = fields.Char('Tiempo de contrato')
 
     def generar(self):
         datos = ''
@@ -44,9 +33,13 @@ class rrhh_igss_wizard(models.TransientModel):
             for centro in w.payslip_run_id[0].slip_ids[0].company_id.centro_trabajo_ids:
                 datos += str(centro.codigo) + '|' + str(centro.nombre) + '|' + str(centro.direccion) + '|' + str(centro.zona) + '|' + str(centro.telefono) + '|' + str(centro.fax) + '|' + str(centro.nombre_contacto) + '|' + str(centro.correo_electronico) + '|' + str(centro.codigo_departamento) + '|' + str(centro.codigo_municipio) + '|' + str(centro.codigo_actividad_economica) + '\r\n'
             datos += '[tiposplanilla]' + '\r\n'
-            datos += self.identificacion_tipo_planilla + '|' + self.nombre_tipo_planilla + '|' + self.tipo_afiliados + '|' + self.periodo_planilla + '|' + self.departamento_republica + '|' + self.actividad_economica + '|' + self.clase_planilla + '|' + self.tiempo_contrato + '|' +'\r\n'
+            for tipo_planilla in w.payslip_run_id[0].slip_ids[0].company_id.tipo_planilla_ids:
+                datos += str(tipo_planilla.codigo) + '|' + str(tipo_planilla.name) + '|' + str(tipo_planilla.tipo_afiliado) + '|' + str(tipo_planilla.periodo_planilla) + '|' + str(tipo_planilla.codigo_departamento) + '|' + str(tipo_planilla.codigo_actividad_economica) + '|' + str(tipo_planilla.clase_planilla) + '|' + str(tipo_planilla.tiempo_contrato) + '|' + '\r\n'
             datos += '[liquidaciones]' + '\r\n'
-            datos += self.numero_liquidacion + '|' + self.tipo_planilla_liquidacion + '|' + str(datetime.strptime(str(self.fecha_inicial),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + str(datetime.strptime(str(self.fecha_final),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + self.tipo_liquidacion + '|' + (self.numero_nota_cargo if self.numero_nota_cargo else '') + '|' +'\r\n'
+            for liquidacion in w.payslip_run_id[0].slip_ids[0].company_id.tipo_planilla_ids.liquidaciones_ids:
+                fecha_inicial = format_date(self.env, liquidacion.fecha_inicial, date_format="d/M/y")
+                fecha_final = format_date(self.env, liquidacion.fecha_final, date_format="d/M/y")
+                datos += str(liquidacion.numero) + '|' + str(liquidacion.tipo_planilla_id.codigo) + '|' + str(fecha_inicial) + '|' + str(fecha_final) + '|' + str(liquidacion.complementaria_original) + '|' + str(liquidacion.numero_nota_cargo) + '\r\n'
             datos += '[empleados]' + '\r\n'
             empleados = {}
             suspensiones = []

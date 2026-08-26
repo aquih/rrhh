@@ -80,6 +80,7 @@ class res_company(models.Model):
     salario_promedio_ids = fields.Many2many('hr.salary.rule','rrhh_salario_promedio_rel', string="Salario promedio")
     numero_horas_extras_ids = fields.Many2many('hr.payslip.input.type','rrhh_num_horas_extras_rel', string='Numero horas extras')
     centro_trabajo_ids = fields.One2many('res.company.centro_trabajo','company_id',string="Centros de trabajo")
+    tipo_planilla_ids = fields.One2many('res.company.tipo_planilla','company_id',string="Tipo de planilla")
     otro_salario_ids = fields.Many2many('hr.salary.rule','rrhh_otro_salario_rel',string='Otros salarios')
     boni_incentivo_decreto_ids = fields.Many2many('hr.salary.rule','rrhh_boni_incentivo_decreto_rel',string='Bonificacion incentivo decreto')
     devolucion_isr_otro_ids = fields.Many2many('hr.salary.rule','rrhh_dev_isr_otro_rel',string='Devolución ISR')
@@ -98,7 +99,7 @@ class res_company_centro_trabajo(models.Model):
     _description = 'Centro de trabajo'
     _rec_name = 'nombre'
 
-    company_id = fields.Many2one('res.company','Compañia')
+    company_id = fields.Many2one('res.company', 'Compañia')
     codigo = fields.Char('Código')
     nombre = fields.Char('Nombre')
     direccion = fields.Char('Dirección')
@@ -110,3 +111,29 @@ class res_company_centro_trabajo(models.Model):
     codigo_departamento = fields.Char('Codigo departamento')
     codigo_municipio = fields.Char('Código municipio')
     codigo_actividad_economica = fields.Char('Codigo actividad economica')
+
+class res_company_tipo_planilla(models.Model):
+    _name = 'res.company.tipo_planilla'
+    _description = 'Tipo de planilla'
+
+    company_id = fields.Many2one('res.company', 'Compañía')
+    codigo = fields.Char('Código')
+    name = fields.Char('Nombre')
+    tipo_afiliado = fields.Char('Tipo de afiliados')
+    periodo_planilla = fields.Char('Periodo de planilla')
+    codigo_departamento = fields.Char('Codigo departamento')
+    codigo_actividad_economica = fields.Char('Codigo actividad economica')
+    clase_planilla = fields.Char('Clase de planilla')
+    tiempo_contrato = fields.Char('Tiempo de contrato')
+    liquidaciones_ids = fields.One2many('res.company.liquidacion', 'tipo_planilla_id', string='Liquidación')
+
+class res_company_liquidacion(models.Model):
+    _name = 'res.company.liquidacion'
+    _description = 'Liquidación'
+
+    tipo_planilla_id = fields.Many2one('res.company.tipo_planilla', 'Tipo de planilla')
+    numero = fields.Char('Número')
+    fecha_inicial = fields.Date('Fecha inicial')
+    fecha_final = fields.Date('Fecha final')
+    complementaria_original = fields.Char('Complementaria u original')
+    numero_nota_cargo = fields.Char('Número nota de cargo')
