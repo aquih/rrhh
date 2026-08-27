@@ -37,8 +37,8 @@ class rrhh_igss_wizard(models.TransientModel):
                 datos += str(tipo_planilla.codigo) + '|' + str(tipo_planilla.name) + '|' + str(tipo_planilla.tipo_afiliado) + '|' + str(tipo_planilla.periodo_planilla) + '|' + str(tipo_planilla.codigo_departamento) + '|' + str(tipo_planilla.codigo_actividad_economica) + '|' + str(tipo_planilla.clase_planilla) + '|' + str(tipo_planilla.tiempo_contrato) + '|' + '\r\n'
             datos += '[liquidaciones]' + '\r\n'
             for liquidacion in w.payslip_run_id[0].slip_ids[0].company_id.tipo_planilla_ids.liquidaciones_ids:
-                fecha_inicial = format_date(self.env, liquidacion.fecha_inicial, date_format="d/M/y")
-                fecha_final = format_date(self.env, liquidacion.fecha_final, date_format="d/M/y")
+                fecha_inicial = format_date(self.env, self.fecha_inicial, date_format="d/M/y")
+                fecha_final = format_date(self.env, self.fecha_final, date_format="d/M/y")
                 datos += str(liquidacion.numero) + '|' + str(liquidacion.tipo_planilla_id.codigo) + '|' + str(fecha_inicial) + '|' + str(fecha_final) + '|' + str(liquidacion.complementaria_original) + '|' + str(liquidacion.numero_nota_cargo) + '\r\n'
             datos += '[empleados]' + '\r\n'
             empleados = {}

@@ -179,8 +179,6 @@
                         <field name="liquidaciones_ids" nolabel="1">
                             <list editable="bottom">
                                 <field name="numero"/>
-                                <field name="fecha_inicial"/>
-                                <field name="fecha_final"/>
                                 <field name="complementaria_original"/>
                                 <field name="numero_nota_cargo"/>
                             </list>

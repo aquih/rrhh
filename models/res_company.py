@@ -133,7 +133,5 @@ class res_company_liquidacion(models.Model):
 
     tipo_planilla_id = fields.Many2one('res.company.tipo_planilla', 'Tipo de planilla')
     numero = fields.Char('Número')
-    fecha_inicial = fields.Date('Fecha inicial')
-    fecha_final = fields.Date('Fecha final')
     complementaria_original = fields.Char('Complementaria u original')
     numero_nota_cargo = fields.Char('Número nota de cargo')
