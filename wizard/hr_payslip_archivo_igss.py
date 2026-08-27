@@ -1,9 +1,7 @@
 from odoo import models, fields, api, _
-import time
+from odoo.tools.misc import format_date
 import base64
-import io
 import logging
-import datetime
 from datetime import datetime
 
 class rrhh_igss_wizard(models.TransientModel):
@@ -20,32 +18,27 @@ class rrhh_igss_wizard(models.TransientModel):
     payslip_run_id = fields.Many2many('hr.payslip.run', string='Payslip run', default=_default_payslip_run)
     archivo = fields.Binary('Archivo')
     name =  fields.Char('File Name', size=32)
-    identificacion_tipo_planilla = fields.Char('Identificación tipo de planilla')
-    nombre_tipo_planilla = fields.Char('Nombre tipo de planilla')
-    tipo_afiliados = fields.Char('Tipo de afiliado')
-    periodo_planilla = fields.Char('Periodo de planilla')
-    departamento_republica = fields.Char('Departamento de la república donde laboran los empleados ')
-    actividad_economica = fields.Char('Actividad económica')
-    clase_planilla = fields.Char('Clase de planilla')
-    numero_liquidacion = fields.Char('Numero de liquidacion')
-    tipo_planilla_liquidacion = fields.Char('Tipo de planilla de liquidación')
     fecha_inicial = fields.Date('Fecha inicial liquidación')
     fecha_final = fields.Date('Fecha final de liquidación')
-    tipo_liquidacion = fields.Char('Tipo de liquidación')
-    numero_nota_cargo = fields.Char('Número nota de cargo')
-    tiempo_contrato = fields.Char('Tiempo de contrato')
 
     def print_report_excel(self):
         datos = ''
         for w in self:
-            datos += str(w.payslip_run_id[0].slip_ids[0].company_id.version_mensaje) + '|' + str(datetime.today().strftime('%d/%m/%Y')) + '|' + str(w.payslip_run_id[0].slip_ids[0].company_id.numero_patronal) + '|'+ str(datetime.strptime(str(w.payslip_run_id[0].date_start),'%Y-%m-%d').date().strftime('%m')).lstrip('0')+ '|' + str(datetime.strptime(str(w.payslip_run_id[0].date_start),'%Y-%m-%d').date().strftime('%Y')).lstrip('0') + '|' + str(w.payslip_run_id[0].slip_ids[0].company_id.name) + '|' +str(w.payslip_run_id[0].slip_ids[0].company_id.vat) + '|'+ str(w.payslip_run_id[0].slip_ids[0].company_id.email) + '|' + str(w.payslip_run_id[0].slip_ids[0].company_id.tipo_planilla) + '\r\n'
+            lote_id = w.payslip_run_id[0]
+            compania_id = lote_id.company_id
+
+            datos += str(compania_id.version_mensaje) + '|' + str(format_date(self.env, datetime.today(), date_format="dd/MM/yyyy")) + '|' + str(compania_id.numero_patronal) + '|'+ str(format_date(self.env, lote_id.date_start, date_format="MM")) + '|' + str(format_date(self.env, lote_id.date_start, date_format="YYYY")) + '|' + str(compania_id.name) + '|' +str(compania_id.vat) + '|'+ str(compania_id.email) + '|' + str(compania_id.tipo_planilla) + '\r\n'
             datos += '[centros]' + '\r\n'
-            for centro in w.payslip_run_id[0].slip_ids[0].company_id.centro_trabajo_ids:
+            for centro in compania_id.centro_trabajo_ids:
                 datos += str(centro.codigo) + '|' + str(centro.nombre) + '|' + str(centro.direccion) + '|' + str(centro.zona) + '|' + str(centro.telefono) + '|' + str(centro.fax) + '|' + str(centro.nombre_contacto) + '|' + str(centro.correo_electronico) + '|' + str(centro.codigo_departamento) + '|' + str(centro.codigo_municipio) + '|' + str(centro.codigo_actividad_economica) + '\r\n'
             datos += '[tiposplanilla]' + '\r\n'
-            datos += self.identificacion_tipo_planilla + '|' + self.nombre_tipo_planilla + '|' + self.tipo_afiliados + '|' + self.periodo_planilla + '|' + self.departamento_republica + '|' + self.actividad_economica + '|' + self.clase_planilla + '|' + self.tiempo_contrato + '|' +'\r\n'
+            for tipo_planilla in compania_id.tipo_planilla_ids:
+                datos += str(tipo_planilla.codigo) + '|' + str(tipo_planilla.name) + '|' + str(tipo_planilla.tipo_afiliado) + '|' + str(tipo_planilla.periodo_planilla) + '|' + str(tipo_planilla.codigo_departamento) + '|' + str(tipo_planilla.codigo_actividad_economica) + '|' + str(tipo_planilla.clase_planilla) + '|' + str(tipo_planilla.tiempo_contrato) + '|' + '\r\n'
             datos += '[liquidaciones]' + '\r\n'
-            datos += self.numero_liquidacion + '|' + self.tipo_planilla_liquidacion + '|' + str(datetime.strptime(str(self.fecha_inicial),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + str(datetime.strptime(str(self.fecha_final),'%Y-%m-%d').date().strftime('%d/%m/%Y')) + '|' + self.tipo_liquidacion + '|' + (self.numero_nota_cargo if self.numero_nota_cargo else '') + '|' +'\r\n'
+            for liquidacion in compania_id.tipo_planilla_ids.liquidaciones_ids:
+                fecha_inicial = format_date(self.env, self.fecha_inicial, date_format="dd/MM/yyyy")
+                fecha_final = format_date(self.env, self.fecha_final, date_format="dd/MM/yyyy")
+                datos += str(liquidacion.numero) + '|' + str(liquidacion.tipo_planilla_id.codigo) + '|' + str(fecha_inicial) + '|' + str(fecha_final) + '|' + str(liquidacion.complementaria_original) + '|' + str(liquidacion.numero_nota_cargo) + '\r\n'
             datos += '[empleados]' + '\r\n'
             empleados = {}
             suspensiones = []
@@ -81,8 +74,8 @@ class rrhh_igss_wizard(models.TransientModel):
                     anio_final_contrato = employee_id.date_end.year if employee_id.date_end else ''
                     mes_planilla = payslip_run.date_start.month
                     anio_planilla = payslip_run.date_start.year
-                    fecha_alta = employee_id.date_start.strftime('%d/%m/%Y') if (mes_inicio_contrato == mes_planilla and anio_inicio_contrato == anio_planilla) else ''
-                    fecha_baja = employee_id.date_end.strftime('%d/%m/%Y') if (mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla) else ''
+                    fecha_alta = format_date(self.env, employee_id.date_start, date_format="dd/MM/yyyy") if (mes_inicio_contrato == mes_planilla and anio_inicio_contrato == anio_planilla) else ''
+                    fecha_baja = format_date(self.env, employee_id.date_end, date_format="dd/MM/yyyy") if (mes_final_contrato == mes_planilla and anio_final_contrato == anio_planilla) else ''
 
                     centro_trabajo = slip.employee_id.codigo_centro_trabajo if slip.employee_id.codigo_centro_trabajo else ''
                     nit = slip.employee_id.work_contact_id.vat if slip.employee_id.work_contact_id.vat else slip.employee_id.nit or ''
@@ -120,19 +113,19 @@ class rrhh_igss_wizard(models.TransientModel):
                             datos += str(dato)
                     datos += '\r\n'
 
-                    ausencias = self.env['hr.leave'].search([('employee_id','=', empleado['empleado_id']),('request_date_from','>=',self.fecha_inicial),('request_date_to','<=',self.fecha_final),('state','=','validate')])
+                    ausencias = self.env['hr.leave'].search([('employee_id','=', empleado['empleado_id']), ('request_date_from','>=',lote_id.fecha_inicial), ('request_date_to','<=',lote_id.fecha_final), ('state','=','validate')])
                     if ausencias:
                         for ausencia in ausencias:
                             if ausencia.holiday_status_id == self.env.ref('rrhh.suspension_igss') or ausencia.holiday_status_id.suspension_igss:
-                                fecha_inicio = str(datetime.strptime(str(ausencia.date_from),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
-                                fecha_fin = str(datetime.strptime(str(ausencia.date_to),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
+                                fecha_inicio = str(format_date(self.env, ausencia.request_date_from, date_format="dd/MM/yyyy"))
+                                fecha_fin = str(format_date(self.env, ausencia.request_date_to, date_format="dd/MM/yyyy"))
                                 igss = ausencia.employee_id.igss if ausencia.employee_id.igss else ""
                                 primer_nombre = ausencia.employee_id.primer_nombre if ausencia.employee_id.primer_nombre else ""
                                 segundo_nombre = ausencia.employee_id.segundo_nombre if ausencia.employee_id.segundo_nombre else ""
                                 primer_apellido = ausencia.employee_id.primer_apellido if ausencia.employee_id.primer_apellido else ""
                                 segundo_apellido = ausencia.employee_id.segundo_apellido if ausencia.employee_id.segundo_apellido else ""
                                 apellido_casada = ausencia.employee_id.apellido_casada if ausencia.employee_id.apellido_casada else ""
-                                suspensiones.append(numero_liquidacion + '|' + igss + '|' + primer_nombre + '|' + segundo_nombre + '|' + primer_apellido + '|' + segundo_apellido + '|' + apellido_casada  + '|' + str(ausencia.request_date_from.strftime('%d/%m/%Y')) + '|' + str(ausencia.request_date_to.strftime('%d/%m/%Y')) + '|' + '\r\n')
+                                suspensiones.append(numero_liquidacion + '|' + igss + '|' + primer_nombre + '|' + segundo_nombre + '|' + primer_apellido + '|' + segundo_apellido + '|' + apellido_casada  + '|' + str(fecha_inicio) + '|' + str(fecha_fin) + '|' + '\r\n')
 
             datos += '[suspendidos]' + '\r\n'
             if suspensiones:

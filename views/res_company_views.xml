@@ -1,166 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
 
-        <record id="view_company_form" model="ir.ui.view">
-            <field name="name">view.company.form.inherit.rrhh</field>
-            <field name="model">res.company</field>
-	        <field name="inherit_id" ref="base.view_company_form"/>
-	        <field name="arch" type="xml">
-                <data>
-                    <notebook position="inside">
-                        <page string="Guatemala">
-                            <group string="Recibos">
-                                <group>
-                                    <field name="tipo_entrada_trabajo_id"/>
-                                    <field name="monto_deduccion_fija"/>
-                                    <field name="isr_sueldo_base_extra"/>
-                                    <field name="proyectar_bonificaciones_adicionales"/>
-                                </group>
-                                <group>
-                                    <field name="ajuste_ids" widget="many2many_tags"/> 
-                                    <field name="salario_ids" widget="many2many_tags"/>
-                                    <field name="salario_total_ids" widget="many2many_tags"/>
-                                    <field name="horas_extras_ids" widget="many2many_tags"/>
-                                    <field name="extras_ids" widget="many2many_tags"/>
-                                    <field name="igss_ids" widget="many2many_tags"/>
-                                    <field name="isr_ids" widget="many2many_tags"/>
-                                    <field name="bonificacion_ids" widget="many2many_tags"/>
-                                    <field name="bonificaciones_adicionales_ids" widget="many2many_tags"/>
-                                    <field name="otro_ingreso_afecto_ids" widget="many2many_tags"/>
-                                </group>
-                            </group>                        
-                            <group string="Archivo IGSS">
-                                <group>
-                                    <field name="version_mensaje"/>
-                                    <field name="numero_patronal"/>
-                                    <field name="zona"/>
-                                    <field name="tipo_planilla"/>
-                                    <field name="igss_dias_trabajo"/>
-                                </group>
-                                <group>                                
-                                    <field name="sueldo_igss_ids" widget="many2many_tags"/>
-                                    <field name="igss_ids" widget="many2many_tags"/>
-                                </group>
+    <record id="view_company_form" model="ir.ui.view">
+        <field name="name">view.company.form.inherit.rrhh</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <data>
+                <notebook position="inside">
+                    <page string="Guatemala">
+                        <group string="Recibos">
+                            <group>
+                                <field name="tipo_entrada_trabajo_id"/>
+                                <field name="monto_deduccion_fija"/>
+                                <field name="isr_sueldo_base_extra"/>
+                                <field name="proyectar_bonificaciones_adicionales"/>
                             </group>
-                            <group string="Informe del empleador">
-                                <group>
-                                    <field name="numero_patronal"/>
-                                    <field name="barrio_colonia"/>
-                                    <field name="zona"/>
-                                    <field name="anio_inicio_operaciones"/>
-                                    <field name="tamanio_empresa_ventas"/>
-                                    <field name="tamanio_empresa_trabajadores"/>
-                                    <field name="actividad_gran_grupo"/>
-                                    <field name="sub_actividad_economica"/>
-                                    <field name="ocupacion_grupo"/>
-                                    <field name="representante_legal_id"/>
-                                    <field name="tipo_entrada_trabajo_id"/>
-                                </group>
-                                <group>                                
-                                    <field name="salario_ids" widget="many2many_tags"/>
-                                    <field name="ordinario_ids" widget="many2many_tags"/>
-                                    <field name="extra_ordinario_ids" widget="many2many_tags"/>
-                                    <field name="horas_extras_ids" widget="many2many_tags"/>
-                                    <field name="retribucion_comisiones_ids" widget="many2many_tags"/>
-                                    <field name="viaticos_ids" widget="many2many_tags"/>
-                                    <field name="extras_ids" widget="many2many_tags"/>
-                                    <field name="vacaciones_ids" widget="many2many_tags"/>
-                                    <field name="numero_horas_extras_ids" widget="many2many_tags"/>
-                                    <field name="bonificacion_ids" widget="many2many_tags"/>
-                                    <field name="bono_ids" widget="many2many_tags"/>
-                                    <field name="aguinaldo_ids" widget="many2many_tags"/>
-                                    <field name="retribucion_vacaciones_ids" widget="many2many_tags"/>
-                                    <field name="bonificaciones_adicionales_ids" widget="many2many_tags"/>
-                                    <field name="decreto_ids" widget="many2many_tags"/>
-                                </group>
+                            <group>
+                                <field name="ajuste_ids" widget="many2many_tags"/> 
+                                <field name="salario_ids" widget="many2many_tags"/>
+                                <field name="salario_total_ids" widget="many2many_tags"/>
+                                <field name="horas_extras_ids" widget="many2many_tags"/>
+                                <field name="extras_ids" widget="many2many_tags"/>
+                                <field name="igss_ids" widget="many2many_tags"/>
+                                <field name="isr_ids" widget="many2many_tags"/>
+                                <field name="bonificacion_ids" widget="many2many_tags"/>
+                                <field name="bonificaciones_adicionales_ids" widget="many2many_tags"/>
+                                <field name="otro_ingreso_afecto_ids" widget="many2many_tags"/>
                             </group>
-                            <group string="Libro de salarios">
-                                <group>
-                                    <field name="tipo_entrada_trabajo_id"/>
-                                </group>
-                                <group>
-                                </group>                                
-                                <group>                                
-                                    <field name="salario_ids" widget="many2many_tags"/>
-                                    <field name="ordinarias_ids" widget="many2many_tags"/>
-                                    <field name="extras_ordinarias_ids" widget="many2many_tags"/>
-                                    <field name="extra_ordinario_ids" widget="many2many_tags"/>
-                                    <field name="vacaciones_ids" widget="many2many_tags"/>
-                                    <field name="igss_ids" widget="many2many_tags"/>
-                                    <field name="isr_ids" widget="many2many_tags"/>
-                                    <field name="anticipos_ids" widget="many2many_tags"/>
-                                    <field name="bonificacion_ids" widget="many2many_tags"/>
-                                </group>
-                                <group>
-                                    <field name="bono_ids" widget="many2many_tags"/>
-                                    <field name="aguinaldo_ids" widget="many2many_tags"/>
-                                    <field name="indemnizacion_ids" widget="many2many_tags"/>
-                                    <field name="decreto_ids" widget="many2many_tags"/>
-                                    <field name="fija_ids" widget="many2many_tags"/>
-                                    <field name="variable_ids" widget="many2many_tags"/>
-                                    <field name="otro_salario_ids" widget="many2many_tags"/>
-                                    <field name="boni_incentivo_decreto_ids" widget="many2many_tags"/>
-                                    <field name="devolucion_isr_otro_ids" widget="many2many_tags"/>
-                                    <!--<field name="salario_promedio_ids" widget="many2many_tags"/>-->
-                                    <!--<field name="descuentos_ids" widget="many2many_tags"/>-->
-                                    <!--<field name="septimos_asuetos_ids" widget="many2many_tags"/>-->
-                                    <!--<field name="marca"/>-->
-                                </group>
+                        </group>                        
+                        <group string="Archivo IGSS">
+                            <group>
+                                <field name="version_mensaje"/>
+                                <field name="numero_patronal"/>
+                                <field name="zona"/>
+                                <field name="tipo_planilla"/>
+                                <field name="igss_dias_trabajo"/>
                             </group>
-                            <label for="centro_trabajo_ids" string="Centros de trabajo"/>
-                            <field name="centro_trabajo_ids">
-                                <list string="Centros" editable="bottom">
-                                    <field name="codigo"/>
-                                    <field name="nombre"/>
-                                    <field name="direccion"/>
-                                    <field name="zona"/>
-                                    <field name="telefono"/>
-                                    <field name="fax"/>
-                                    <field name="nombre_contacto"/>
-                                    <field name="correo_electronico"/>
-                                    <field name="codigo_departamento"/>
-                                    <field name="codigo_municipio"/>
-                                    <field name="codigo_actividad_economica"/>
-                                </list>
-                            </field>
-                            <!--
-                            <group string="Centros">
-                                <group>
-                                    <field name="codigo_centro_trabajo"/>
-                                    <field name="nombre_centro_trabajo"/>
-                                    <field name="direccion_centro_trabajo"/>
-                                    <field name="telefonos"/>
-                                    <field name="fax"/>
-                                </group>
-                                <group>
-                                    <field name="nombre_contacto"/>
-                                    <field name="correo_electronico"/>
-                                    <field name="codigo_departamento"/>
-                                    <field name="codigo_municipio"/>
-                                    <field name="codigo_actividad_economica"/>
-                                </group>
+                            <group>                                
+                                <field name="sueldo_igss_ids" widget="many2many_tags"/>
+                                <field name="igss_ids" widget="many2many_tags"/>
                             </group>
-                            -->
-                            <!--
-                            <group string="Tipos de planilla">
-                                <group>
-                                    <field name="identificacion_tipo_planilla"/>
-                                    <field name="nombre_tipo_planilla"/>
-                                    <field name="tipo_afiliados"/>
-                                    <field name="periodo_planilla"/>
-                                </group>
-                                <group>
-                                    <field name="departamento_republica"/>
-                                    <field name="actividad_economica"/>
-                                    <field name="clase_planilla"/>
-                                </group>
+                        </group>
+                        <group string="Informe del empleador">
+                            <group>
+                                <field name="numero_patronal"/>
+                                <field name="barrio_colonia"/>
+                                <field name="zona"/>
+                                <field name="anio_inicio_operaciones"/>
+                                <field name="tamanio_empresa_ventas"/>
+                                <field name="tamanio_empresa_trabajadores"/>
+                                <field name="actividad_gran_grupo"/>
+                                <field name="sub_actividad_economica"/>
+                                <field name="ocupacion_grupo"/>
+                                <field name="representante_legal_id"/>
+                                <field name="tipo_entrada_trabajo_id"/>
                             </group>
-                            -->
-                        </page>
-                    </notebook>
-                </data>
-	        </field>
-	    </record>
+                            <group>                                
+                                <field name="salario_ids" widget="many2many_tags"/>
+                                <field name="ordinario_ids" widget="many2many_tags"/>
+                                <field name="extra_ordinario_ids" widget="many2many_tags"/>
+                                <field name="horas_extras_ids" widget="many2many_tags"/>
+                                <field name="retribucion_comisiones_ids" widget="many2many_tags"/>
+                                <field name="viaticos_ids" widget="many2many_tags"/>
+                                <field name="extras_ids" widget="many2many_tags"/>
+                                <field name="vacaciones_ids" widget="many2many_tags"/>
+                                <field name="numero_horas_extras_ids" widget="many2many_tags"/>
+                                <field name="bonificacion_ids" widget="many2many_tags"/>
+                                <field name="bono_ids" widget="many2many_tags"/>
+                                <field name="aguinaldo_ids" widget="many2many_tags"/>
+                                <field name="retribucion_vacaciones_ids" widget="many2many_tags"/>
+                                <field name="bonificaciones_adicionales_ids" widget="many2many_tags"/>
+                                <field name="decreto_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <group string="Libro de salarios">
+                            <group>
+                                <field name="tipo_entrada_trabajo_id"/>
+                            </group>
+                            <group>
+                            </group>                                
+                            <group>                                
+                                <field name="salario_ids" widget="many2many_tags"/>
+                                <field name="ordinarias_ids" widget="many2many_tags"/>
+                                <field name="extras_ordinarias_ids" widget="many2many_tags"/>
+                                <field name="extra_ordinario_ids" widget="many2many_tags"/>
+                                <field name="vacaciones_ids" widget="many2many_tags"/>
+                                <field name="igss_ids" widget="many2many_tags"/>
+                                <field name="isr_ids" widget="many2many_tags"/>
+                                <field name="anticipos_ids" widget="many2many_tags"/>
+                                <field name="bonificacion_ids" widget="many2many_tags"/>
+                            </group>
+                            <group>
+                                <field name="bono_ids" widget="many2many_tags"/>
+                                <field name="aguinaldo_ids" widget="many2many_tags"/>
+                                <field name="indemnizacion_ids" widget="many2many_tags"/>
+                                <field name="decreto_ids" widget="many2many_tags"/>
+                                <field name="fija_ids" widget="many2many_tags"/>
+                                <field name="variable_ids" widget="many2many_tags"/>
+                                <field name="otro_salario_ids" widget="many2many_tags"/>
+                                <field name="boni_incentivo_decreto_ids" widget="many2many_tags"/>
+                                <field name="devolucion_isr_otro_ids" widget="many2many_tags"/>
+                                <!--<field name="salario_promedio_ids" widget="many2many_tags"/>-->
+                                <!--<field name="descuentos_ids" widget="many2many_tags"/>-->
+                                <!--<field name="septimos_asuetos_ids" widget="many2many_tags"/>-->
+                                <!--<field name="marca"/>-->
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Centros de trabajos">
+                                <field name="centro_trabajo_ids" nolabel="1">
+                                    <list>
+                                        <field name="codigo"/>
+                                        <field name="nombre"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Tipo de planilla">
+                                <field name="tipo_planilla_ids" nolabel="1">
+                                    <list>
+                                        <field name="codigo"/>
+                                        <field name="name"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </data>
+        </field>
+    </record>
 
-  </data>
+    <record id="rrhh_centro_trabajo_view_form" model="ir.ui.view">
+        <field name="name">rrhh.centro_trabajo.view.form</field>
+        <field name="model">rrhh.centro_trabajo</field>
+        <field name="arch" type="xml">
+            <form string="Centro de trabajo">
+                <group>
+                    <group>
+                        <field name="codigo"/>
+                        <field name="nombre"/>
+                        <field name="direccion"/>
+                        <field name="zona"/>
+                        <field name="telefono"/>
+                        <field name="fax"/>
+                    </group>
+                    <group>
+                        <field name="nombre_contacto"/>
+                        <field name="correo_electronico"/>
+                        <field name="codigo_departamento"/>
+                        <field name="codigo_municipio"/>
+                        <field name="codigo_actividad_economica"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="rrhh_tipo_planilla_view_form" model="ir.ui.view">
+        <field name="name">rrhh.tipo_planilla.view.form</field>
+        <field name="model">rrhh.tipo_planilla</field>
+        <field name="arch" type="xml">
+            <form string="Tipo de planilla">
+                <group>
+                    <group>
+                        <field name="codigo"/>
+                        <field name="name"/>
+                        <field name="tipo_afiliado"/>
+                        <field name="periodo_planilla"/>
+                        <field name="codigo_departamento"/>
+                    </group>
+                    <group>
+                        <field name="codigo_actividad_economica"/>
+                        <field name="clase_planilla"/>
+                        <field name="tiempo_contrato"/>
+                    </group>
+                    <field name="liquidaciones_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="numero"/>
+                            <field name="complementaria_original"/>
+                            <field name="numero_nota_cargo"/>
+                        </list>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
 </odoo>

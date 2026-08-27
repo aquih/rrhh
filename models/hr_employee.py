@@ -29,7 +29,7 @@ class HrEmployeePrivate(models.Model):
     primer_apellido = fields.Char('Primer apellido', groups="hr.group_hr_user")
     segundo_apellido = fields.Char('Segundo apellido', groups="hr.group_hr_user")
     apellido_casada = fields.Char('Apellido casada', groups="hr.group_hr_user")
-    centro_trabajo_id = fields.Many2one('res.company.centro_trabajo',string='Centro de trabajo', groups="hr.group_hr_user")
+    centro_trabajo_id = fields.Many2one('rrhh.centro_trabajo',string='Centro de trabajo', groups="hr.group_hr_user")
     tipo_salario = fields.Char('Tipo salario', default="1", groups="hr.group_hr_user")
     tiempo_contrato = fields.Char('Tiempo de contrato', default="TC", groups="hr.group_hr_user")
     nacionalidad = fields.Char('Nacionalidad', groups="hr.group_hr_user")

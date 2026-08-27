@@ -7,35 +7,9 @@
         <field name="arch" type="xml">
             <form string="Planillas">
                 <group>
-                    <separator colspan="4" string="Tipo de planilla"/>
                     <group>
-                        <field name="identificacion_tipo_planilla" required="True"/>
-                        <field name="nombre_tipo_planilla" required="True"/>
-                        <field name="tipo_afiliados" required="True"/>
-                        <field name="periodo_planilla" required="True"/>
-                    </group>
-                    <group>
-                        <field name="departamento_republica" required="True"/>
-                        <field name="actividad_economica" required="True"/>
-                        <field name="clase_planilla" required="True"/>
-                        <field name="tiempo_contrato" required="True"/>
-                    </group>
-                </group>
-                <group>
-                    <separator colspan="4" string="Liquidaciones"/>
-                    <group>
-                        <field name="numero_liquidacion"/>
-                        <field name="tipo_planilla_liquidacion"/>
                         <field name="fecha_inicial"/>
-                    </group>
-                    <group>
                         <field name="fecha_final"/>
-                        <field name="tipo_liquidacion"/>
-                        <field name="numero_nota_cargo"/>
-                    </group>
-                </group>
-                <group>
-                    <group>
                         <field name="name" colspan="4" invisible="1"/>
                         <field name="archivo" filename="name" readonly="1"/>
                     </group>
@@ -55,6 +29,7 @@
         <field name="view_id" ref="archivo_igss_wizard_view_form"/>
         <field name="target">new</field>
         <field name="binding_model_id" ref="model_hr_payslip_run"/>
+
     </record>
         
 </odoo>

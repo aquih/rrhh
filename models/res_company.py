@@ -1,12 +1,11 @@
 from odoo import models, fields, api
 
-
 class res_company(models.Model):
     _inherit = 'res.company'
 
     version_mensaje = fields.Char('Version del mensaje')
     numero_patronal = fields.Char('Numero patronal')
-    tipo_planilla = fields.Selection([('0', 'Produccion'), ('1', 'Pruebas')], 'Tipo de planilla')
+    tipo_planilla = fields.Selection([('0', 'Producción'), ('1', 'Pruebas')], 'Produccióno o pruebas')
     representante_legal_id = fields.Many2one('hr.employee', 'Representante legal')
     barrio_colonia = fields.Char('Barrio o Colonia')
     zona = fields.Char('Zona donde se ubica')
@@ -28,7 +27,8 @@ class res_company(models.Model):
     numero_horas_extras_ids = fields.Many2many('hr.payslip.input.type', 'rrhh_num_horas_extras_rel', string='Numero horas extras')
     tipo_entrada_trabajo_id = fields.Many2one('hr.work.entry.type', 'Entrada de trabajo para días trabajados')
     igss_dias_trabajo = fields.Many2one('hr.work.entry.type', 'IGSS días de trabajo')
-    centro_trabajo_ids = fields.One2many('res.company.centro_trabajo', 'company_id', string="Centros de trabajo")
+    centro_trabajo_ids = fields.One2many('rrhh.centro_trabajo', 'company_id', string='Centros de trabajo')
+    tipo_planilla_ids = fields.One2many('rrhh.tipo_planilla', 'company_id', string='Tipo de planilla')
 
     ordinarias_ids = fields.Many2many('hr.salary.rule', 'rrhh_ordinarias_rel', string='Ordinarias')
     extras_ordinarias_ids = fields.Many2many('hr.salary.rule', 'rrhh_extra_ordinarias_rel', string='Extras ordinarias')
@@ -85,12 +85,12 @@ class res_company(models.Model):
     rango_ingresos = fields.Selection([('si', 'Si'), ('no', 'No')], 'Rango ingresos anual') # no parece usarse
     origen_compania = fields.Selection([('nacional', 'Nacional'), ('extranjero', 'Extranjero')], 'Nacional o Extranjero') # no parece usarse
 
-class res_company_centro_trabajo(models.Model):
-    _name = 'res.company.centro_trabajo'
+class rrhh_centro_trabajo(models.Model):
+    _name = 'rrhh.centro_trabajo'
     _description = 'Centro de trabajo'
     _rec_name = 'nombre'
 
-    company_id = fields.Many2one('res.company','Compañia')
+    company_id = fields.Many2one('res.company', 'Compañía')
     codigo = fields.Char('Código')
     nombre = fields.Char('Nombre')
     direccion = fields.Char('Dirección')
@@ -102,3 +102,27 @@ class res_company_centro_trabajo(models.Model):
     codigo_departamento = fields.Char('Código departamento')
     codigo_municipio = fields.Char('Código municipio')
     codigo_actividad_economica = fields.Char('Código actividad economica')
+
+class rrhh_tipo_planilla(models.Model):
+    _name = 'rrhh.tipo_planilla'
+    _description = 'Tipo de planilla'
+
+    company_id = fields.Many2one('res.company', 'Compañía')
+    codigo = fields.Char('Código')
+    name = fields.Char('Nombre')
+    tipo_afiliado = fields.Char('Tipo de afiliados')
+    periodo_planilla = fields.Char('Periodo de planilla')
+    codigo_departamento = fields.Char('Codigo departamento')
+    codigo_actividad_economica = fields.Char('Codigo actividad economica')
+    clase_planilla = fields.Char('Clase de planilla')
+    tiempo_contrato = fields.Char('Tiempo de contrato')
+    liquidaciones_ids = fields.One2many('rrhh.liquidacion_tipo_planilla', 'tipo_planilla_id', string='Liquidación')
+
+class rrhh_liquidacion_tipo_planilla(models.Model):
+    _name = 'rrhh.liquidacion_tipo_planilla'
+    _description = 'Liquidación del tipo de planilla'
+
+    tipo_planilla_id = fields.Many2one('rrhh.tipo_planilla', 'Tipo de planilla')
+    numero = fields.Char('Número')
+    complementaria_original = fields.Char('Complementaria u original')
+    numero_nota_cargo = fields.Char('Número nota de cargo')

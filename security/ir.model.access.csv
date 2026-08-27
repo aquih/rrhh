@@ -13,8 +13,12 @@ access_rrhh_prestamo_usuario,rrhh.prestamo.usuario,model_rrhh_prestamo,base.grou
 access_rrhh_prestamo_manager,rrhh.prestamo.manager,model_rrhh_prestamo,hr.group_hr_manager,1,1,0,1
 access_rrhh_prestamo_linea_usuario,rrhh.prestamo.linea.usuario,model_rrhh_prestamo_linea,base.group_user,1,0,0,0
 access_rrhh_prestamo_linea_manager,rrhh.prestamo.linea.manager,model_rrhh_prestamo_linea,hr.group_hr_manager,1,1,0,1
-access_rrhh_res_company_centro_trabajo_usuario,rrhh.res.company.centro.trabajo.usuario,rrhh.model_res_company_centro_trabajo,base.group_user,1,0,0,0
-access_rrhh_res_company_centro_trabajo_manager,rrhh.res.company.centro.trabajo.manager,rrhh.model_res_company_centro_trabajo,hr.group_hr_manager,1,1,1,1
+access_rrhh_centro_trabajo_usuario,rrhh.centro.trabajo.usuario,rrhh.model_rrhh_centro_trabajo,base.group_user,1,0,0,0
+access_rrhh_centro_trabajo_manager,rrhh.centro.trabajo.manager,rrhh.model_rrhh_centro_trabajo,hr.group_hr_manager,1,1,1,1
+access_rrhh_tipo_planilla_usuario,rrhh.centro.trabajo.usuario,rrhh.model_rrhh_tipo_planilla,base.group_user,1,0,0,0
+access_rrhh_tipo_planilla_manager,rrhh.centro.trabajo.manager,rrhh.model_rrhh_tipo_planilla,hr.group_hr_manager,1,1,1,1
+access_rrhh_liquidacion_usuario,rrhh.centro.trabajo.usuario,rrhh.model_rrhh_liquidacion_tipo_planilla,base.group_user,1,0,0,0
+access_rrhh_liquidacion_manager,rrhh.centro.trabajo.manager,rrhh.model_rrhh_liquidacion_tipo_planilla,hr.group_hr_manager,1,1,1,1
 access_rrhh_historial_salario_user,rrhh.historial.salario.user,model_rrhh_historial_salario,base.group_user,1,0,0,0
 access_rrhh_historial_salario_manager,rrhh.historial.salario.manager,model_rrhh_historial_salario,hr.group_hr_manager,1,1,1,1
 access_rrhh_informe_empleador_wizard_manager,rrhh.informe.empleador.wizard.manager,rrhh.model_rrhh_informe_empleador_wizard,hr.group_hr_manager,1,1,1,1
