@@ -77,7 +77,7 @@ class HrPayslip(models.Model):
                 if linea.salary_rule_id.id in n.employee_id.company_id.horas_extras_ids.ids:
                     horas_extras += linea.total
         
-        return horas_extras_devengado + ((horas_extras / meses_transcurrido ) * meses_proyectar)
+        return horas_extras + ((horas_extras / meses_transcurrido ) * meses_proyectar)
 
     def calcular_bonificacion_decreto_devengado(self, nomina):
         fecha_inicio = nomina.date_to.replace(month=1, day=1)
