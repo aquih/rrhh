@@ -15,8 +15,8 @@ from odoo.exceptions import ValidationError
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    porcentaje_prestamo = fields.Float(related="payslip_run_id.porcentaje_prestamo", string='Prestamo (%)', store=True)
     cuenta_analitica_id = fields.Many2one('account.analytic.account', 'Cuenta analítica')
+    porcentaje_prestamo = fields.Float(related="payslip_run_id.porcentaje_prestamo", string='Prestamo (%)', store=True)
     descuento_isr = fields.Boolean(related="payslip_run_id.descuento_isr", string='Descuento ISR', store=True)
     
     # TODO: Quitar en la siguiente versión
@@ -114,14 +114,14 @@ class HrPayslip(models.Model):
         return devengado + proyectado
 
     def calcular_aguinaldo(self, nomina):
-        aguinaldo = (nomina.wage * 12) / 12
+        aguinaldo = (nomina.employee_id.wage * 12) / 12
         if nomina.company_id.isr_sueldo_base_extra:
             aguinaldo = ((nomina.wage + nomina.base_extra) * 12) / 12
 
         return aguinaldo
 
     def calcular_bonoc(self, nomina):
-        bonoc = (nomina.wage * 12) / 12
+        bonoc = (nomina.employee_id.wage * 12) / 12
         if nomina.company_id.isr_sueldo_base_extra:
             bonoc = ((nomina.wage + nomina.base_extra) * 12) / 12
             
@@ -172,6 +172,7 @@ class HrPayslip(models.Model):
 
     def calcular_igss_devengado(self, nomina):
         fecha_inicio = nomina.date_to.replace(month=1, day=1)
+        fecha_fin = nomina.date_to
         nomina_ids = self.env['hr.payslip'].search([('employee_id','=', nomina.employee_id.id), ('date_from', '>=', fecha_inicio), ('date_to', '<=', fecha_fin)])
 
         igss_devengado = 0
@@ -392,6 +393,7 @@ class HrPayslip(models.Model):
         
         return salario_promedio_total
 
+    # TODO: Borrar lo antes posible, ya no sirve para nada
     def dias_horas_sumar(self, lineas):
         horas = 0
         dias = 0
@@ -405,23 +407,21 @@ class HrPayslip(models.Model):
 
     # TODO: dejar de usar, odoo 19.0 ya debería de poder funcionar sin necesidad de estos cálculos
     def _get_worked_day_lines(self, domain=None, check_out_of_version=True):
-        res = super()._get_worked_day_lines(domain=None, check_out_of_version=True)
-        tipos_ausencias_ids = self.env['hr.leave.type'].search([])
-        datos = self.dias_horas_sumar(res)
-        ausencias_restar = []
-
+        res = super()._get_worked_day_lines(domain, check_out_of_version)
+        trabajo_id = self.env['hr.work.entry.type'].search([('code','=','TRABAJO100')])
         dias_ausentados_restar = 0
 
-        for ausencia in tipos_ausencias_ids:
+        ausencias_restar = []
+        for ausencia in self.env['hr.leave.type'].search([]):
             if ausencia.work_entry_type_id and ausencia.work_entry_type_id.descontar_nomina:
                 ausencias_restar.append(ausencia.work_entry_type_id.id)
 
-        trabajo_id = self.env['hr.work.entry.type'].search([('code','=','TRABAJO100')])
+        # datos = self.dias_horas_sumar(res)
         for r in res:
-            tipo_id = self.env['hr.work.entry.type'].browse(r['work_entry_type_id'])
-            if tipo_id and not tipo_id.is_leave:
-                r['number_of_hours'] += datos['horas']
-                r['number_of_days'] += datos['dias']
+            # tipo_id = self.env['hr.work.entry.type'].browse(r['work_entry_type_id'])
+            # if tipo_id and not tipo_id.is_leave:
+            #     r['number_of_hours'] += datos['horas']
+            #     r['number_of_days'] += datos['dias']
 
             if len(ausencias_restar) > 0:
                 if r['work_entry_type_id'] in ausencias_restar:
@@ -522,32 +522,33 @@ class HrPayslip(models.Model):
         res = super()._compute_input_line_ids()
         for slip in self:
             if slip.employee_id and slip.struct_id and slip.struct_id.input_line_type_ids:
-                input_line_vals = []
-                if slip.input_line_ids:
-                    slip.input_line_ids.unlink()
-
-                for line in slip.struct_id.input_line_type_ids:
-                    input_line_vals.append((0,0,{
-                        'name': line.name,
-                        'amount': 0,
-                        'input_type_id': line.id,
-                    }))
-                slip.update({'input_line_ids': input_line_vals})
-
                 mes_nomina = slip.date_from.month
                 anio_nomina = slip.date_from.year
                 dia_nomina = slip.date_to.day
-                entradas_nomina = []
                 if slip.employee_id.prestamo_ids:
-                    for prestamo in slip.employee_id.prestamo_ids:
-                        anio_prestamo = int(prestamo.fecha_inicio.year)
-                        for entrada in slip.input_line_ids:
-                            if (prestamo.codigo == entrada.input_type_id.code) and ((prestamo.estado == 'nuevo') or (prestamo.estado == 'proceso')):
-                                valor_entrada = entrada.amount
-                                for lineas in prestamo.prestamo_ids:
-                                    if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
-                                        valor_entrada += lineas.monto*(slip.porcentaje_prestamo/100)
-                                entrada.amount = valor_entrada
+                    for prestamo in slip.employee_id.prestamo_ids.filtered(lambda p: p.estado in ['nuevo', 'proceso']):
+                        entrada = slip.struct_id.input_line_type_ids.filtered(lambda i: i.code == prestamo.codigo)
+                        if entrada:
+                            anio_prestamo = int(prestamo.fecha_inicio.year)
+                            valor_entrada = 0
+                            for lineas in prestamo.prestamo_ids:
+                                if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
+                                    valor_entrada += lineas.monto*(slip.porcentaje_prestamo/100)
+                            slip.update({'input_line_ids': [(0,0,{
+                                'name': entrada.name,
+                                'amount': valor_entrada,
+                                'input_type_id': entrada.id,
+                            })]})
+                if slip.descuento_isr:
+                    calculos_isr = self.calculo_isr(slip)
+                    for k in calculos_isr.keys():
+                        entrada = slip.struct_id.input_line_type_ids.filtered(lambda i: i.code == k)
+                        if entrada:
+                            slip.update({'input_line_ids': [(0,0,{
+                                'name': entrada.name,
+                                'amount': calculos_isr[k],
+                                'input_type_id': entrada.id,
+                            })]})
         return res
 
     # TODO: dejar de usar: las entradas se pueden poner en el empleado y los
@@ -581,13 +582,6 @@ class HrPayslip(models.Model):
                         if prestamo.pendiente_pagar_prestamo == 0:
                             prestamo.estado = "pagado"
         res =  super().compute_sheet()
-        for nomina in self:
-            if nomina.descuento_isr:
-                calculos_isr = self.calculo_isr(nomina)
-                for entrada in self.input_line_ids:
-                    if entrada.input_type_id.code in calculos_isr:
-                        entrada.amount = calculos_isr[entrada.input_type_id.code]
-                nomina.with_context(payslip_no_recompute=True)._compute_line_ids()
         return res
 
     def action_payslip_cancel(self):

@@ -11,7 +11,7 @@
                     <field name="estado" widget="statusbar"/>
                 </header>
                 <div class="alert alert-danger" role="alert">
-                    No usar, esta funcionalidad está deprecada. Usar ajustes de inventarios.
+                    No usar, esta funcionalidad está obsoleta. Usar ajustes de salarios.
                 </div>
                 <sheet>
                     <div class="row justify-content-between position-relative w-100 m-0">
