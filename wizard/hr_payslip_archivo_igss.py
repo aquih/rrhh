@@ -117,7 +117,7 @@ class rrhh_igss_wizard(models.TransientModel):
                     if ausencias:
                         for ausencia in ausencias:
                             if ausencia.holiday_status_id == self.env.ref('rrhh.suspension_igss') or ausencia.holiday_status_id.suspension_igss:
-                                fecha_inicio = str(format_date(self.env, ausencia.request_date_from, date_format="dd/MM/yyyy"))
+                                numero_liquidacion = str(ausencia.employee_id.numero_liquidacion) if ausencia.employee_id.numero_liquidacion else ''                                fecha_inicio = str(format_date(self.env, ausencia.request_date_from, date_format="dd/MM/yyyy"))
                                 fecha_fin = str(format_date(self.env, ausencia.request_date_to, date_format="dd/MM/yyyy"))
                                 igss = ausencia.employee_id.igss if ausencia.employee_id.igss else ""
                                 primer_nombre = ausencia.employee_id.primer_nombre if ausencia.employee_id.primer_nombre else ""
