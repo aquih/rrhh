@@ -7,6 +7,7 @@ import base64
 import io
 import logging
 import datetime
+import re
 from datetime import datetime
 
 class rrhh_igss_wizard(models.TransientModel):
@@ -47,10 +48,10 @@ class rrhh_igss_wizard(models.TransientModel):
                 for slip in payslip_run.slip_ids:
                     if slip.contract_id:
                         if slip.employee_id.id not in empleados:
-                            empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id.id,'informacion': [0] * 19,'suspension': ''}
+                            empleados[slip.employee_id.id] = {'empleado_id': slip.employee_id.id, 'informacion': [0] * 19}
 
                         contrato_ids = self.env['hr.contract'].search( [['employee_id', '=', slip.employee_id.id]],offset=0,limit=1,order='date_start desc')
-                        numero_liquidacion = str(slip.employee_id.numero_liquidacion) if slip.employee_id.numero_liquidacion else ''
+                        numero_liquidacion = str(slip.employee_id.numero_liquidacion) if slip.employee_id.numero_liquidacion and re.match(r'\d+', slip.employee_id.numero_liquidacion) else '-1'
                         numero_afiliado = str(slip.employee_id.igss) if slip.employee_id.igss else ''
                         primer_nombre = str(slip.employee_id.primer_nombre) if slip.employee_id.primer_nombre else ''
                         segundo_nombre = str(slip.employee_id.segundo_nombre) if slip.employee_id.segundo_nombre else ''
@@ -105,7 +106,7 @@ class rrhh_igss_wizard(models.TransientModel):
                         empleados[slip.employee_id.id]['informacion'][18] = int(dias_laborados)
 
             if empleados:
-                for empleado in empleados.values():
+                for empleado in sorted(empleados.values(), key=lambda e: int(e['informacion'][0])):
                     for dato in empleado['informacion']:
                         index = empleado['informacion'].index(dato)
                         if index != 18:
