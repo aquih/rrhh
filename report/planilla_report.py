@@ -4,6 +4,7 @@ from odoo import api, models
 import datetime
 import logging
 
+#TODO: Urge limpiar el código
 class report_planilla_pdf(models.AbstractModel):
     _name = 'report.rrhh.planilla'
     _description = 'Planilla de salario'
@@ -140,9 +141,9 @@ class report_planilla_pdf(models.AbstractModel):
                 reporte['suma'][llave][- 1] += total_salario
                 reporte['total'][- 1] += total_salario
 
-                linea['estatico']['banco_depositar'] = slip.employee_id.bank_account_id.bank_id.name
-                linea['estatico']['cuenta_depositar'] = slip.employee_id.bank_account_id.acc_number
-                linea['estatico']['observaciones'] = slip.note
+                linea['estatico']['banco_depositar'] = ', '.join(slip.employee_id.bank_account_ids.bank_id.mapped('name'))
+                linea['estatico']['cuenta_depositar'] = ', '.join(slip.employee_id.bank_account_ids.mapped('acc_number'))
+                linea['estatico']['observaciones'] = slip.note or ''
                 if slip.cuenta_analitica_id:
                     linea['estatico']['cuenta_analitica'] = slip.cuenta_analitica_id.name
                 else:
@@ -172,8 +173,8 @@ class report_planilla_pdf(models.AbstractModel):
                     'puesto': slip.employee_id.job_id.name,
                     'dias': dias,
                     'columnas': [],
-                    'banco_depositar': slip.employee_id.bank_account_ids[0].bank_id.name if slip.employee_id.bank_account_ids and slip.employee_id.bank_account_ids[0].bank_id else '',
-                    'cuenta_depositar': slip.employee_id.bank_account_ids[0].acc_number if slip.employee_id.bank_account_ids and slip.employee_id.bank_account_ids[0].bank_id else '',
+                    'banco_depositar': ', '.join(slip.employee_id.bank_account_ids.bank_id.mapped('name')),
+                    'cuenta_depositar': ', '.join(slip.employee_id.bank_account_ids.mapped('acc_number')),
                     'observaciones': slip.note
                 }
 

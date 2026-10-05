@@ -5,6 +5,7 @@ import re
 import logging
 from datetime import datetime
 
+#TODO: Urge limpiar el código
 class rrhh_igss_wizard(models.TransientModel):
     _name = 'rrhh.archivo_igss.wizard'
     _description = 'Wizard para generar archivo de IGSS'
