@@ -103,7 +103,7 @@ class rrhh_igss_wizard(models.TransientModel):
                         empleados[slip.employee_id.id]['informacion'][15] = (tipo_salario)
                         empleados[slip.employee_id.id]['informacion'][16] = (horas_laboradas)
                         empleados[slip.employee_id.id]['informacion'][17] = (tiempo_contrato)
-                        empleados[slip.employee_id.id]['informacion'][18] = int(dias_laborados)
+                        empleados[slip.employee_id.id]['informacion'][18] = int(dias_laborados) or ''
 
             if empleados:
                 for empleado in sorted(empleados.values(), key=lambda e: int(e['informacion'][0])):
