@@ -17,10 +17,10 @@
                         <span t-field="current_company_id.vat"/>
                     </div>
                     <div class="text-center">
-                        LIBRO DE SALARIOS PARA TRABAJADORES PERMANENTES
+                        LIBRO COMPUTARIZADO PARA LA OPERACIÓN DE SALARIOS DE TRABAJADORES PERMANENTES, AUTORIZADO POR EL MINISTERIO DE TRABAJO Y
                     </div>
                     <div class="text-center">
-                        AUTORIZADO POR EL MINISTERIO DE TRABAJO Y PREVISION SOCIAL, SEGÚN ARTÍCULO 102 DEL CODIGO DE TRABAJO
+                        PREVISION SOCIAL, FUNDAMENTO LEGAL: ARTÍCULOS 102 DEL DECRETO No. 1441 Y 2 DEL ACUERDO MINISTERIAL No. 124-2019
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                                     </th>
                                     <th colspan="6" class="text-center">
                                         <div t-field="empleado.job_id.name"/>
-                                        <div style="border-top: 1px solid black">Ocupación</div>
+                                        <div style="border-top: 1px solid black">Ocupación o puesto que desempeña</div>
                                     </th>
                                 </tr>
                                 <tr class="mb-2">
@@ -90,11 +90,11 @@
                                     </th>
                                     <th colspan="5" class="text-center">
                                         <div t-esc="empleado.date_start" t-options="{'widget': 'date'}"/>
-                                        <div style="border-top: 1px solid black">Fecha de ingreso</div>
+                                        <div style="border-top: 1px solid black">Inicio de relación laboral</div>
                                     </th>
                                     <th colspan="5" class="text-center">
                                         <div t-esc="empleado.date_end" t-options="{'widget': 'date'}"/>
-                                        <div style="border-top: 1px solid black">Fecha finalizac. de relación laboral</div>
+                                        <div style="border-top: 1px solid black">Fecha de finalización de relación laboral</div>
                                     </th>
                                 </tr>
                                 <tr>
@@ -126,8 +126,8 @@
                                     <th>Bonificación anual 42-92, Aguinaldo Decreto 76-78</th>
                                     <th>Bonificación Incentivo Decreto 37-2001</th>
                                     <th>Devoluciones I.S.R. y otras</th>
-                                    <th>Liquido a recibir</th>
-                                    <th>Firma</th>
+                                    <th>Salario Liquido</th>
+                                    <th>Firma o número de boleta de pago / váucher.</th>
                                     <th>Observaciones</th>
                                 </tr>
                             </thead>
