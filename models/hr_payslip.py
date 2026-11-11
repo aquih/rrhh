@@ -525,25 +525,23 @@ class HrPayslip(models.Model):
                 mes_nomina = slip.date_from.month
                 anio_nomina = slip.date_from.year
                 dia_nomina = slip.date_to.day
-                if slip.employee_id.prestamo_ids:
-                    for prestamo in slip.employee_id.prestamo_ids.filtered(lambda p: p.estado in ['nuevo', 'proceso']):
-                        entrada = slip.struct_id.input_line_type_ids.filtered(lambda i: i.code == prestamo.codigo)
-                        if entrada:
-                            anio_prestamo = int(prestamo.fecha_inicio.year)
-                            valor_entrada = 0
-                            for lineas in prestamo.prestamo_ids:
-                                if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
-                                    valor_entrada += lineas.monto*(slip.porcentaje_prestamo/100)
-                            slip.update({'input_line_ids': [(0,0,{
-                                'name': entrada.name,
-                                'amount': valor_entrada,
-                                'input_type_id': entrada.id,
-                            })]})
+                for prestamo in slip.employee_id.prestamo_ids.filtered(lambda p: p.estado in ['nuevo', 'proceso']):
+                    for entrada in slip.struct_id.input_line_type_ids.filtered(lambda i: i.code == prestamo.codigo):
+                        anio_prestamo = int(prestamo.fecha_inicio.year)
+                        valor_entrada = 0
+                        for lineas in prestamo.prestamo_ids:
+                            if mes_nomina == int(lineas.mes) and anio_nomina == int(lineas.anio):
+                                valor_entrada += lineas.monto * (slip.porcentaje_prestamo / 100)
+                        slip.update({'input_line_ids': [(0,0,{
+                            'name': entrada.name,
+                            'amount': valor_entrada,
+                            'input_type_id': entrada.id,
+                        })]})
+
                 if slip.descuento_isr:
                     calculos_isr = self.calculo_isr(slip)
                     for k in calculos_isr.keys():
-                        entrada = slip.struct_id.input_line_type_ids.filtered(lambda i: i.code == k)
-                        if entrada:
+                        for entrada in slip.struct_id.input_line_type_ids.filtered(lambda i: i.code == k):
                             slip.update({'input_line_ids': [(0,0,{
                                 'name': entrada.name,
                                 'amount': calculos_isr[k],
