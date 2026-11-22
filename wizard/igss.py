@@ -40,7 +40,7 @@ class rrhh_igss_wizard(models.TransientModel):
             for liquidacion in w.payslip_run_id[0].slip_ids[0].company_id.tipo_planilla_ids.liquidaciones_ids:
                 fecha_inicial = format_date(self.env, self.fecha_inicial, date_format="d/M/y")
                 fecha_final = format_date(self.env, self.fecha_final, date_format="d/M/y")
-                datos += str(liquidacion.numero) + '|' + str(liquidacion.tipo_planilla_id.codigo) + '|' + str(fecha_inicial) + '|' + str(fecha_final) + '|' + str(liquidacion.complementaria_original) + '|' + str(liquidacion.numero_nota_cargo) + '\r\n'
+                datos += str(liquidacion.numero) + '|' + str(liquidacion.tipo_planilla_id.codigo) + '|' + str(fecha_inicial) + '|' + str(fecha_final) + '|' + str(liquidacion.complementaria_original) + '|' + str(liquidacion.numero_nota_cargo) + '|\r\n'
             datos += '[empleados]' + '\r\n'
             empleados = {}
             suspensiones = []
@@ -115,20 +115,20 @@ class rrhh_igss_wizard(models.TransientModel):
                             datos += str(dato)
                     datos += '\r\n'
 
-                    ausencias = self.env['hr.leave'].search([('employee_id','=', empleado['empleado_id']),('request_date_from','>=',self.fecha_inicial),('request_date_to','<=',self.fecha_final),('state','=','validate')])
-                    if ausencias:
-                        for ausencia in ausencias:
-                            if ausencia.holiday_status_id.suspension_igss:
-                                numero_liquidacion = str(ausencia.employee_id.numero_liquidacion) if ausencia.employee_id.numero_liquidacion else ''                                
-                                fecha_inicio = str(datetime.strptime(str(ausencia.date_from),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
-                                fecha_fin = str(datetime.strptime(str(ausencia.date_to),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
-                                igss = ausencia.employee_id.igss if ausencia.employee_id.igss else ""
-                                primer_nombre = ausencia.employee_id.primer_nombre if ausencia.employee_id.primer_nombre else ""
-                                segundo_nombre = ausencia.employee_id.segundo_nombre if ausencia.employee_id.segundo_nombre else ""
-                                primer_apellido = ausencia.employee_id.primer_apellido if ausencia.employee_id.primer_apellido else ""
-                                segundo_apellido = ausencia.employee_id.segundo_apellido if ausencia.employee_id.segundo_apellido else ""
-                                apellido_casada = ausencia.employee_id.apellido_casada if ausencia.employee_id.apellido_casada else ""
-                                suspensiones.append(numero_liquidacion + '|' + igss + '|' + primer_nombre + '|' + segundo_nombre + '|' + primer_apellido + '|' + segundo_apellido + '|' + apellido_casada  + '|' + str(ausencia.request_date_from.strftime('%d/%m/%Y')) + '|' + str(ausencia.request_date_to.strftime('%d/%m/%Y')) + '|' + '\r\n')
+                ausencias = self.env['hr.leave'].search([('employee_id','in',list(empleados.keys())),('request_date_from','>=',self.fecha_inicial),('request_date_to','<=',self.fecha_final),('state','=','validate')], order='request_date_from')
+                if ausencias:
+                    for ausencia in ausencias:
+                        if ausencia.holiday_status_id.suspension_igss:
+                            numero_liquidacion = str(ausencia.employee_id.numero_liquidacion) if ausencia.employee_id.numero_liquidacion else ''                                
+                            fecha_inicio = str(datetime.strptime(str(ausencia.date_from),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
+                            fecha_fin = str(datetime.strptime(str(ausencia.date_to),'%Y-%m-%d %H:%M:%S').date().strftime('%d/%m/%Y'))
+                            igss = ausencia.employee_id.igss if ausencia.employee_id.igss else ""
+                            primer_nombre = ausencia.employee_id.primer_nombre if ausencia.employee_id.primer_nombre else ""
+                            segundo_nombre = ausencia.employee_id.segundo_nombre if ausencia.employee_id.segundo_nombre else ""
+                            primer_apellido = ausencia.employee_id.primer_apellido if ausencia.employee_id.primer_apellido else ""
+                            segundo_apellido = ausencia.employee_id.segundo_apellido if ausencia.employee_id.segundo_apellido else ""
+                            apellido_casada = ausencia.employee_id.apellido_casada if ausencia.employee_id.apellido_casada else ""
+                            suspensiones.append(numero_liquidacion + '|' + igss + '|' + primer_nombre + '|' + segundo_nombre + '|' + primer_apellido + '|' + segundo_apellido + '|' + apellido_casada  + '|' + str(ausencia.request_date_from.strftime('%d/%m/%Y')) + '|' + str(ausencia.request_date_to.strftime('%d/%m/%Y')) + '|' + '\r\n')
 
             datos += '[suspendidos]' + '\r\n'
             if suspensiones:
@@ -139,7 +139,7 @@ class rrhh_igss_wizard(models.TransientModel):
             datos += 'BAJO MI EXCLUSIVA Y ABSOLUTA RESPONSABILIDAD, DECLARO QUE LA INFORMACION QUE AQUI CONSIGNO ES FIEL Y EXACTA, QUE ESTA PLANILLA INCLUYE A TODOS LOS TRABAJADORES QUE ESTUVIERON A MI SERVICIO Y QUE SUS SALARIOS SON LOS EFECTIVAMENTE DEVENGADOS, DURANTE EL MES ARRIBA INDICADO' + '\r\n'
             datos += '[finplanilla]' + '\r\n'
             datos = datos.replace('False', '')
-        datos = base64.b64encode(datos.encode("utf-8"))
+        datos = base64.b64encode(datos.encode("iso-8859-1"))
         self.write({'archivo': datos, 'name':'planilla.txt'})
 
         return {
